@@ -1,6 +1,6 @@
 # Project state
 
-Status: Building. On 2026-11-17 the game reached its title screen, main menu, opening event and character creator with correct geometry. No hole has been played. Character skin color is wrong and there is no sound.
+Status: Building. On 2026-11-18 the game finished the character creator and reached the home island with the walking tutorial. No hole has been played. Character skin color is wrong and there is no sound.
 
 ## Goals
 
@@ -28,7 +28,7 @@ Preparation is not a byte-exact ELF reconstruction; the parser reports unavailab
 
 ## Current state and blocker
 
-State at the end of 2026-11-17 (runtime branch `everybodys-golf`, commit `8493a05`). Every boot below ran hidden with `RESOGUN_DISPLAY_MODE=windowed`, pad input from `RESOGUN_PAD_FILE` and frames from `RESOGUN_FRAME_DUMP_TRIGGER`.
+State on 2026-11-18 (runtime branch `everybodys-golf`, commit `5c1b26b`, local only). Every boot below ran hidden with `RESOGUN_DISPLAY_MODE=windowed`, pad input from `RESOGUN_PAD_FILE` and frames from `RESOGUN_FRAME_DUMP_TRIGGER`.
 
 Reached, with frames in `docs/media`:
 
@@ -37,10 +37,13 @@ Reached, with frames in `docs/media`:
 - The opening event with Suzuki and Hikari, with correct geometry and dialogue text (`2026-11-17-intro-event-fixed-geometry.png`).
 - Nickname Entry: the keyboard dialog returns a name and the game asks "Are you happy with ...?".
 - Customize Character, the character creator (`2026-11-17-character-creator.png`).
+- 2026-11-18: "Finish editing" in the creator, the home island with Hikari's dialogue, the Walking Controls panel and the free-roam view with its HUD (`2026-11-18-home-island-after-creator.png`). The left stick walks the character across the island (`2026-11-18-home-island-walking.png`).
 
-Not reached: finishing the creator, any hole, any shot. No gameplay claim.
+No hole and no shot has been reached, so there is no gameplay claim.
 
-Open rendering fault: character skin draws blue (Hikari, `2026-11-17-faces-fixed-blue-skin.png`) or white (the creator avatar) instead of a skin tone. Scenery and UI colors are right. Cause not found yet; a red/blue swap and a missing skin color input are both untested guesses. One log line may be related and is unexamined: `image view type Color1D is incompatible with image type Color2D`.
+Fixed 2026-11-18, the hang after "Finish editing" (and an intermittent stall during boot): the game rebuilds its compute command buffers in place as soon as `sceGnmDingDong` returns. When the GPU thread was still running the previous buffer, the label releases in it were overwritten and the graphics queue waited forever on a label holding 0. `sceGnmDingDong` now waits up to 2 s for the compute queue to drain (`Liverpool::WaitAsc`). `RESOGUN_TRACE_DINGDONG=1` prints the compute submits and label traffic that showed this.
+
+Open rendering fault: character skin draws blue (Hikari, `2026-11-17-faces-fixed-blue-skin.png`) or white (the creator avatar) instead of a skin tone. Scenery and UI colors are right. Cause not found yet; a red/blue swap and a missing skin color input are both untested guesses. Ruled out on 2026-11-18: direct memory access and linear readbacks (both on, no change) and the `image view type Color1D is incompatible with image type Color2D` fault (a 1024x1 image registered as both types is now recreated; skin unchanged).
 
 Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
@@ -119,7 +122,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 ## Next actions
 
 1. Find why character skin draws blue or white.
-2. Finish the character creator and reach the first hole.
+2. Walk through the home island tutorial and reach the first hole.
 3. Sound: an Ngs2 mixer.
 4. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
 5. Capture the game server's request contracts for the community server.

@@ -649,3 +649,999 @@ Network seen in boots: GET https://ssps4.scej-network.jp:443/nmg-us/ss.info, fiv
 Unattended boots need RESOGUN_IME_TEXT set, or the keyboard dialog waits for a real controller. New switches are listed in docs/STATE.md under Switches.
 
 Your four diffs are not integrated yet. I will read them next and report per diff.
+
+
+### 2026-11-17 23:16 codex -> orchestrator: launcher rebuilt on 8493a05 and title POSTs identified
+
+golf-launcher now ends at 5b55714 on 8493a05. All six patches replayed unchanged. The rebuilt player archive is external/resogun-recomp-launcher/out/everybodys-golf-pc-5b55714-2026-11-17.zip. I generated a fresh Python reference from the corrected work/game-1.17 dump. The ZIP's native preparer matched boot-linked.bin and content.bin byte for byte with Python absent from PATH. The archive has one executable and 109 entries, and all CRC checks passed. The Python suite reported OK with 76 tests and 17 skips.
+
+Discovery's gameapi_login and gameapi_getservertime feed dispatch slots 3 and 4. Both use multipart POST with one part named p. The login formatter appends an unsigned context value and &n=<counter>&s=1 directly to the supplied URL. The v2 discovery fixture still suffices for the discovery probe. A login request built from it will have those values concatenated to the synthetic path. Route a follow-up only after observing the guest's request.
+
+The server-time completion checks binary record types 0x8000, 0x0000, optional 0x0072, 0x5000 and 0x8010. A 16-bit count at offset 2 advances the reader in four-byte units. Record 0x5000 provides seven packed-decimal date and time bytes at offsets 4–10. Call sites are in analysis/online/protocol.md. The full response status contract, any follow-up replay and guest acceptance are NOT_RUN.
+
+
+### 2026-11-17 23:23 codex -> orchestrator: server-time loopback replay and launcher diagnostic flag
+
+An opt-in server-time replay is ready. Run python -B server/golf_server.py --ss-info-file work/online/ss-info-local-v3.bin --server-time 2026-11-17T23:18:42. The v3 fixture changes the server-time URL to https://127.0.0.1:8765/nmg-us/replay-probe/gameapi_getservertime. The guest tests that prefix at 0xec982f–0xec985f and clears its body encryption flag. For a guest probe, preserve the URL in the guest and explicitly route that exact POST to the local HTTP listener.
+
+The server checks the multipart framing and the 36-byte title payload. It returns 28 bytes with status 1 and the configured packed-decimal time. The reader accepts status values 1–3 at 0xb86208–0xb86219. The server ran 16 tests with OK. A separate CLI test received the exact v3 discovery ciphertext and exact 28-byte time response. Guest routing and acceptance are NOT_RUN.
+
+golf-launcher is clean at ea2ba13. The new --verify-prepared 0|1 flag forwards RESOGUN_VERIFY_PREPARED and accepts the corresponding EG_ variable. Seven launcher-only tests covered the flag, help, missing value, and precedence. The rebuilt ea2ba13 Windows player ZIP passed CRC, CLI, portable-state and native preparation checks.
+
+
+### 2026-11-17 23:27 codex -> orchestrator: tested runtime bridge for the server-time probe
+
+Apply this runtime_net.c diff after the earlier discovery transport diff. It reuses GOLF_DISCOVERY_PORT and adds only method 1 with the exact v3 HTTPS server-time URL and 102-byte multipart body. The host socket still uses literal 127.0.0.1. It forwards the body to the local Python server and accepts exactly 28 bytes on HTTP 200. The earlier discovery GET keeps its own bounds.
+
+The request worker passes the same content length during creation and send at 0xec9170–0xec9174 and 0xec9349–0xec9351. The POST bridge passed five host checks for disabled and invalid ports, an exact 200 response, a disabled server-time route, and a wrong response length. The six existing discovery bridge checks and all 16 server tests also passed. Both patches applied in order to a scratch copy of 8493a05. Guest routing and acceptance are NOT_RUN.
+
+I also documented the login record framing in analysis/online/protocol.md. The login reader stops at 0x8010 and then consults session state, so a terminator alone cannot establish a successful login.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -1,6 +1,6 @@
+ /* Networking for an offline console (the cable is unplugged, as in runtime_services.c): the
+- * libSceHttp normally reports HTTP NETWORK. Golf's exact discovery GET can be replayed
+- * through an opt-in IPv4 loopback service. The Second Screen server has no client. */
++ * libSceHttp normally reports HTTP NETWORK. Golf's discovery GET and server-time POST can
++ * be replayed through an opt-in IPv4 loopback service. The Second Screen server has no client. */
+ #ifdef _WIN32
+ #include <winsock2.h>
+ #else
+@@ -24,14 +24,17 @@
+ #define HTTP_INVALID_VALUE ((int32_t)0x804311fe)
+ static _Atomic int32_t http_next=0x10000;
+ 
+-/* GOLF_DISCOVERY_PORT turns on exactly one URL and uses a literal loopback address. */
++/* Both guest URLs replay over the literal loopback socket. */
+ static const char discovery_url[]="https://ssps4.scej-network.jp:443/nmg-us/ss.info";
+-enum { DISCOVERY_MAX=0xa2800, DISCOVERY_HEADER_MAX=4096 };
++#define SERVER_TIME_PATH "/nmg-us/replay-probe/gameapi_getservertime"
++static const char server_time_url[]="https://127.0.0.1:8765" SERVER_TIME_PATH;
++enum { DISCOVERY_MAX=0xa2800, DISCOVERY_HEADER_MAX=4096,
++       SERVER_TIME_REQUEST_BYTES=102, SERVER_TIME_RESPONSE_BYTES=28 };
+ static pthread_mutex_t discovery_lock=PTHREAD_MUTEX_INITIALIZER;
+ static struct {
+     int32_t id;
+     unsigned port;
+-    int status, read;
++    int server_time, status, read;
+     size_t length;
+     unsigned char *body;
+ } discovery;
+@@ -55,11 +58,25 @@
+ #define DISCOVERY_SEND_FLAGS MSG_NOSIGNAL
+ #endif
+ 
+-static int discovery_exchange(void) {
++static int discovery_send(DiscoverySocket sock,const void *data,int size) {
++    const char *bytes=data;
++    int sent=0;
++    while (sent<size) {
++        int n=(int)send(sock,bytes+sent,size-sent,DISCOVERY_SEND_FLAGS);
++        if (n<=0) return 0;
++        sent+=n;
++    }
++    return 1;
++}
++
++static int discovery_exchange(const void *data,int size) {
+     static const char request_format[]=
+-        "GET /nmg-us/ss.info HTTP/1.1\r\nHost: 127.0.0.1:%u\r\n"
++        "%s %s HTTP/1.1\r\nHost: 127.0.0.1:%u\r\n"
+         "User-Agent: PS4Application nolib/0.0 (U-UP9000-CUSA04687_00-EVERYBODYSGOLF07/2017022700/1170)\r\n"
+-        "Connection: close\r\n\r\n";
++        "%sConnection: close\r\n\r\n";
++    static const char time_headers[]=
++        "Content-Type: multipart/form-data; boundary=xYzZY\r\n"
++        "Content-Length: 102\r\n";
+ #ifdef _WIN32
+     WSADATA wsa;
+     if (WSAStartup(MAKEWORD(2,2),&wsa)) return 0;
+@@ -79,17 +96,16 @@
+     target.sin_port=htons((uint16_t)discovery.port);
+     if (connect(sock,(const struct sockaddr *)&target,sizeof target)) goto done;
+ 
+-    char request[256];
+-    int request_size=snprintf(request,sizeof request,request_format,discovery.port);
+-    if (request_size<0 || (size_t)request_size>=sizeof request) goto done;
+-    int sent=0;
+-    while (sent<request_size) {
+-        int n=(int)send(sock,request+sent,request_size-sent,DISCOVERY_SEND_FLAGS);
+-        if (n<=0) goto done;
+-        sent+=n;
+-    }
+-
+-    const size_t capacity=DISCOVERY_HEADER_MAX+DISCOVERY_MAX;
++    char request[320];
++    const char *method=discovery.server_time ? "POST" : "GET";
++    const char *path=discovery.server_time ? SERVER_TIME_PATH : "/nmg-us/ss.info";
++    const char *headers=discovery.server_time ? time_headers : "";
++    int request_size=snprintf(request,sizeof request,request_format,method,path,discovery.port,headers);
++    if (request_size<0 || (size_t)request_size>=sizeof request ||
++        !discovery_send(sock,request,request_size) || !discovery_send(sock,data,size)) goto done;
++
++    const size_t max_body=discovery.server_time ? SERVER_TIME_RESPONSE_BYTES : DISCOVERY_MAX;
++    const size_t capacity=DISCOVERY_HEADER_MAX+max_body;
+     response=malloc(capacity+1);
+     if (!response) goto done;
+     struct timespec start, now;
+@@ -122,8 +138,9 @@
+             size_t digits=strspn(field,"0123456789");
+             if (!digits || digits>6 || (field[digits] && field[digits]!='\r')) goto done;
+             length=(size_t)strtoul(field,NULL,10);
+-            if (length>DISCOVERY_MAX || (status==200 && (!length || length%8)) ||
+-                (status!=200 && length)) goto done;
++            if (length>max_body || (status!=200 && length)) goto done;
++            if (status==200 && (discovery.server_time ? length!=SERVER_TIME_RESPONSE_BYTES :
++                                                     (!length || length%8))) goto done;
+         }
+     } while (!header_size || received<header_size+length);
+     if (received!=header_size+length) goto done;
+@@ -143,15 +160,15 @@
+ }
+ 
+ static ABI int32_t http_send(int32_t id,const void *data,uint64_t length) {
+-    (void)data;
+     pthread_mutex_lock(&discovery_lock);
+     int ok=0;
+-    if (discovery.id && id==discovery.id && !length) {
++    int valid_body=discovery.server_time ? data && length==SERVER_TIME_REQUEST_BYTES : !length;
++    if (discovery.id && id==discovery.id && valid_body) {
+         free(discovery.body);
+         discovery.body=NULL;
+         discovery.status=discovery.read=0;
+         discovery.length=0;
+-        ok=discovery_exchange();
++        ok=discovery_exchange(data,(int)length);
+     }
+     pthread_mutex_unlock(&discovery_lock);
+     return ok ? 0 : HTTP_NETWORK;
+@@ -244,13 +261,15 @@
+     (void)conn;
+     if (!url) return HTTP_INVALID_VALUE;
+     const int32_t id=atomic_fetch_add(&http_next,1);
+-    if (!method && !length && !strcmp(url,discovery_url)) {
++    const int server_time=method==1 && length==SERVER_TIME_REQUEST_BYTES && !strcmp(url,server_time_url);
++    if (server_time || (!method && !length && !strcmp(url,discovery_url))) {
+         const unsigned port=discovery_port();
+         if (port) {
+             pthread_mutex_lock(&discovery_lock);
+             if (!discovery.id) {
+                 discovery.id=id;
+                 discovery.port=port;
++                discovery.server_time=server_time;
+                 pthread_mutex_unlock(&discovery_lock);
+                 return id;
+             }
+```
+
+
+### 2026-11-17 23:29 codex -> orchestrator: CMake integration order
+
+The CMake hunk in the 21:46 entry depends on the launcher commits. The current boot checkout has the hunk, but still lacks packaging/launcher.cmake and its build.sh still requests resogun-setup. Integrate the launcher commits before building with that hunk. For a runtime-only build with the old launcher, defer the gpu/CMakeLists.txt portion until the launcher commits are in place. The content, WebAPI, discovery and thread test hunks can be integrated independently.
+
+The current launcher commits are 5373650, 630026e, 6aec7a1, 396b94a, a0bf636, 5b55714 and ea2ba13, in order.
+
+
+### 2026-11-17 23:30 codex -> orchestrator: AppContent short-label bounds fix
+
+The ticket-label diff shortened two built-in strings but left their fixed 17-byte source copy in place. AddressSanitizer reported a global-buffer-overflow in the host AppContent probe. The one-line correction below passed git apply --check on your integrated source. The corrected ASan probe passed the 31-row built-in case, the three-row original-folder case and the other-title case. Apply it after the ticket-label diff. Guest execution is NOT_RUN.
+
+```diff
+--- a/src/runtime_content.c
++++ b/src/runtime_content.c
+@@ -150,7 +150,7 @@
+     for (size_t i=0;i<sizeof(golf_addons)/sizeof(golf_addons[0]) && addon_count<MAX_ADDONS;++i) {
+         if (find_addon(golf_addons[i])>=0) continue;
+         Addon *a=&addons[addon_count++];
+-        memcpy(a->label,golf_addons[i],LABEL_SIZE); strcpy(a->folder,"built in");
++        memcpy(a->label,golf_addons[i],strlen(golf_addons[i])+1); strcpy(a->folder,"built in");
+         ++added;
+     }
+     printf("Runtime: %u built-in add-ons unlocked (GOLF_ENTITLEMENTS=original turns this off)\n",added);
+```
+
+
+### 2026-11-17 23:34 codex -> orchestrator: portable root can contain the dump
+
+The launcher now writes game=. when the dump directory is the portable root. The earlier build stored an absolute path in that case, so moving the directory broke cache reuse. Commit 62b4c6a fixes matching roots and trailing separators.
+
+The rebuilt Windows ZIP passed the existing archive and preparation checks. A separate prepare-only probe used the dump as its data root, moved it twice, and reused the prepared image after each move. Three trailing-separator combinations also passed. The current launcher branch ends at 62b4c6a. Guest execution is NOT_RUN.
+
+
+### 2026-11-17 23:38 codex -> orchestrator: launcher repairs incomplete cached images
+
+Commit 476bacc validates the framing and exact file length of boot-linked.bin, content.bin and isa-rewrite.bin before accepting a cached generation. The prior launcher reused boot-linked.bin after one byte was removed from the end. The rebuilt ZIP created a fresh generation after each of the three files was truncated, then reused the replacement. It rejected a truncated explicit --prepared image without changing the selected generation.
+
+The Windows ZIP passed the usual single-executable, CRC, CLI and native preparation checks. The full Python suite reported OK with 76 tests and 17 skips. Guest execution is NOT_RUN. golf-launcher ends at 476bacc.
+
+
+### 2026-11-17 23:42 codex -> orchestrator: Linux packager preserves dependency names
+
+golf-launcher now ends at 13e3d66. Linux packaging keeps spaces in resolved dependency paths and stages each library under the name ldd says the loader requested. This matters when a library's resolved filename includes a fuller version than its lookup name.
+
+The old parser failed the fixture with an SDK path containing spaces. Both new tests passed, and the full Python suite reported OK with 78 tests and 17 skips. A packaging fixture with simulated Linux tools produced a tarball and staged the AppDir with identical library bytes under the expected lookup name. A native Linux build and a real AppImage are NOT_RUN. This commit changes only Linux packaging and its tests. The verified Windows ZIP remains 476bacc.
+
+
+### 2026-11-17 23:50 codex -> orchestrator: ticket IDs and consumption replay
+
+The entitlement UI's default path queues six-character labels from the local table at 0xc77eac–0xc77ef3. The only two are EN0001 and EN0002. The guest compares those strings against WebAPI id values and puts the matching ID string into the consume URL. The queued amount comes from use_limit, and the PUT sends it as use_count. On a successful callback, the guest adds the amount to its cached use_count and clears use_limit. Protocol.md and entitlements.md have the addresses. Thirteen static checks passed.
+
+Run python -B server/golf_server.py --ticket-grants for two synthetic rows with amounts 1 and 10. The default list stays empty. With the fixture, each exact-amount PUT consumes its row once. A CLI probe sent simultaneous PUTs and received HTTP 200 and 409, followed by a GET showing one consumed grant. All 18 server tests passed.
+
+Guest ticket handling is NOT_RUN. The current in-process WebAPI provider has to route these requests or reproduce the fixture before a guest probe can use it.
+
+
+### 2026-11-17 23:55 codex -> orchestrator: in-process WebAPI ticket probe
+
+The diff below applies after the commerce root change in runtime_golf.c. It keeps the exact sdk:entitlement service GET empty by default and returns HTTP 404 for unsupported entitlement requests. With GOLF_TICKET_GRANTS=1, the runtime answers the same two synthetic grants as the Python service. The guest can consume each grant once with its exact amount. The fixture uses the existing WebAPI mutex and lasts for the process. It needs no HTTP listener.
+
+The ASan probe passed seven default-route checks and 15 enabled checks. It verified the option's HTTP status and error buffer, both ticket rows, repeated consumes, and response allocation rollback. The 18 loopback server tests still pass. git apply --check passed against the current integration worktree. Guest WebAPI acceptance and ticket visibility are NOT_RUN.
+
+```diff
+--- a/src/runtime_golf.c
++++ b/src/runtime_golf.c
+@@ -5,22 +5,26 @@
+  * GOLF_NP=offline turns this off: the game then sees a signed-out console, as before.
+  * Resolved before the other tables (runtime.c), and only for this title. */
+ #include "runtime.h"
++#include <limits.h>
+ #include <pthread.h>
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
+ 
+ #define NP_INVALID_ARGUMENT ((int32_t)0x80550003)
++#define WEBAPI_OUT_OF_MEMORY ((int32_t)0x80552901)
+ #define WEBAPI_INVALID_ARGUMENT ((int32_t)0x80552902)
+ #define WEBAPI_INVALID_LIB_CONTEXT_ID ((int32_t)0x80552903)
+ #define WEBAPI_REQUEST_NOT_FOUND ((int32_t)0x80552907)
+ #define USER_INVALID (-1)
+ 
+-static int local_account;
++static int local_account, replay_tickets;
+ static char online_id[17]="Golfer";
+ void runtime_golf_set_title(const char *title_id) {
+     const char *mode=getenv("GOLF_NP"), *name=getenv("GOLF_ONLINE_ID");
+     local_account=title_id && !strncmp(title_id,"CUSA04687",9) && !(mode && !strcmp(mode,"offline"));
++    const char *grants=getenv("GOLF_TICKET_GRANTS");
++    replay_tickets=grants && !strcmp(grants,"1");
+     if (name && *name) snprintf(online_id,sizeof(online_id),"%.16s",name);
+     if (local_account) printf("Runtime: local PSN account '%s' signed in (GOLF_NP=offline turns this off)\n",online_id);
+ }
+@@ -84,23 +88,84 @@
+     pthread_mutex_unlock(&lock);
+     return 0;
+ }
+-/* The server's answer. Service entitlements are the game's consumables (S Tickets and the like):
+- * the list is empty until a grant table exists; a use is accepted. Friends and presence: no
+- * friends, updates accepted. Anything else does not exist. */
+-static void answer(Request *r,const char *sent,size_t sent_size) {
++static const char entitlement_list[]="/v1/users/me/entitlements?entitlement_type=service";
++static const char entitlement_item[]="/v1/users/me/entitlements/";
++static const struct { const char *id; unsigned count; } ticket_grants[]={
++    {"EN0001",1}, {"EN0002",10},
++};
++/* The opt-in fixture shares the WebAPI mutex. It lasts for the life of the process. */
++static unsigned consumed_tickets;
++
++static int find_ticket(const char *path) {
++    if (strncmp(path,entitlement_item,sizeof(entitlement_item)-1)) return -1;
++    const char *id=path+sizeof(entitlement_item)-1;
++    for (size_t i=0;i<sizeof(ticket_grants)/sizeof(ticket_grants[0]);++i)
++        if (!strcmp(id,ticket_grants[i].id)) return (int)i;
++    return -1;
++}
++
++static int consume_count(const char *data,size_t size,unsigned *count) {
++    static const char prefix[]="{\"use_count\":";
++    const size_t prefix_size=sizeof(prefix)-1;
++    if (!data || size<prefix_size+2 || size>prefix_size+11 ||
++        data[size-1]!='}' || memcmp(data,prefix,prefix_size) ||
++        (size>prefix_size+2 && data[prefix_size]=='0')) return 0;
++    unsigned amount=0;
++    for (size_t i=prefix_size;i<size-1;++i) {
++        unsigned digit=(unsigned char)data[i]-'0';
++        if (digit>9 || amount>(UINT_MAX-digit)/10) return 0;
++        amount=amount*10+digit;
++    }
++    *count=amount;
++    return 1;
++}
++
++static int32_t answer(Request *r,const char *sent,size_t sent_size) {
++    static const char not_found[]="{\"error\":{\"code\":2105356,\"message\":\"Not found\"}}";
+     const char *body="{}";
+-    r->status=200;
+-    if (!strncmp(r->path,"/v1/users/me/entitlements?",26)) body="{\"entitlements\":[],\"start\":0,\"size\":0,\"total_results\":0}";
+-    else if (!strncmp(r->path,"/v1/users/me/entitlements/",26)) body=r->method==0 ? "{\"use_count\":0,\"use_limit\":0}" : "{}";
+-    else if (r->method==0 && !strcmp(r->group,"sdk:commerce") &&
+-             !strcmp(r->path,"/v1/users/me/container/?size=128&serviceLabel=0")) body="[]";
++    int status=200;
++    char list[256];
++    unsigned consume=0;
++    if (!strcmp(r->group,"sdk:entitlement")) {
++        if (r->method==0 && !strcmp(r->path,entitlement_list)) {
++            body="{\"entitlements\":[],\"start\":0,\"size\":0,\"total_results\":0}";
++            if (replay_tickets) {
++                const int first=(consumed_tickets&1)!=0, second=(consumed_tickets&2)!=0;
++                snprintf(list,sizeof(list),
++                         "{\"entitlements\":[{\"id\":\"%s\",\"use_count\":%u,\"use_limit\":%u},"
++                         "{\"id\":\"%s\",\"use_count\":%u,\"use_limit\":%u}],\"start\":0,\"size\":2,\"total_results\":2}",
++                         ticket_grants[0].id,first ? ticket_grants[0].count : 0,first ? 0 : ticket_grants[0].count,
++                         ticket_grants[1].id,second ? ticket_grants[1].count : 0,second ? 0 : ticket_grants[1].count);
++                body=list;
++            }
++        } else {
++            const int ticket=replay_tickets && r->method==2 ? find_ticket(r->path) : -1;
++            if (ticket<0) { status=404; body=not_found; }
++            else {
++                unsigned count;
++                const unsigned bit=1u<<(unsigned)ticket;
++                if (!consume_count(sent,sent_size,&count)) status=400;
++                else if (count!=ticket_grants[ticket].count || (consumed_tickets&bit)) status=409;
++                else consume=bit;
++            }
++        }
++    } else if (r->method==0 && !strcmp(r->group,"sdk:commerce") &&
++               !strcmp(r->path,"/v1/users/me/container/?size=128&serviceLabel=0")) body="[]";
+     else if (strstr(r->path,"/friendList")) body="{\"friendList\":[],\"start\":0,\"size\":0,\"totalResults\":0}";
+     else if (strstr(r->path,"/presence/")) body="{}";
+-    else { r->status=404; body="{\"error\":{\"code\":2105356,\"message\":\"Not found\"}}"; }
+-    r->size=strlen(body); r->body=malloc(r->size+1); memcpy(r->body,body,r->size+1); r->read=0;
++    else { status=404; body=not_found; }
++
++    const size_t size=strlen(body);
++    char *response=malloc(size+1);
++    if (!response) return WEBAPI_OUT_OF_MEMORY;
++    memcpy(response,body,size+1);
++    free(r->body);
++    r->body=response; r->status=status; r->size=size; r->read=0;
++    consumed_tickets|=consume;
+     printf("Runtime: NpWebApi %s %s %s -> %d (answered locally)",methods[r->method],r->group,r->path,r->status);
+     if (sent && sent_size) printf(" body '%.*s'",(int)(sent_size>200 ? 200 : sent_size),sent);
+     printf("\n");
++    return 0;
+ }
+ /* sceNpWebApiSendRequest2(request, data, size, responseInformationOption): the option is
+  * int32 httpStatus, char *errorObject @8, u64 errorObjectSize @16, u64 responseDataSize @24; an
+@@ -108,20 +173,18 @@
+ static ABI int32_t webapi_send2(int64_t id,const void *data,uint64_t size,void *option) {
+     pthread_mutex_lock(&lock);
+     Request *r=find(id);
+-    if (r) {
+-        answer(r,data,size);
+-        if (option) {
+-            char *o=option, *error; uint64_t room, wrote=0;
+-            memcpy(o,&r->status,4); memcpy(&error,o+8,8); memcpy(&room,o+16,8);
+-            if (r->status>=400 && error && room) {
+-                wrote=r->size<room-1 ? r->size : room-1;
+-                memcpy(error,r->body,wrote); error[wrote]=0; r->read=r->size;
+-            }
+-            memcpy(o+24,&wrote,8);
++    const int32_t result=r ? answer(r,data,size) : WEBAPI_REQUEST_NOT_FOUND;
++    if (!result && option) {
++        char *o=option, *error; uint64_t room, wrote=0;
++        memcpy(o,&r->status,4); memcpy(&error,o+8,8); memcpy(&room,o+16,8);
++        if (r->status>=400 && error && room) {
++            wrote=r->size<room-1 ? r->size : room-1;
++            memcpy(error,r->body,wrote); error[wrote]=0; r->read=r->size;
+         }
++        memcpy(o+24,&wrote,8);
+     }
+     pthread_mutex_unlock(&lock);
+-    return r ? 0 : WEBAPI_REQUEST_NOT_FOUND;
++    return result;
+ }
+ static ABI int32_t webapi_send(int64_t id,const void *data,uint64_t size) { return webapi_send2(id,data,size,NULL); }
+ /* sceNpWebApiGetHttpStatusCode(request, status). */
+```
+
+
+### 2026-11-18 00:00 codex -> orchestrator: login request layout and completion gate
+
+The login request has ten framed records. 0x0202 is the last payload word in the 0x0070 record. Its three-word length puts the next header, 0x0071, at offset 12. The variable strings and all ten record positions are documented in protocol.md.
+
+The 0x8010 terminator makes the decoder return 4. Login then reads context offset 0x5e5e8, which record 0x2020 writes. Below 4 the login callback posts event 0xec. At 4 or above it takes the error path with 0x90000002. The common decoder also has separate handlers for 0x2031 and 0x0080–0x0088 with gaps. Their presence in a successful login response remains unknown.
+
+Eleven jump-table targets and 13 login instructions passed static checks. All 18 loopback tests passed. The service still returns 404 for login. Guest session creation is NOT_RUN.
+
+
+### 2026-11-18 00:06 codex -> orchestrator: Linux CI artifacts and rebuilt Windows archive
+
+golf-launcher ends at 79c3b83 on 8493a05. Linux CI now builds the AppImage and companion tarball, requires both files, and runs the AppImage with a directory containing a space plus --version. It uses appimagetool 1.9.1 and type2 runtime 20251108. Both downloaded files matched their pinned hashes. A simulated CI run rejected either missing artifact and passed with both present. Native Linux, real AppImage execution and hosted CI are NOT_RUN.
+
+The Windows ZIP was rebuilt from 79c3b83. It contains one executable and 109 CRC-checked entries. Native preparation matched the Python reference without Python on PATH. CLI, cache reuse, relocation, forced rebuild, failed-prep rollback and repair of each truncated cache artifact passed. The Python suite reported OK with 78 tests and 17 skips with the CLANG64 DLLs on PATH. The ZIP is in the launcher worktree at out/everybodys-golf-pc-79c3b83-2026-11-18.zip. Guest execution is NOT_RUN.
+
+
+### 2026-11-18 00:08 codex -> orchestrator: Capone report endpoint
+
+The separate JSON POST at 0xc5ee1c uses capone_url1 from discovery. The decoder copies it to title context +0x5e2e8, and the report client stores it at +0x5120. The report carries reporter fields and a nested item with owner and content metadata. Addresses are in protocol.md.
+
+Twenty string checks and eleven instruction checks passed. A localhost request to the synthetic Capone route returned HTTP 404 with an empty body. Guest report submission is NOT_RUN.
+
+
+### 2026-11-18 00:12 codex -> orchestrator: discovery fixture covers all 37 URL keys
+
+Use work/online/ss-info-local-v4.bin for the next discovery probe. The 34-entry validation loop is followed by three separate lookups for gameapi_uploaddata, gameapi_getregulationdata and gameapi_getfinishboardlist. They are now included alongside the original keys. title-url-map.tsv lists 37 keys, 36 destination fields and their identified request references.
+
+Run python -B server/golf_server.py --ss-info-file work/online/ss-info-local-v4.bin --server-time 2026-11-17T23:18:42 with the existing transport patch. The 7,640-byte fixture passed the standalone cipher round-trip and the loopback GET returned the exact bytes. Server-time POST still returned HTTP 200 with 28 bytes. All 18 server tests passed. Guest discovery and server time remain NOT_RUN.
+
+
+### 2026-11-18 00:14 codex -> orchestrator: reproduce the discovery fixture from a local dump
+
+server/make_discovery_fixture.py now rebuilds v4 from the prepared 1.17 EBOOT and OpenSSL libcrypto. The command is in server/README.md. It reproduced the existing 7,640 bytes exactly, rejected a different input, and preserved an existing output. All 18 loopback tests passed.
+
+golf-launcher remains clean at 79c3b83 on 8493a05. The Windows player ZIP and host checks are recorded above. Integration evidence is pending for discovery, server time, commerce root, AppContent, the ticket fixture and the build-test hunks. Full integrated tests and guest execution are NOT_RUN on the Codex side.
+
+
+### 2026-11-18 00:23 codex -> orchestrator: all title HTTP dispatch slots mapped
+
+title-dispatch.tsv now covers all 62 title dispatch slots. Seven can reach a GET, 53 can reach multipart POST, and two clear the request state and return. The table identifies 20 slots that send through helpers and includes their URL source and producer addresses. Static checks matched all 124 primary targets, six subsidiary targets and 20 helper routes.
+
+The notice-list request and response framing are in protocol.md. A zero-count 0x3000 list skips item parsing, but the guest still requires record 0x0083 before the list. The 0x0083 handler transforms its string and Base64-encodes it back into the request context. The loopback service has no notice replay. All 18 server tests passed. Guest notice acceptance is NOT_RUN.
+
+
+### 2026-11-18 00:27 codex -> orchestrator: AppImage shortcuts use the durable package path
+
+golf-launcher ends at 0e31793 on 8493a05. An AppImage shortcut now uses the original AppImage path and passes the portable data directory as its first argument. The prior launcher wrote a path inside the temporary mount. The tarball shortcut still uses the binary and the --data-dir flag. A compiled host probe reproduced the old failure and verified both new commands with spaces and percent signs. CI now checks the shortcut generated by the AppImage. Native Linux and real AppImage execution are NOT_RUN.
+
+The rebuilt Windows ZIP is out/everybodys-golf-pc-0e31793-2026-11-18.zip in the launcher worktree. Build and verification exited zero. The archive had one executable and 109 CRC-checked entries. Native preparation matched the Python reference and the portable relocation, rollback, and CLI checks passed. The Python suite reported OK with 78 tests and 17 skips. Guest execution is NOT_RUN.
+
+
+### 2026-11-18 00:35 codex -> orchestrator: EULA text fetch and tested loopback bridge
+
+Slots 1 and 2 send different title identifiers in otherwise matching 110-byte multipart bodies. The response parser requires revision, digest, length and text records. It computes MD5 over the exact text bytes before copying the NUL-terminated text to its display path. The local reply supplies revision 1 and an explicit UTF-8 text file. The service holds no agreement state. Addresses and fixture choices are in protocol.md.
+
+Run python -B server/golf_server.py --ss-info-file work/online/ss-info-local-eula.bin --eula-file work/online/eula-local.txt --server-time 2026-11-17T23:18:42. The 7,648-byte discovery fixture changes only the EULA URL from v4. The diff below applies after the server-time diff and uses its GOLF_DISCOVERY_PORT setting. Both patches passed git apply --check in order against a copy of the current runtime.
+
+All 20 loopback tests passed. The standalone bridge passed seven EULA, six discovery and five server-time cases. Fourteen static checks passed. Guest EULA display and agreement are NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -1,6 +1,6 @@
+ /* Networking for an offline console (the cable is unplugged, as in runtime_services.c): the
+- * libSceHttp normally reports HTTP NETWORK. Golf's discovery GET and server-time POST can
+- * be replayed through an opt-in IPv4 loopback service. The Second Screen server has no client. */
++ * libSceHttp normally reports HTTP NETWORK. Golf's discovery, server-time and EULA routes
++ * can replay over opt-in IPv4 loopback. The Second Screen server has no client. */
+ #ifdef _WIN32
+ #include <winsock2.h>
+ #else
+@@ -24,17 +24,26 @@
+ #define HTTP_INVALID_VALUE ((int32_t)0x804311fe)
+ static _Atomic int32_t http_next=0x10000;
+ 
+-/* Both guest URLs replay over the literal loopback socket. */
+-static const char discovery_url[]="https://ssps4.scej-network.jp:443/nmg-us/ss.info";
++/* Only these guest URLs can replay over the literal loopback socket. */
++#define DISCOVERY_PATH "/nmg-us/ss.info"
+ #define SERVER_TIME_PATH "/nmg-us/replay-probe/gameapi_getservertime"
+-static const char server_time_url[]="https://127.0.0.1:8765" SERVER_TIME_PATH;
+-enum { DISCOVERY_MAX=0xa2800, DISCOVERY_HEADER_MAX=4096,
+-       SERVER_TIME_REQUEST_BYTES=102, SERVER_TIME_RESPONSE_BYTES=28 };
++#define EULA_PATH "/nmg-us/replay-probe/gameapi_geteula"
++enum { DISCOVERY_HEADER_MAX=4096 };
++typedef struct {
++    const char *url, *path;
++    unsigned request_size, response_min, response_max, response_alignment;
++} ReplayRoute;
++static const ReplayRoute replay_routes[]={
++    {"https://ssps4.scej-network.jp:443" DISCOVERY_PATH, DISCOVERY_PATH, 0, 8, 0xa2800, 8},
++    {"https://127.0.0.1:8765" SERVER_TIME_PATH, SERVER_TIME_PATH, 102, 28, 28, 4},
++    {"https://127.0.0.1:8765" EULA_PATH, EULA_PATH, 110, 64, 60+0x8000, 4},
++};
+ static pthread_mutex_t discovery_lock=PTHREAD_MUTEX_INITIALIZER;
+ static struct {
+     int32_t id;
+     unsigned port;
+-    int server_time, status, read;
++    const ReplayRoute *route;
++    int status, read;
+     size_t length;
+     unsigned char *body;
+ } discovery;
+@@ -74,9 +83,7 @@
+         "%s %s HTTP/1.1\r\nHost: 127.0.0.1:%u\r\n"
+         "User-Agent: PS4Application nolib/0.0 (U-UP9000-CUSA04687_00-EVERYBODYSGOLF07/2017022700/1170)\r\n"
+         "%sConnection: close\r\n\r\n";
+-    static const char time_headers[]=
+-        "Content-Type: multipart/form-data; boundary=xYzZY\r\n"
+-        "Content-Length: 102\r\n";
++    const ReplayRoute *route=discovery.route;
+ #ifdef _WIN32
+     WSADATA wsa;
+     if (WSAStartup(MAKEWORD(2,2),&wsa)) return 0;
+@@ -96,15 +103,19 @@
+     target.sin_port=htons((uint16_t)discovery.port);
+     if (connect(sock,(const struct sockaddr *)&target,sizeof target)) goto done;
+ 
+-    char request[320];
+-    const char *method=discovery.server_time ? "POST" : "GET";
+-    const char *path=discovery.server_time ? SERVER_TIME_PATH : "/nmg-us/ss.info";
+-    const char *headers=discovery.server_time ? time_headers : "";
+-    int request_size=snprintf(request,sizeof request,request_format,method,path,discovery.port,headers);
++    char request[320], headers[96]="";
++    if (route->request_size) {
++        int n=snprintf(headers,sizeof headers,
++                       "Content-Type: multipart/form-data; boundary=xYzZY\r\n"
++                       "Content-Length: %u\r\n",route->request_size);
++        if (n<0 || (size_t)n>=sizeof headers) goto done;
++    }
++    const char *method=route->request_size ? "POST" : "GET";
++    int request_size=snprintf(request,sizeof request,request_format,method,route->path,discovery.port,headers);
+     if (request_size<0 || (size_t)request_size>=sizeof request ||
+         !discovery_send(sock,request,request_size) || !discovery_send(sock,data,size)) goto done;
+ 
+-    const size_t max_body=discovery.server_time ? SERVER_TIME_RESPONSE_BYTES : DISCOVERY_MAX;
++    const size_t max_body=route->response_max;
+     const size_t capacity=DISCOVERY_HEADER_MAX+max_body;
+     response=malloc(capacity+1);
+     if (!response) goto done;
+@@ -139,8 +150,7 @@
+             if (!digits || digits>6 || (field[digits] && field[digits]!='\r')) goto done;
+             length=(size_t)strtoul(field,NULL,10);
+             if (length>max_body || (status!=200 && length)) goto done;
+-            if (status==200 && (discovery.server_time ? length!=SERVER_TIME_RESPONSE_BYTES :
+-                                                     (!length || length%8))) goto done;
++            if (status==200 && (length<route->response_min || length%route->response_alignment)) goto done;
+         }
+     } while (!header_size || received<header_size+length);
+     if (received!=header_size+length) goto done;
+@@ -162,8 +172,7 @@
+ static ABI int32_t http_send(int32_t id,const void *data,uint64_t length) {
+     pthread_mutex_lock(&discovery_lock);
+     int ok=0;
+-    int valid_body=discovery.server_time ? data && length==SERVER_TIME_REQUEST_BYTES : !length;
+-    if (discovery.id && id==discovery.id && valid_body) {
++    if (discovery.id && id==discovery.id && length==discovery.route->request_size && (!length || data)) {
+         free(discovery.body);
+         discovery.body=NULL;
+         discovery.status=discovery.read=0;
+@@ -261,15 +270,22 @@
+     (void)conn;
+     if (!url) return HTTP_INVALID_VALUE;
+     const int32_t id=atomic_fetch_add(&http_next,1);
+-    const int server_time=method==1 && length==SERVER_TIME_REQUEST_BYTES && !strcmp(url,server_time_url);
+-    if (server_time || (!method && !length && !strcmp(url,discovery_url))) {
++    const ReplayRoute *replay=NULL;
++    for (size_t i=0;i<sizeof replay_routes/sizeof *replay_routes;++i) {
++        const ReplayRoute *route=&replay_routes[i];
++        if (method==(route->request_size!=0) && length==route->request_size && !strcmp(url,route->url)) {
++            replay=route;
++            break;
++        }
++    }
++    if (replay) {
+         const unsigned port=discovery_port();
+         if (port) {
+             pthread_mutex_lock(&discovery_lock);
+             if (!discovery.id) {
+                 discovery.id=id;
+                 discovery.port=port;
+-                discovery.server_time=server_time;
++                discovery.route=replay;
+                 pthread_mutex_unlock(&discovery_lock);
+                 return id;
+             }
+```
+
+
+### 2026-11-18 00:38 codex -> orchestrator: Windows watchdog millisecond overflow
+
+The Windows watchdog multiplies an unsigned timeout by 1,000 before passing it to Sleep. The standalone probe reproduced 4,294,968 seconds turning into 704 milliseconds. The loader diff below uses a 64-bit total and finite DWORD waits. The probe got the exact total for five timeout values, including 36,000, the first overflowing value and UINT_MAX. git apply --check passed against both worktrees. Real elapsed watchdog timing and guest execution are NOT_RUN.
+
+The existing 0e31793 Windows ZIP also passed native preparation when the program and dump shared a portable root with Japanese and accented path components. Moving the root reused the cache. An explicit Arabic --data-dir prepared successfully, and the unrelated working directory remained empty.
+
+```diff
+--- a/src/loader.c
++++ b/src/loader.c
+@@ -476,8 +476,14 @@
+     fflush(NULL);
+ }
+ static DWORD WINAPI watchdog_thread(void *seconds) {
+-    Sleep(*(unsigned *)seconds*1000u);
+-    fprintf(stderr,"STOP: watchdog timeout after %u s; thread stacks:\n",*(unsigned *)seconds);
++    const unsigned timeout=*(const unsigned *)seconds;
++    uint64_t remaining=(uint64_t)timeout*1000u;
++    while (remaining>=INFINITE) {
++        Sleep(INFINITE-1u);
++        remaining-=INFINITE-1u;
++    }
++    Sleep((DWORD)remaining);
++    fprintf(stderr,"STOP: watchdog timeout after %u s; thread stacks:\n",timeout);
+     dump_threads();
+     runtime_report();
+     fflush(NULL);
+```
+
+
+### 2026-11-18 00:47 codex -> orchestrator: local Title User Storage probe
+
+The runtime_np.c patch below enables TUS only when GOLF_TUS=local and the Golf local account is signed in. It supports the guest's account-ID GET and SET for slots 1, 2 and 3 at 2,008, 64 and 217 bytes. The blobs stay in process memory. Data transfers use the existing account and RTC providers. Optional previous-author and timestamp checks are atomic under the storage mutex. The patch leaves the other TUS imports on the existing fallback.
+
+An unpopulated slot reports USER_STORAGE_DATA_NOT_FOUND as its operation result. An unknown account reports USER_NOT_ASSIGNED. These are local choices pending comparison with guest behavior and a retail trace. The 0x210 GET layout and observed guest calls are in protocol.md.
+
+The ASan probe passed in default, signed-out and enabled modes, including a separate link with the real account and RTC providers. It checked all three blob round-trips, metadata and capacity, invalid handles, request cleanup and contention. Exactly one conditional write succeeded when two requests submitted the same prior tick. git apply --check passed against the current runtime. Guest TUS and multiplayer are NOT_RUN.
+
+```diff
+--- a/src/runtime_np.c
++++ b/src/runtime_np.c
+@@ -8,6 +8,8 @@
+  * Dialogs about PSN or the system (sign-in, invitation, error, social screen) draw nothing: an
+  * opened one finishes at once, cancelled by the user. */
+ #include "runtime.h"
++#include <pthread.h>
++#include <stdlib.h>
+ #include <stdio.h>
+ #include <string.h>
+ #include <stdatomic.h>
+@@ -34,6 +36,215 @@
+  * Delete call on a request, sceNpTusAbortRequest, sceNpTusDeleteRequest and
+  * sceNpTusDeleteNpTitleCtx find no such id: COMMUNITY INVALID_ID. */
+ static ABI int32_t community_no_id(void) { return COMMUNITY_INVALID_ID; }
++
++/* ---- Golf's opt-in, process-local Title User Storage ---- */
++#define TUS_TOO_MANY_OBJECTS ((int32_t)0x80550706)
++#define TUS_ABORTED ((int32_t)0x80550707)
++#define TUS_BODY_TOO_LARGE ((int32_t)0x80550709)
++#define TUS_ALREADY_END ((int32_t)0x80550712)
++#define TUS_REQUEST_BEFORE_END ((int32_t)0x80550717)
++#define TUS_USER_NOT_ASSIGNED ((int32_t)0x8055082B)
++#define TUS_DATA_NOT_FOUND ((int32_t)0x8055084A)
++#define TUS_CONDITIONS_NOT_SATISFIED ((int32_t)0x80550873)
++
++/* The guest reads this ABI layout after its asynchronous GET completes. */
++typedef struct {
++    char online_id[20];
++    uint8_t reserved[16];
++    int32_t set;
++    uint64_t tick;
++    char author_id[20];
++    uint8_t padding[20];
++    void *data;
++    uint64_t size;
++    uint8_t info[392];
++    uint64_t owner, author;
++    uint8_t tail[16];
++} TusStatus;
++_Static_assert(sizeof(TusStatus)==0x210 && offsetof(TusStatus,tick)==0x28 &&
++               offsetof(TusStatus,data)==0x58 && offsetof(TusStatus,size)==0x60 &&
++               offsetof(TusStatus,author)==0x1f8,"Golf TUS status layout");
++
++enum { TUS_MAX_SLOT_BYTES=0x7d8, TUS_REQUESTS=8 };
++static const size_t tus_slot_sizes[]={TUS_MAX_SLOT_BYTES,0x40,0xd9};
++static struct { uint64_t tick; uint8_t bytes[TUS_MAX_SLOT_BYTES]; } tus_slots[3];
++static struct { int32_t id; uint64_t account; char online_id[20]; } tus_context;
++typedef struct { int32_t id, result; int ready; } TusRequest;
++static TusRequest tus_requests[TUS_REQUESTS];
++static pthread_mutex_t tus_lock=PTHREAD_MUTEX_INITIALIZER;
++
++static TusRequest *tus_find(int32_t id) {
++    if (id<=0) return NULL;
++    for (size_t i=0;i<TUS_REQUESTS;++i)
++        if (tus_requests[i].id==id) return &tus_requests[i];
++    return NULL;
++}
++
++static ABI int32_t tus_create_context(uint32_t label,int32_t user) {
++    if (label!=0) return COMMUNITY_INVALID_ARGUMENT;
++    int32_t initial;
++    uint64_t account;
++    char online_id[20]={0};
++    typedef int32_t (ABI *Initial)(int32_t *);
++    typedef int32_t (ABI *Account)(int32_t,uint64_t *);
++    typedef int32_t (ABI *OnlineId)(int32_t,char *);
++    Initial get_initial=(Initial)runtime_services_resolve("sceUserServiceGetInitialUser");
++    Account get_account=(Account)runtime_services_resolve("sceNpGetAccountIdA");
++    OnlineId get_online_id=(OnlineId)runtime_golf_resolve("sceNpGetOnlineId");
++    if (!get_initial || !get_account || !get_online_id || get_initial(&initial) || user!=initial ||
++        get_account(user,&account) || get_online_id(user,online_id)) return NP_SIGNED_OUT;
++
++    pthread_mutex_lock(&tus_lock);
++    int32_t result=TUS_TOO_MANY_OBJECTS;
++    if (!tus_context.id) {
++        tus_context.id=result=new_object();
++        tus_context.account=account;
++        memcpy(tus_context.online_id,online_id,sizeof online_id);
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static ABI int32_t tus_delete_context(int32_t context) {
++    pthread_mutex_lock(&tus_lock);
++    int32_t result=COMMUNITY_INVALID_ID;
++    if (context>0 && context==tus_context.id) {
++        memset(&tus_context,0,sizeof tus_context);
++        memset(tus_requests,0,sizeof tus_requests);
++        result=0;
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static ABI int32_t tus_create_request(int32_t context) {
++    pthread_mutex_lock(&tus_lock);
++    int32_t result=COMMUNITY_INVALID_ID;
++    if (context>0 && context==tus_context.id) {
++        result=TUS_TOO_MANY_OBJECTS;
++        for (size_t i=0;i<TUS_REQUESTS;++i) {
++            if (tus_requests[i].id) continue;
++            tus_requests[i].id=result=new_object();
++            break;
++        }
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static ABI int32_t tus_delete_request(int32_t id) {
++    pthread_mutex_lock(&tus_lock);
++    TusRequest *request=tus_find(id);
++    if (request) memset(request,0,sizeof *request);
++    pthread_mutex_unlock(&tus_lock);
++    return request ? 0 : COMMUNITY_INVALID_ID;
++}
++
++static ABI int32_t tus_abort(int32_t id) {
++    pthread_mutex_lock(&tus_lock);
++    TusRequest *request=tus_find(id);
++    int32_t result=COMMUNITY_INVALID_ID;
++    if (request) {
++        result=TUS_ALREADY_END;
++        if (!request->ready) {
++            request->ready=1;
++            request->result=TUS_ABORTED;
++            result=0;
++        }
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static ABI int32_t tus_poll(int32_t id,int32_t *operation_result) {
++    pthread_mutex_lock(&tus_lock);
++    TusRequest *request=tus_find(id);
++    int32_t result=COMMUNITY_INVALID_ID;
++    if (request) {
++        result=1;
++        if (request->ready) {
++            if (operation_result) *operation_result=request->result;
++            request->ready=0;
++            result=0;
++        }
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static int32_t tus_submission(TusRequest *request) {
++    if (!request) return COMMUNITY_INVALID_ID;
++    return request->ready ? TUS_REQUEST_BEFORE_END : 0;
++}
++
++static ABI int32_t tus_get_data(int32_t id,uint64_t account,int32_t slot,void *status,
++                                uint64_t status_size,void *data,uint64_t capacity,void *option) {
++    if (slot<1 || slot>3 || !status || status_size!=sizeof(TusStatus) || !data || option)
++        return COMMUNITY_INVALID_ARGUMENT;
++    const size_t index=(size_t)(slot-1), size=tus_slot_sizes[index];
++    pthread_mutex_lock(&tus_lock);
++    TusRequest *request=tus_find(id);
++    int32_t result=tus_submission(request);
++    if (!result) {
++        int32_t operation=0;
++        if (account!=tus_context.account) operation=TUS_USER_NOT_ASSIGNED;
++        else if (!tus_slots[index].tick) operation=TUS_DATA_NOT_FOUND;
++        else if (capacity<size) operation=TUS_BODY_TOO_LARGE;
++        else {
++            TusStatus stored={.set=1,.tick=tus_slots[index].tick,.data=data,.size=size,
++                              .owner=account,.author=account};
++            memcpy(stored.online_id,tus_context.online_id,sizeof stored.online_id);
++            memcpy(stored.author_id,tus_context.online_id,sizeof stored.author_id);
++            memcpy(data,tus_slots[index].bytes,size);
++            memcpy(status,&stored,sizeof stored);
++        }
++        request->result=operation;
++        request->ready=1;
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static ABI int32_t tus_set_data(int32_t id,uint64_t account,int32_t slot,uint64_t total_size,
++                                uint64_t send_size,const void *data,const void *info,uint64_t info_size,
++                                const uint64_t *author,const uint64_t *changed,void *option) {
++    if (slot<1 || slot>3 || !data || info || info_size || option) return COMMUNITY_INVALID_ARGUMENT;
++    const size_t index=(size_t)(slot-1), size=tus_slot_sizes[index];
++    if (total_size!=size || send_size!=size) return COMMUNITY_INVALID_ARGUMENT;
++    typedef int32_t (ABI *Tick)(uint64_t *);
++    Tick current_tick=(Tick)runtime_rtc_resolve("sceRtcGetCurrentTick");
++    uint64_t now=0;
++    if (!current_tick || current_tick(&now) || !now) return NP_SIGNED_OUT;
++
++    pthread_mutex_lock(&tus_lock);
++    TusRequest *request=tus_find(id);
++    int32_t result=tus_submission(request);
++    if (!result) {
++        int32_t operation=0;
++        const uint64_t previous=tus_slots[index].tick;
++        uint64_t expected_author=0, expected_tick=0;
++        if (author) memcpy(&expected_author,author,sizeof expected_author);
++        if (changed) memcpy(&expected_tick,changed,sizeof expected_tick);
++        if (account!=tus_context.account) operation=TUS_USER_NOT_ASSIGNED;
++        else if ((author && expected_author!=(previous ? account : 0)) ||
++                 (changed && expected_tick!=previous)) operation=TUS_CONDITIONS_NOT_SATISFIED;
++        else {
++            memcpy(tus_slots[index].bytes,data,size);
++            tus_slots[index].tick=now>previous ? now : previous+1;
++        }
++        request->result=operation;
++        request->ready=1;
++    }
++    pthread_mutex_unlock(&tus_lock);
++    return result;
++}
++
++static const RuntimeExport golf_tus_exports[]={
++    {"sceNpTusCreateNpTitleCtxA",tus_create_context}, {"sceNpTusDeleteNpTitleCtx",tus_delete_context},
++    {"sceNpTusCreateRequest",tus_create_request}, {"sceNpTusDeleteRequest",tus_delete_request},
++    {"sceNpTusAbortRequest",tus_abort}, {"sceNpTusPollAsync",tus_poll},
++    {"sceNpTusGetDataAAsync",tus_get_data}, {"sceNpTusSetDataAAsync",tus_set_data},
++};
+ 
+ /* ---- NpScore A variants (shadPS4 np_score.cpp) ----
+  * sceNpScoreCreateNpTitleCtxA(label, user): SIGNED_OUT first, then the label is checked. The
+@@ -727,4 +938,13 @@
+     {"sceInvitationDialogOpen",invitation_open},
+     {"sceInvitationDialogGetResult",invitation_result},
+ };
+-uintptr_t runtime_np_resolve(const char *name) { return RUNTIME_LOOKUP(exports,name); }
++uintptr_t runtime_np_resolve(const char *name) {
++    if (!strncmp(name,"sceNpTus",8) && runtime_golf_local_account()) {
++        const char *mode=getenv("GOLF_TUS");
++        if (mode && !strcmp(mode,"local")) {
++            const uintptr_t local=RUNTIME_LOOKUP(golf_tus_exports,name);
++            if (local) return local;
++        }
++    }
++    return RUNTIME_LOOKUP(exports,name);
++}
+```
+
+### 2026-11-18 01:11 codex -> orchestrator: AppContent bounds patch still needed
+
+The 5c1b26b runtime commit adds the short labels EN0001 and EN0002, but the built-in copy still reads 17 bytes from each seven-byte string. The AddressSanitizer probe in the 23:30 entry caught this overread. Apply the one-line runtime_content.c patch from that entry before handing out a player build based on 5c1b26b. The launcher rebuild on this revision is for host verification.
+
+### 2026-11-18 01:15 codex -> orchestrator: launcher and loopback handoff
+
+The local golf-launcher branch ends at d033e27, with 12 commits on runtime 5c1b26b.
+
+| Check | Result |
+|---|---|
+| Windows build and ZIP | Passed. One executable in 109 CRC-checked entries. |
+| Extracted ZIP with System32 alone on PATH | CLI, portable paths and cache checks passed. |
+| Native preparation | 13 modules, 1,158 imports and 274 native bindings. Boot image and content profile matched the Python reference. |
+| Python runner tests | OK, 78 run with 17 skips |
+| Loopback service tests | OK, 21 passed |
+| Linux packaging fixtures | AppImage wrapper, shortcut and paired-artifact checks passed |
+
+The ZIP for host checks is in the launcher worktree at out/everybodys-golf-pc-d033e27-2026-11-18.zip. The analysis and server files are uncommitted for review.
+
+- AppContent bounds fix from the 23:30 entry, verified to apply and required before a player build
+- Applicability checks passed for server-time followed by EULA, plus ticket WebAPI, Title User Storage and Windows watchdog
+- CMake and GPU portability hunks for integration with the launcher commits in the 21:46 entry
+
+NOT_RUN covers the native Linux build, real AppImage execution, guest execution, online acceptance and DLC visibility.
+
+### 2026-11-18 01:35 orchestrator -> codex: diffs integrated, creator hang fixed, free roam reached
+
+Applied to the integration worktree and built: the server-time bridge (23:27), the EULA bridge (00:35), the in-process ticket probe (23:55), the watchdog overflow fix (00:38) and local TUS (00:47). Earlier: the EN0001/EN0002 labels, the empty commerce container and loopback discovery, committed as `5c1b26b`. A read-only review of the five new diffs found no memory or network fault. It noted that entitlement item calls now answer 404 without `GOLF_TICKET_GRANTS=1`; that is kept as you designed it. Guest runs with `GOLF_DISCOVERY_PORT`, `GOLF_TICKET_GRANTS` or `GOLF_TUS` are NOT_RUN.
+
+Not applied: the `gpu/CMakeLists.txt` and `path_util.cpp` parts of the 23:29 CMake entry. They include `packaging/launcher.cmake`, which is not on `everybodys-golf`.
+
+Runtime `1cbda4c` fixes the hang after "Finish editing": `sceGnmDingDong` now waits for the compute queue, because the game rebuilds its compute buffers in place. The game now reaches the home island, and the left stick walks the character. Pad-file tokens `lstick_*` and `rstick_*` now drive the axes. No hole has been played. Rebase `golf-launcher` onto the new head when convenient.
+
+### 2026-11-18 01:24 codex -> orchestrator: notice-list replay and transport patch
+
+The protocol notes now trace the notice-list request and the positive-item records, including the selector-specific nid and bid lookups.
+
+Run the discovery-fixture generator and server with --empty-notices. The 7,648-byte fixture sets the guest notice URL to HTTPS to select plaintext title records, and the bridge below maps that exact URL to IPv4 loopback. Apply the bridge after server-time and EULA.
+
+All 24 server tests passed, and the compiled bridge replayed the 36-byte reply for requests of 394 and 1,394 bytes while rejecting malformed requests. Both EULA variants still passed. The reply supplies a synthetic 0x0083 string and a zero count, so guest acceptance and session continuity remain NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -1,5 +1,5 @@
+ /* Networking for an offline console (the cable is unplugged, as in runtime_services.c): the
+- * libSceHttp normally reports HTTP NETWORK. Golf's discovery, server-time and EULA routes
++ * libSceHttp normally reports HTTP NETWORK. Golf's discovery and selected title routes
+  * can replay over opt-in IPv4 loopback. The Second Screen server has no client. */
+ #ifdef _WIN32
+ #include <winsock2.h>
+@@ -28,15 +28,17 @@
+ #define DISCOVERY_PATH "/nmg-us/ss.info"
+ #define SERVER_TIME_PATH "/nmg-us/replay-probe/gameapi_getservertime"
+ #define EULA_PATH "/nmg-us/replay-probe/gameapi_geteula"
++#define NOTICE_PATH "/nmg-us/replay-probe/gameapi_getinfolist"
+ enum { DISCOVERY_HEADER_MAX=4096 };
+ typedef struct {
+     const char *url, *path;
+-    unsigned request_size, response_min, response_max, response_alignment;
++    unsigned request_min, request_max, response_min, response_max, response_alignment;
+ } ReplayRoute;
+ static const ReplayRoute replay_routes[]={
+-    {"https://ssps4.scej-network.jp:443" DISCOVERY_PATH, DISCOVERY_PATH, 0, 8, 0xa2800, 8},
+-    {"https://127.0.0.1:8765" SERVER_TIME_PATH, SERVER_TIME_PATH, 102, 28, 28, 4},
+-    {"https://127.0.0.1:8765" EULA_PATH, EULA_PATH, 110, 64, 60+0x8000, 4},
++    {"https://ssps4.scej-network.jp:443" DISCOVERY_PATH, DISCOVERY_PATH, 0, 0, 8, 0xa2800, 8},
++    {"https://127.0.0.1:8765" SERVER_TIME_PATH, SERVER_TIME_PATH, 102, 102, 28, 28, 4},
++    {"https://127.0.0.1:8765" EULA_PATH, EULA_PATH, 110, 110, 64, 60+0x8000, 4},
++    {"https://127.0.0.1:8765" NOTICE_PATH, NOTICE_PATH, 394, 1394, 36, 36, 4},
+ };
+ static pthread_mutex_t discovery_lock=PTHREAD_MUTEX_INITIALIZER;
+ static struct {
+@@ -44,7 +46,7 @@
+     unsigned port;
+     const ReplayRoute *route;
+     int status, read;
+-    size_t length;
++    size_t length, request_size;
+     unsigned char *body;
+ } discovery;
+ 
+@@ -104,13 +106,13 @@
+     if (connect(sock,(const struct sockaddr *)&target,sizeof target)) goto done;
+ 
+     char request[320], headers[96]="";
+-    if (route->request_size) {
++    if (size) {
+         int n=snprintf(headers,sizeof headers,
+                        "Content-Type: multipart/form-data; boundary=xYzZY\r\n"
+-                       "Content-Length: %u\r\n",route->request_size);
++                       "Content-Length: %d\r\n",size);
+         if (n<0 || (size_t)n>=sizeof headers) goto done;
+     }
+-    const char *method=route->request_size ? "POST" : "GET";
++    const char *method=size ? "POST" : "GET";
+     int request_size=snprintf(request,sizeof request,request_format,method,route->path,discovery.port,headers);
+     if (request_size<0 || (size_t)request_size>=sizeof request ||
+         !discovery_send(sock,request,request_size) || !discovery_send(sock,data,size)) goto done;
+@@ -172,7 +174,7 @@
+ static ABI int32_t http_send(int32_t id,const void *data,uint64_t length) {
+     pthread_mutex_lock(&discovery_lock);
+     int ok=0;
+-    if (discovery.id && id==discovery.id && length==discovery.route->request_size && (!length || data)) {
++    if (discovery.id && id==discovery.id && length==discovery.request_size && (!length || data)) {
+         free(discovery.body);
+         discovery.body=NULL;
+         discovery.status=discovery.read=0;
+@@ -273,7 +275,8 @@
+     const ReplayRoute *replay=NULL;
+     for (size_t i=0;i<sizeof replay_routes/sizeof *replay_routes;++i) {
+         const ReplayRoute *route=&replay_routes[i];
+-        if (method==(route->request_size!=0) && length==route->request_size && !strcmp(url,route->url)) {
++        if (method==(route->request_min!=0) && length>=route->request_min &&
++            length<=route->request_max && !((length-route->request_min)%4) && !strcmp(url,route->url)) {
+             replay=route;
+             break;
+         }
+@@ -286,6 +289,7 @@
+                 discovery.id=id;
+                 discovery.port=port;
+                 discovery.route=replay;
++                discovery.request_size=(size_t)length;
+                 pthread_mutex_unlock(&discovery_lock);
+                 return id;
+             }
+```
+
+### 2026-11-18 01:29 codex -> orchestrator: Golf launcher flags
+
+Launcher commit fca84c4 adds --np-mode local|offline, --online-id NAME, --discovery-port N and --font-file FILE. Port 0 disables replay for that launch. The compiled probe verified environment overrides, invalid-value handling and argument forwarding. The Windows build passed, and the runner suite reported OK with 78 tests and 17 skips.
+
+I’ll rebase once your integrated changes are committed. The short-label copy still uses LABEL_SIZE and needs the 23:30 fix before a player package.
