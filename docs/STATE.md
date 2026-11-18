@@ -44,7 +44,11 @@ Reached, with frames in `docs/media`:
 - 2026-11-18: Tournament Select with Beginners' Cup No. 1 and its 16-player list (`2026-11-18-tournament-select.png`), the pre-round screen (`2026-11-18-pre-round.png`), and the Solo Stroke Play course list with six courses (`2026-11-18-solo-stroke-course-list.png`).
 - 2026-11-18, first hole reached: Eagle City G.C., 9 holes OUT, Solo Stroke Play. Course Preview (`2026-11-18-course-preview-eagle-city.png`), hole 1 at the tee with "Set Up Tee Shot" (`2026-11-18-hole-1-tee.png`) and the shot view with power bar, club, wind and hole map (`2026-11-18-hole-1-shot-view.png`). The course load shows no new frame for about 40 s while pipelines compile; it is not a hang.
 
-No shot has been taken yet: the Cross presses sent in that run did not start the swing before the run's time limit, so "first playable hole" is reached on screen and NOT_VERIFIED for play. Grass and trees draw teal and the hole map draws black in these frames, which looks like the same color fault as the skin.
+- 2026-11-18, shots played: in Beginners' Cup No. 1 on Green C.C. hole 10 (378 y, par 4, `2026-11-18-green-cc-hole-10-tee.png`) three tee shots ran from swing to result. Two were mis-hits that ended "O.B." with a penalty stroke (`2026-11-18-first-shot-ob-sequence.png`). The third had 97% power and a perfect impact and flew 187.8 y with 163.2 y carry (`2026-11-18-clean-tee-shot-sequence.png`); the game still returned to "Set Up Tee Shot" with a further penalty, so where that ball came to rest is not established.
+
+Gameplay status: the swing, ball flight, O.B. rule, score and rival list work on screen. No hole has been finished, so "first playable hole" is reached and a completed hole is NOT_RUN. Open faults seen on the course: the sky draws in flat color bands, the hole map flips between green and black, Eagle City draws teal grass while Green C.C. draws green, and skin is still blue.
+
+Swing input: `work/test-scripts/shot.py 1.1 1.15` sends Cross, waits 1.1 s, Cross for power, waits 1.15 s, Cross for impact. Pad-file polling adds about 0.1 s of jitter, so impact timing is not repeatable; "Toggle Auto-Impact" (Square on the pre-round screen) is untested.
 
 Stepwise driver: `work/test-scripts/step.py TOKEN[:ms] ...` plays pad tokens against a running hidden boot (`boot-seq.ps1 -Warm 66 -Seq '-wait'` in the background), dumps one frame and writes `last.png`. Talking to a character needs the player turned toward them before Cross. A copy of the post-tutorial save is in `work/saves/after-tutorial` (untracked).
 
