@@ -66,6 +66,18 @@ Color correction, 2026-11-18: the "blue skin", teal grass and orange sky recorde
 
 Sound (2026-11-18, runtime `648d038` and `0e61e13`): the Ngs2 sampler rack is mixed. Effects are HE-VAG (waveform type 0x1c, 16-byte frames, channels alternating frame by frame) and music is ATRAC9 (type 0x40, config word stored as a big-endian number, streamed in appended blocks). A 119 s boot to the home island put 18,842 of 22,320 buffers above -60 dBFS on the main port, peak 0.90, no clipped samples; lag-1 autocorrelation 0.98 says it is not noise. Nobody has listened to it yet: sound by ear is NOT_VERIFIED (clip in `work/evidence/first-sound-2026-11-18.wav`). Runtime `0e61e13` applies each voice's matrix 0 levels and port 0 volume (the game pans a stereo pair as two mono voices and fades with the levels). Still not applied: patches to the submixers, reverb sends (port 1 and up), envelopes and filters. The prebuilt FFmpeg archive lacks the atrac9 decoder, so `build.sh` builds FFmpeg from source until `tools/build_ffmpeg.sh --pack` is rerun on each platform.
 
+Network connected and the PlayStation Store check (2026-11-18, runtime `845f548` and `d91027d`): with `GOLF_DISCOVERY_PORT` set, `sceNetCtlGetState` reports 3 and `sceNetCtlGetInfo(14)` returns 127.0.0.1. The boot then runs the "Checking purchase status on PlayStation Store" step. Three runtime bugs kept it from finishing, and each is fixed:
+
+- The game stores "push filter thread running" (3) in its NpWebApi manager after `scePthreadCreate` returns (`0xb9978c`). The runtime's thread had already finished and stored 4, so the 3 stayed and the request queue never drained (the dialog timed out after 3,600 frames). A new guest thread now waits until `scePthreadCreate` is returning, then 1 ms more.
+- `sce::Json::Initializer` is an empty class and the game allocates 1 byte for it. The runtime constructor wrote 8 bytes, and the game's heap check stopped the boot on the next free.
+- `Parser::parse` receives the size of the whole 512 KiB response buffer, so the document now ends at the first NUL. `getInteger` and `getBoolean` return references.
+
+Result: the entitlement request `GET /v1/users/me/entitlements?entitlement_type=service` is answered with an empty list, the dialog closes, and the boot reaches the home island with the network up. The Shop's "Last Month's Items" tab loads 3,000-coin items for the 2018-09-14 server date (`work/evidence/shop-limited-tab-online-2026-11-18.png`). With `GOLF_TICKET_GRANTS=1` the game consumed both test grants (`PUT .../entitlements/EN0001` with `{"use_count":1}`, `EN0002` with `{"use_count":10}`) and the Menu shows S Ticket 101, which was still 101 on the next boot without the switch (`work/evidence/s-ticket-grant-101-2026-11-18.png`). The Shop also asks `GET /v1/users/me/container/EN0002...:EN0001...?size=128&serviceLabel=0` (group `sdk:commerce`), answered 404 for now.
+
+Telemetry: the poster declares the full JSON length and sends 2 KiB per `sceHttpSendRequest`. The runtime refused partial sends, and the game reopened the request every frame (6,268 opens in 250 s). Bodies are now assembled from chunks and each replay route has its own slot (Codex diffs): 37 opened, 37 answered.
+
+Open Course now reaches the "Select Open Course" screen, shows "Connecting..." and then "Server connection failed". The title queue repeats discovery, server time and property info, and no NpAuth request is created. Codex traced the next blocker to `sceNpMatching2CreateContextA` at `0xa7e1e1`, which the runtime answers SIGNED_OUT.
+
 Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
 ### What fixed what (2026-11-17, second half)
@@ -86,6 +98,7 @@ Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnm
 - `RESOGUN_FAULT_PEEK=<reg><+|->0x<offset>`: print the string at that address in a fault report.
 - `RESOGUN_VERIFY_PREPARED=1`: compare what the draw-preparation workers read with a fresh read and log differences.
 - `RESOGUN_NGS2_TRACE=1`: print the Ngs2 voice parameters the game sends. `RESOGUN_NGS2_MIX=0`: silent output. `RESOGUN_AUDIO_DUMP=<prefix>`: raw samples of every audio port.
+- `GOLF_NP_TRACE=1`: log each distinct guest call site of the shared NP answers. `GOLF_PEEK="offset:bytes,*offset+delta:bytes"` (hex, `*` follows the pointer stored there) prints guest memory ranges when they change, every `GOLF_PEEK_MS` ms (default 2000).
 - `RESOGUN_TOGGLE_FILE=<file>`: a number in the file switches renderer optimizations off while the game runs (bits in `gpu/shim/resogun_toggles.h`).
 
 ### Network contract seen so far
@@ -147,8 +160,8 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Online entry: with the property and telemetry routes answered (2026-11-18), Menu > Online > Open Course shows "Server connection failed" without any login request leaving the game. Find the check that fails before HTTP.
-2. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
+1. Online entry: a local NpMatching2 service for the signed-in local account. `sceNpMatching2CreateContextA` and `sceNpMatching2ContextStart` must succeed and deliver context event 0x6f02, then world discovery, before the game asks for an NpAuth code and logs in to the title server.
+2. S Tickets: the grant path works with `GOLF_TICKET_GRANTS=1` (101 tickets). Answer the `sdk:commerce` container request, then spend tickets in the Shop and check the limited-event gear in the game (NOT_RUN).
 3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
 4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
 5. Sound: a listening check, then volumes, patches and submixers in the Ngs2 mixer.
