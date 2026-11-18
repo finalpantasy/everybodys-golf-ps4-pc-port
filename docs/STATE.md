@@ -64,7 +64,9 @@ Fixed 2026-11-18, the hang after "Finish editing" (and an intermittent stall dur
 
 Color correction, 2026-11-18: the "blue skin", teal grass and orange sky recorded earlier were never drawn by the game. The screenshots were wrong. The frame dump (`output_*.raw`) holds the presenter frame in the swapchain format, which is BGRA on this PC, and the conversion scripts read it as RGBA, so every screenshot had red and blue swapped. Read as BGRA the home island shows a blue sky, skin tones and a brick plaza. A frame capture confirmed it from the other side: the game's 16-bit float copy of the final image has natural colors with no channel remapping. All screenshots in `docs/media` were re-saved with red and blue restored, and `step.py`, `burst.py` and `conv.py` now read BGRA. Still open: the creator avatar's skin draws white (`2026-11-17-character-creator.png`); whether that is a fault or the creator's default is NOT_VERIFIED. Re-checked on corrected frames of Eagle City hole 1 (`2026-11-18-eagle-city-hole-1-true-colors.png`, `2026-11-18-eagle-city-fairway-true-colors.png`, home island in `2026-11-18-home-island-true-colors.png`): sky, grass and skin are right and the sky has no bands. The hole map on hole 1 is still a black silhouette.
 
-Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
+Sound (2026-11-18, runtime `648d038` and `0e61e13`): the Ngs2 sampler rack is mixed. Effects are HE-VAG (waveform type 0x1c, 16-byte frames, channels alternating frame by frame) and music is ATRAC9 (type 0x40, config word stored as a big-endian number, streamed in appended blocks). A 119 s boot to the home island put 18,842 of 22,320 buffers above -60 dBFS on the main port, peak 0.90, no clipped samples; lag-1 autocorrelation 0.98 says it is not noise. Nobody has listened to it yet: sound by ear is NOT_VERIFIED (clip in `work/evidence/first-sound-2026-11-18.wav`). Runtime `0e61e13` applies each voice's matrix 0 levels and port 0 volume (the game pans a stereo pair as two mono voices and fades with the levels). Still not applied: patches to the submixers, reverb sends (port 1 and up), envelopes and filters. The prebuilt FFmpeg archive lacks the atrac9 decoder, so `build.sh` builds FFmpeg from source until `tools/build_ffmpeg.sh --pack` is rerun on each platform.
+
+Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
 ### What fixed what (2026-11-17, second half)
 
@@ -83,6 +85,7 @@ Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION`
 - `RESOGUN_FILE_TRACE_MATCH=<text>`: log every open whose path contains the text, found or not.
 - `RESOGUN_FAULT_PEEK=<reg><+|->0x<offset>`: print the string at that address in a fault report.
 - `RESOGUN_VERIFY_PREPARED=1`: compare what the draw-preparation workers read with a fresh read and log differences.
+- `RESOGUN_NGS2_TRACE=1`: print the Ngs2 voice parameters the game sends. `RESOGUN_NGS2_MIX=0`: silent output. `RESOGUN_AUDIO_DUMP=<prefix>`: raw samples of every audio port.
 - `RESOGUN_TOGGLE_FILE=<file>`: a number in the file switches renderer optimizations off while the game runs (bits in `gpu/shim/resogun_toggles.h`).
 
 ### Network contract seen so far
@@ -144,11 +147,11 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Add server routes for `gameapi_getgamepropertyinfo` and telemetry (Codex side), then rerun the guest to reach login, notices and boards.
+1. Online entry: with the property and telemetry routes answered (2026-11-18), Menu > Online > Open Course shows "Server connection failed" without any login request leaving the game. Find the check that fails before HTTP.
 2. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
 3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
 4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
-5. Sound: an Ngs2 mixer.
+5. Sound: a listening check, then volumes, patches and submixers in the Ngs2 mixer.
 6. Check the creator avatar's skin color with a correctly read screenshot (NOT_VERIFIED).
 
 ## Verification commands
