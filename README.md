@@ -18,9 +18,9 @@ This is not playable yet. No hole has been played.
 - Character skin draws blue or white instead of skin tones. Scenery and menus have the right colors.
 - There is no sound yet.
 
-![The character creator, drawn by the port. The skin color is wrong (white instead of a skin tone).](docs/media/2026-11-17-character-creator.png)
+![The character creator, drawn by the port. The avatar skin draws white; whether that is a fault is not verified.](docs/media/2026-11-17-character-creator.png)
 
-![The opening event. Faces draw correctly; the skin is blue because of the same color fault.](docs/media/2026-11-17-faces-fixed-blue-skin.png)
+![The opening event, drawn by the port.](docs/media/2026-11-17-faces-fixed.png)
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first four are reached.
 

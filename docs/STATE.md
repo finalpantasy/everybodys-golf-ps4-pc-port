@@ -1,6 +1,6 @@
 # Project state
 
-Status: Building. On 2026-11-18 the game finished the character creator and reached the home island with the walking tutorial. Later that day hole 1 of Eagle City G.C. was finished twice (bogey, then par) and hole 2 was started. Character skin and grass colors are wrong and there is no sound.
+Status: Building. On 2026-11-18 the game finished the character creator and reached the home island with the walking tutorial. Later that day hole 1 of Eagle City G.C. was finished twice (bogey, then par) and hole 2 was started. There is no sound.
 
 ## Goals
 
@@ -50,7 +50,7 @@ Reached, with frames in `docs/media`:
 - 2026-11-18, first completed hole: Eagle City G.C. hole 1 (309 y, par 4) with the readback switch on: fairway, fairway, approach to 6.9 ft ("Nice Approach!", `2026-11-18-eagle-city-nice-approach.png`), one putt short, gimme, "BOGEY" with total score +1 (`2026-11-18-eagle-city-hole-1-holed-out-bogey.png`).
 - 2026-11-18, same hole on the rebuilt default runtime with no environment switches: fairway, "Bunker" (`2026-11-18-default-build-bunker-lie.png`), sand shot to 5.0 ft, putt holed, "PAR", then the scorecard (`2026-11-18-default-build-hole-1-par-scorecard.png`). Cross on the scorecard loaded hole 2 (281 y, par 4, `2026-11-18-default-build-hole-2-tee.png`); the drive went 182.2 y to the fairway (`2026-11-18-default-build-hole-2-drive.png`) and the approach was judged "Rough". The run ended there on the 600 s watchdog.
 
-Gameplay status: the swing, ball flight, lie judgment (fairway, rough, bunker, green), putting, gimme, hole-out, scorecard and the move to the next hole work on screen. "First playable hole" and one completed hole are done; a full round is NOT_RUN. Open faults seen on the course: the sky draws in flat color bands, the hole map is black on hole 1 and drawn in color on hole 2, Eagle City draws teal grass while Green C.C. draws green, and skin is still blue. Auto-Impact was on for the completed holes; a three-press swing through to hole-out is NOT_RUN.
+Gameplay status: the swing, ball flight, lie judgment (fairway, rough, bunker, green), putting, gimme, hole-out, scorecard and the move to the next hole work on screen. "First playable hole" and one completed hole are done; a full round is NOT_RUN. Open fault seen on the course: the hole map is black on hole 1 and drawn in color on hole 2. Auto-Impact was on for the completed holes; a three-press swing through to hole-out is NOT_RUN.
 
 Swing input: `work/test-scripts/shot.py 1.1 1.15` sends Cross, waits 1.1 s, Cross for power, waits 1.15 s, Cross for impact. Pad-file polling adds about 0.1 s of jitter, so impact timing is not repeatable; "Toggle Auto-Impact" (Square on the pre-round screen) is untested.
 
@@ -62,7 +62,7 @@ Test driver: copies of the boot scripts are in `work/test-scripts` (untracked). 
 
 Fixed 2026-11-18, the hang after "Finish editing" (and an intermittent stall during boot): the game rebuilds its compute command buffers in place as soon as `sceGnmDingDong` returns. When the GPU thread was still running the previous buffer, the label releases in it were overwritten and the graphics queue waited forever on a label holding 0. `sceGnmDingDong` now waits up to 2 s for the compute queue to drain (`Liverpool::WaitAsc`). `RESOGUN_TRACE_DINGDONG=1` prints the compute submits and label traffic that showed this.
 
-Open rendering fault: character skin draws blue (Hikari, `2026-11-17-faces-fixed-blue-skin.png`) or white (the creator avatar) instead of a skin tone. Scenery and UI colors are right. Cause not found yet; a red/blue swap and a missing skin color input are both untested guesses. Ruled out on 2026-11-18: direct memory access and linear readbacks (both on, no change) and the `image view type Color1D is incompatible with image type Color2D` fault (a 1024x1 image registered as both types is now recreated; skin unchanged).
+Color correction, 2026-11-18: the "blue skin", teal grass and orange sky recorded earlier were never drawn by the game. The screenshots were wrong. The frame dump (`output_*.raw`) holds the presenter frame in the swapchain format, which is BGRA on this PC, and the conversion scripts read it as RGBA, so every screenshot had red and blue swapped. Read as BGRA the home island shows a blue sky, skin tones and a brick plaza. A frame capture confirmed it from the other side: the game's 16-bit float copy of the final image has natural colors with no channel remapping. All screenshots in `docs/media` were re-saved with red and blue restored, and `step.py`, `burst.py` and `conv.py` now read BGRA. Still open: the creator avatar's skin draws white (`2026-11-17-character-creator.png`); whether that is a fault or the creator's default is NOT_VERIFIED. The sky bands noted on the course have not been re-checked on a corrected frame (NOT_RUN).
 
 Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
