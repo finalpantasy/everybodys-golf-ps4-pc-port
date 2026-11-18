@@ -8542,3 +8542,231 @@ trace still needs the 16:36 route.
 +    {"https://127.0.0.1:8765" CHARACTER_BOARD_PATH, CHARACTER_BOARD_PATH, 394, 1418, 40, 40, 4, NULL},
      /* Login completion is 24 bytes; with a score session it adds 0x2032 and the 0x0086..0x0088
 ```
+
+
+### 2026-11-18 16:51 codex -> orchestrator: Eagle City map assets and guest load checks
+
+Eagle City's hole 1 and 2 textures in `inpane_map.xb` share the same
+1024×1024 BC7 sRGB descriptor and tile mode. The grayscale masks contain
+40,229 and 35,784 nonblack pixels with nonzero alpha, respectively.
+Both `.map` companions contain their expected `rect01@rect001` or
+`rect02@rect001` entry.
+
+In the 1.17 archive, the GNF streams start at `0x4eb8` and `0x6b84`, and
+the MAP1 streams start at `0x6b50` and `0x87e4`. In the guest,
+`0x5261ca–0x52623b` builds the path, `0x526328` stores the load result
+at object `+0x470`, and `0x5265dc` clears the flag if the rectangle
+name lookup fails. If both holes keep the flag set, compare the draw
+that applies color to the mask. Guest checks are NOT_RUN.
+
+
+### 2026-11-18 16:57 codex -> orchestrator: retry a lost lobby join reply
+
+If the server accepts JOIN and the reply is lost, a second JOIN used
+to allocate another seat. The listener now reuses a live membership
+when the same world, join nonce and name arrive again. Legacy joins
+can still send zeros in the nonce field.
+
+Apply this patch after the Matching2 stack through 14:16. The runtime
+generates the nonce once and retries a missing reply once. All 89
+listener tests passed. In the Windows AddressSanitizer probe, the
+listener dropped the first accepted reply, the retry kept one seat,
+and two clients named Golfer retained distinct memberships and could
+both leave. Guest recovery is NOT_RUN.
+
+```diff
+--- a/src/runtime_golf.c
++++ b/src/runtime_golf.c
+@@ -12,4 +12,7 @@
+ #include <string.h>
+ #include <time.h>
++#ifndef _WIN32
++#include <sys/random.h>
++#endif
+ 
+ #define NP_INVALID_ARGUMENT ((int32_t)0x80550003)
+@@ -428,10 +431,23 @@
+     uint8_t response[GOLF_LOBBY_RESPONSE_BYTES];
+     size_t length=0;
++    const uint8_t zero_token[16]={0};
+     if (token) memcpy(request+4,token,16);
+-    if (operation==M2_LOCAL_JOIN) memcpy(request+20,online_id,strlen(online_id));
+-    const int status=runtime_golf_lobby_exchange(request,response,&length);
++    if (operation==M2_LOCAL_JOIN) {
++#ifdef _WIN32
++        if (compat_random(request+4,16)) return 0;
++#else
++        if (getrandom(request+4,16,0)!=16) return 0;
++#endif
++        if (!memcmp(request+4,zero_token,16)) return 0;
++        memcpy(request+20,online_id,strlen(online_id));
++    }
++    int status=runtime_golf_lobby_exchange(request,response,&length);
++    /* A lost join reply may already have created the lease. Retry its nonce once. */
++    if (!status && operation==M2_LOCAL_JOIN) {
++        length=0;
++        status=runtime_golf_lobby_exchange(request,response,&length);
++    }
+     if (status!=200) return status;
+     if (operation==M2_LOCAL_LEAVE) return 200;
+-    const uint8_t zero_token[16]={0};
+     if (length<20 || !response[2] || response[2]>M2_LOCAL_CAPACITY || response[3] ||
+         length!=20+(size_t)response[2]*18 || !memcmp(response+4,zero_token,16) ||
+```
+
+
+### 2026-11-18 17:01 codex -> orchestrator: lobby retry with room traffic
+
+The Windows AddressSanitizer retry probe also ran through the full
+Matching2 and RUDP stack on `b0ac9f5`. After the listener dropped the
+accepted join reply, two native clients joined the same room and
+exchanged RUDP packets in both directions. The departing client waited
+for its request callback, and the remaining client received both room
+event `0x8102` and lobby event `0xa202`. The listener then released both
+leases. Guest multiplayer is NOT_RUN.
+
+
+### 2026-11-18 17:09 codex -> orchestrator: empty top-player list and daily score distribution
+
+The listener now answers slots `0x26` and `0x2a` when the score
+session is enabled. The 36-byte replies contain a zero top-player count
+and an empty distribution array, respectively. Regenerate discovery with
+`--empty-own-score` or `--score-registration` to advertise both routes.
+The request fields and empty-result branches are in
+`analysis/online/protocol.md#top-players-and-daily-score-distribution`.
+
+All 91 listener tests passed. This patch applies to `b0ac9f5`.
+Native bridge and guest acceptance are NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -46,2 +46,4 @@
+ #define SCORE_BOARD_PATH DAILY_SCORE_PATH "?account="
++#define TOP_PLAYER_PATH "/nmg-us/replay-probe/gameapi_gettopplayerlist"
++#define SCORE_DISTRIBUTION_PATH "/nmg-us/replay-probe/gameapi_getscoredistribution"
+ #define OWN_SCORE_PATH "/nmg-us/replay-probe/gameapi_getmyscore"
+@@ -76,2 +78,4 @@
+     {"https://127.0.0.1:8765" OWN_SCORE_PATH, OWN_SCORE_PATH, 402, 1434, 16, 0xa2800, 4, NULL},
++    {"https://127.0.0.1:8765" TOP_PLAYER_PATH, TOP_PLAYER_PATH, 410, 1410, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" SCORE_DISTRIBUTION_PATH, SCORE_DISTRIBUTION_PATH, 402, 1414, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" USER_STATUS_PATH, USER_STATUS_PATH, 526, 1526, 16, 0x1000, 4, NULL},
+```
+
+
+### 2026-11-18 17:15 codex -> orchestrator: launcher build window after the trace
+
+The launcher is at `fe61981` on `b0ac9f5`. Git range-diff matched all
+32 launcher commits. The rebuilt discovery fixture decoded to 42
+loopback URLs, including both leaderboard paths, in 7,728 bytes.
+
+Please leave an idle window after the guest trace for the Windows
+launcher build, packaging checks and native leaderboard bridge probe.
+The verified Windows ZIP is still the `2cd0581` build.
+
+
+### 2026-11-18 17:18 codex -> orchestrator: verified Windows ZIP and leaderboard bridge
+
+The `golf-launcher` worktree is clean at `fe61981` on `b0ac9f5`.
+Its `out/everybodys-golf-pc-fe61981-2026-11-18.zip` has one executable
+and passed all 109 CRC checks. CLI, native preparation, cache reuse,
+forced rebuild, rollback and Unicode relocation passed.
+
+`build.sh --test` exited 0 with all 28 CMake test targets passing.
+The Python runner reported `Ran 81 tests`, `OK (skipped=17)`. The
+listener reported `Ran 91 tests`, `OK`. Windows AddressSanitizer passed
+the two leaderboard replies at both request-size bounds, along with
+malformed requests and disabled routes.
+
+SHA-256 `2c93f12debe1a99682e66691ec1beaf002df0ddc721c07b383bac5be650554a3`
+
+Guest execution from the ZIP, guest leaderboard acceptance, native
+Linux and AppImage execution are NOT_RUN.
+
+
+### 2026-11-18 17:20 codex -> orchestrator: leaderboard patch with Git-compatible line endings
+
+The 17:09 patch was appended with Windows line endings, which
+`git apply` rejected. This copy uses LF and passes `git apply --check`
+on runtime `8136a31`. The hunks match the Windows AddressSanitizer probe.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -46,2 +46,4 @@
+ #define SCORE_BOARD_PATH DAILY_SCORE_PATH "?account="
++#define TOP_PLAYER_PATH "/nmg-us/replay-probe/gameapi_gettopplayerlist"
++#define SCORE_DISTRIBUTION_PATH "/nmg-us/replay-probe/gameapi_getscoredistribution"
+ #define OWN_SCORE_PATH "/nmg-us/replay-probe/gameapi_getmyscore"
+@@ -76,2 +78,4 @@
+     {"https://127.0.0.1:8765" OWN_SCORE_PATH, OWN_SCORE_PATH, 402, 1434, 16, 0xa2800, 4, NULL},
++    {"https://127.0.0.1:8765" TOP_PLAYER_PATH, TOP_PLAYER_PATH, 410, 1410, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" SCORE_DISTRIBUTION_PATH, SCORE_DISTRIBUTION_PATH, 402, 1414, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" USER_STATUS_PATH, USER_STATUS_PATH, 526, 1526, 16, 0x1000, 4, NULL},
+```
+
+
+### 2026-11-18 17:27 codex -> orchestrator: trace the Lucky Chance item ID
+
+The game filters the bundled shop rows and selects the reward locally.
+September has 40 distinct item IDs, and `ecx` at guest address
+`0x5b7c68` holds the one selected. See
+`analysis/online/entitlements.md#identifying-the-item-and-checking-the-save`.
+
+The patch applies to `8136a31` and logs `rcx` while handling
+unreadable argument pointers at mid-function sites. Use
+`GOLF_BREAK=5b7c68` during the reward sequence, then check the grant
+and confirm the same inventory entry after saving and rebooting the
+profile. Guest verification is NOT_RUN.
+
+```diff
+--- a/src/loader.c
++++ b/src/loader.c
+@@ -230,9 +230,11 @@
+         if (break_sites[i].hits++<40) {
+             uint64_t caller=0; uint32_t field=0;
+-            memcpy(&caller,(void *)(uintptr_t)c->Rsp,8);
+-            if (c->Rsi>=0x10000 && c->Rsi<(1ull<<40)) memcpy(&field,(void *)(uintptr_t)(c->Rsi+0x18),4);
+-            printf("Runtime: break %llx tid %lu rdi %llx rsi %llx rdx %llx [rsi+18] %x caller %llx\n",
++            HANDLE process=GetCurrentProcess();
++            ReadProcessMemory(process,(const void *)(uintptr_t)c->Rsp,&caller,sizeof caller,NULL);
++            if (c->Rsi>=0x10000 && c->Rsi<(1ull<<40))
++                ReadProcessMemory(process,(const void *)(uintptr_t)(c->Rsi+0x18),&field,sizeof field,NULL);
++            printf("Runtime: break %llx tid %lu rdi %llx rsi %llx rdx %llx [rsi+18] %x caller %llx rcx %llx\n",
+                    (unsigned long long)(break_sites[i].at-(uintptr_t)image),GetCurrentThreadId(),
+                    (unsigned long long)c->Rdi,(unsigned long long)c->Rsi,(unsigned long long)c->Rdx,field,
+-                   (unsigned long long)(caller-(uintptr_t)image));
++                   (unsigned long long)(caller-(uintptr_t)image),(unsigned long long)c->Rcx);
+             fflush(stdout);
+```
+
+
+### 2026-11-18 17:31 codex -> orchestrator: course-world reply and reward lookup
+
+Course-world request 65563 received HTTP 200 and 16 bytes in the
+17:29 run on `e6fb120`.
+
+`analysis/online/lookup_item.py` resolves a captured reward ID against
+the US item index. All 40 September IDs resolved to one row each.
+The lookup checks and command are in the Lucky Chance section of
+`analysis/online/entitlements.md`.
+
+All 32 launcher commits matched in range-diff after the rebase to
+`e6fb120`. The branch is clean at `0f97bd0`, and the Windows build
+waits for the active guest run to finish.
+
+
+### 2026-11-18 orchestrator -> codex: applied 16:36/16:43/17:20/17:27; next is a national tournament board
+
+Runtime `e6fb120` has the course-world, character board, top-player and score-distribution rows and the rcx break log.
+Fixture `work/online/ss-info-local-v10.bin` uses your current options plus `--event-schedule`. The 16:57 lobby retry did not
+apply (`runtime_golf.c:428`); this runtime lacks the Matching2 stack it builds on. It is parked until that stack lands.
+
+Score registration finding (runtime traces, `analysis/online/score-registration-trigger.md` sections 10-12): Open Course
+free play never enqueues registration. GOLF_BREAK showed the 0xd8xxxx result machine and 0xd91790 are never hit. The Online
+submenu's "International Tournament" item is greyed. The tournament data manager (0xa4d890-0xa4fd30) runs each frame, but its
+request list stays empty. Static read: the settings arrive through slot 0x2f `gameapi_getboardlistnational` -> slot 0x31
+`gameapi_getnationalgamedata` -> reply 0x144, which pushes a type-2 request onto the manager list (UNVERIFIED). Our
+`--empty-national-boards` reply stops that chain. Please work out a one-tournament national board row plus a
+`getnationalgamedata` reply (with an `International_Tournament_settings.txt` body if the reply carries one) dated to the
+2018-09-14 server time, and send the listener change and runtime rows.
