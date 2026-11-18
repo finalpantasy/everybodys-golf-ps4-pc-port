@@ -8770,3 +8770,106 @@ request list stays empty. Static read: the settings arrive through slot 0x2f `ga
 `--empty-national-boards` reply stops that chain. Please work out a one-tournament national board row plus a
 `getnationalgamedata` reply (with an `International_Tournament_settings.txt` body if the reply carries one) dated to the
 2018-09-14 server time, and send the listener change and runtime rows.
+
+
+### 2026-11-18 17:43 codex -> orchestrator: local national tournament replay
+
+Use `work/online/ss-info-local-national-v1.bin` with `--national-tournament --server-time 2018-09-14T12:00:00` and keep the other listener options from v10. The generator reproduced v10 byte for byte.
+
+The patch passes `git apply --check` on `e6fb120`. All 93 listener tests passed, including the two board selectors, both game-data request bounds, and the settings and messages archive. Guest acceptance is NOT_RUN.
+
+Expected guest slots are `0x2f`, `0x30`, `0x31`, and `0x32`. Breakpoints `b84b63`, `a61427`, `b65de3`, and `a4e1be` identify board parsing, request scheduling, archive delivery, and the settings open.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -36,6 +36,9 @@
+ #define BOARD_LIST_PATH "/nmg-us/replay-probe/gameapi_getboardlist"
+ #define CHARACTER_BOARD_PATH "/nmg-us/replay-probe/gameapi_getboardlistcharactordownload"
+ #define NATIONAL_BOARD_PATH "/nmg-us/replay-probe/gameapi_getboardlistnational"
++#define NATIONAL_GAME_DATA_PATH "/nmg-us/replay-probe/gameapi_getnationalgamedata"
++#define NATIONAL_BOARD_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-national-board.bin"
++#define NATIONAL_GAME_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-tournament.xb"
+ #define CHARACTER_COUNT_PATH "/nmg-us/replay-probe/gameapi_getcountcharactordownload"
+ #define PROPERTY_INFO_PATH "/nmg-us/replay-probe/gameapi_getgamepropertyinfo"
+ #define TELEMETRY_PATH "/nmg-us/replay-probe/analytics/19d916d7-6a01-4371-9e6c-c91b2ff386bb/telemetry"
+@@ -92,6 +95,9 @@
+     /* Action 0x26 of the login run (slot 0x2f). Over plain http the game encrypts the payload and drops
+      * it (eboot 0xec97d0), so the discovery fixture must list this key as https. */
+     {"https://127.0.0.1:8765" NATIONAL_BOARD_PATH, NATIONAL_BOARD_PATH, 378, 1378, 28, 0x8000, 4, NULL},
++    {"http://127.0.0.1:8765" NATIONAL_BOARD_DOWNLOAD_PATH, NATIONAL_BOARD_DOWNLOAD_PATH, 0, 0, 136, 136, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_GAME_DATA_PATH, NATIONAL_GAME_DATA_PATH, 406, 1406, 72, 72, 4, NULL},
++    {"http://127.0.0.1:8765" NATIONAL_GAME_DOWNLOAD_PATH, NATIONAL_GAME_DOWNLOAD_PATH, 0, 0, 16, 8192, 1, NULL},
+     {"https://127.0.0.1:8765" PROPERTY_INFO_PATH, PROPERTY_INFO_PATH, 118, 118, 24, 24, 4, NULL},
+     {"https://127.0.0.1:8765" CHARACTER_COUNT_PATH "?account=", CHARACTER_COUNT_PATH "?account=", 394, 1394, 44, 44, 4, NULL},
+     {"https://127.0.0.1:8765" CHARACTER_COUNT_PATH SESSION_QUERY, NULL, 394, 1394, 44, 44, 4, NULL},
+```
+
+
+### 2026-11-18 17:47 codex -> orchestrator: mount the tournament cache
+
+The tournament worker writes the archive under `/download0/` (`a4fda2â€“a4fe83`) before reopening it (`a4df32â€“a4dfd4`). The runtime has no default mount there. Create an empty folder inside your portable test profile and add `--mount /download0=<folder>` to the boot command.
+
+Windows AddressSanitizer passed both POSTs, both GETs, both game-data request bounds, and disabled routes.
+
+
+### 2026-11-18 17:51 codex -> orchestrator: Windows launcher test build started
+
+The PC was idle. I started `build.sh --test` in the launcher worktree at `0f97bd0` on `e6fb120`. I will finish the host checks before packaging.
+
+
+### 2026-11-18 18:02 codex -> orchestrator: verified launcher ZIP and handoff
+
+The launcher worktree is clean on `golf-launcher` at `0f97bd0`, 32 commits above `e6fb120`.
+
+| Verification | Result |
+|---|---|
+| Player archive | `out/everybodys-golf-pc-0f97bd0-2026-11-18.zip` in the launcher worktree |
+| SHA-256 | `07f4fcdeb9c029a403191019e490d6332368e0217e640103e17e12755423aa02` |
+| ZIP and launcher | One executable, 109 CRC checks, native preparation parity, cache reuse, rollback, Unicode relocation and shortcut |
+| Windows build | Exit 0 and 28 CMake targets passed |
+| Python runner | `Ran 81 tests`, `OK (skipped=17)` |
+| Local listener | `Ran 93 tests`, `OK`, plus Windows AddressSanitizer replay of the tournament routes |
+
+The 17:43 and 17:47 entries have the tournament patch and cache mount. The listener now writes both tables with the UTF-8 BOM used by the bundled parameter files. The lobby retry remains parked behind the Matching2 stack.
+
+NOT_RUN â€” guest execution from the ZIP, tournament entry, native Linux and AppImage execution.
+
+
+### 2026-11-18 18:07 codex -> orchestrator: registration evidence and matched FPS test
+
+The 18:01 trace and SQLite rows confirm Open Course registration and both readback routes for holes 1 and 2. The national game-data request ID is at `ctx+0x128058` (`b56289`). The `0x41f6` reply writes the version at `ctx+0x12805c` (`b66712`). Both findings are in `analysis/online/protocol.md`.
+
+| FPS evidence | Result |
+|---|---|
+| Latest two-hole run | 172,014 copy-wait yields and no timed FPS windows |
+| 15:35 copy-wait patch on `0ff2ae4` | Strict apply check and Windows ASan passed with one and four workers |
+| Four-worker ASan copy probe | 468.8 to 0.0 ms of caller CPU, 458.8 to 467.1 ms elapsed |
+| Earlier nine-hole run | Ten VRAM budget changes between 8,569 and 22,346 MiB, 80 reported evictions, zero writebacks |
+
+Use the 10:41 frame-stat patch on both sides of the same warmed tee comparison. Apply only the 15:35 asynchronous wait patch on the candidate. Keep the flip IRQ handling and texture budget identical. If budget swings recur, isolate them in a separate run with `--gc-budget-mb 7168`, a test override above the observed 4,426 MiB use.
+
+The result BGM misses are the first locale lookup. The table at `133a3e0` gives both English modes a second `data` path, tried after failure at `ef4ac7-ef4ad5`. Both neutral `result.sxd1` and `result.sxd2` exist. `--file-trace-match sound/bgm/result.sxd` records successful opens too. Audio playback and guest FPS A/B are NOT_RUN.
+
+
+### 2026-11-18 18:11 codex -> orchestrator: keep the lower One Hole score
+
+The One Hole listener now keeps the lower primary score when submissions arrive out of order. Previously, the last write won, so both readbacks returned the worse score. The SQLite comparison and write are atomic. The registration acknowledgment still returns the normal success records.
+
+The loopback regression test failed on both queries before the fix. All 94 listener tests now pass, and a separate 24-submission probe over four concurrent connections retained the lowest score in both queries.
+
+
+### 2026-11-18 orchestrator -> codex: tournament replay works; four board requests get 400
+
+Runtime `8eae334` has the 17:43 rows. Listener: `ss-info-local-national-v1.bin`, `--national-tournament`, the v10 options, and
+`--event-group` rows for course 1. Boot mounts `/download0=work/online/download0`. All four GOLF_BREAK sites hit (b84b63,
+a61427, b65de3, a4e1be). The guest wrote `LocalTournament.US_01.xb` (188 bytes) and `LocalTournamentversionUS_01_ENG.dat`
+(4 bytes) to the mount. The Online submenu's International Tournament is enabled, the island shows the "AIM FOR THE TOP!"
+banner, and the info line reads "An International Tournament is currently being held. Participate by going through the
+central gate." Frames: `work/evidence/international-tournament-{menu,island}-1118.png`. Log:
+`work/evidence/international-tournament-1118.log` (lines 2749-2762).
+
+Problem: after the first answered board, the guest's next four `gameapi_getboardlistnational` POSTs get 400 from the
+listener. `valid_national_board_request` takes only selectors 0 and 1 with no extra records. These are probably another
+selector or the paged `0x4a10/0x4000/0x4010` tail. Please accept them with the right reply. Then work out what selecting the
+item, or walking through the central gate, sends next.
