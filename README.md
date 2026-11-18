@@ -8,19 +8,21 @@ The port runs the game's original x86-64 code directly on Windows. The PS4 syste
 
 ## Current status
 
-This is not playable yet.
+This is not playable yet. No hole has been played.
 
-- The original game code starts and runs initialization.
-- The runner creates 56 game threads.
-- The runner registers two display buffers.
-- Network, HTTP and mouse startup calls are handled.
-- Audio startup runs against a silent `libSceNgs2` (no mixing yet) and fonts are served from a host font.
-- The game draws its first frames: the "NOW LOADING" screen below, captured from a 90-second run.
-- It stays on that screen for the rest of the run. There is no menu and no gameplay yet.
+- The original game code boots to the title screen and the main menu.
+- The opening event plays with correct 3D geometry and dialogue text.
+- Nickname entry works and the character creator opens.
+- Course 00 loads and draws behind the loading text.
+- A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed. Whether the game shows those items is not verified.
+- Character skin draws blue or white instead of skin tones. Scenery and menus have the right colors.
+- There is no sound yet.
 
-![The game's own NOW LOADING screen, drawn by the port](docs/media/2026-11-17-first-frame-now-loading.png)
+![The character creator, drawn by the port. The skin color is wrong (white instead of a skin tone).](docs/media/2026-11-17-character-creator.png)
 
-Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first three are reached; guest rendering so far means the loading screen only.
+![The opening event. Faces draw correctly; the skin is blue because of the same color fault.](docs/media/2026-11-17-faces-fixed-blue-skin.png)
+
+Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first four are reached.
 
 ## Goals
 
@@ -28,7 +30,7 @@ Progress is measured by these steps: prepared image, boot, guest rendering, real
 - Online multiplayer through a community server and a compatible peer transport.
 - Restored limited-event gear, based on evidence of the original event, redemption and shop behavior.
 
-None of these is implemented yet.
+The entitlement unlock is implemented and not yet verified in the game. Online and event gear are not implemented.
 
 ## What you need
 

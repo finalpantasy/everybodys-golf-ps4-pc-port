@@ -1,6 +1,6 @@
 # Project state
 
-Status: Building. First guest frames reached on 2026-11-17 (the game's "NOW LOADING" screen). No real menu or gameplay yet.
+Status: Building. On 2026-11-17 the game reached its title screen, main menu, opening event and character creator with correct geometry. No hole has been played. Character skin color is wrong and there is no sound.
 
 ## Goals
 
@@ -13,9 +13,9 @@ Status: Building. First guest frames reached on 2026-11-17 (the game's "NOW LOAD
 
 - `analysis/input-inventory.json`: 26 packages (base, update, 24 DLC), with sizes, hashes and Orbis metadata.
 - `analysis/dlc-content-inventory.json`: all 24 DLC packages are metadata/entitlement-only; none contains a filesystem file.
-- `work/base/uroot`: base 1.00 extraction using LibOrbisPkg. Its old validator reported several digest errors; do not treat that validator result as proof of corruption or authenticity.
+- `work/base-orbis`: base 1.00 extracted with the Orbis CLI (1,114 files). The earlier LibOrbisPkg extraction in `work/base/uroot` is damaged (zero-filled holes in 805 files) and is no longer staged.
 - `work/update-1.17`: 1,196 update files extracted with Orbis after LibOrbisPkg's old PFS parser failed on the update.
-- `work/game-1.17`: 1,778 hard-linked files, with update precedence and the non-empty base `libSceNpToolkit.prx` filling the update's zero-byte placeholder.
+- `work/game-1.17`: 1,778 hard-linked files (base files from `work/base-orbis`), with update precedence and the non-empty base `libSceNpToolkit.prx` filling the update's zero-byte placeholder.
 - `work/game-1.17-prepared/analysis.json`: 756 EBOOT imports, 43,099 relocations, 45 required modules; source SHA-256 `59d9dc8df97c2b39315afed269d33e63839d594c9f3357b8784ec0db7606e820`.
 - `work/game-1.17-prepared/link.json`: 13 linked modules, 274 native bindings and 884 host imports.
 - `analysis/import-names.json`: 713 host imports resolved to unique names, one ambiguous and 170 unresolved using the pinned Resogun/DriveClub symbol inventories.
@@ -26,7 +26,48 @@ Status: Building. First guest frames reached on 2026-11-17 (the game's "NOW LOAD
 
 Preparation is not a byte-exact ELF reconstruction; the parser reports unavailable non-loadable metadata header 10. Execution must be verified separately.
 
-## Current blocker
+## Current state and blocker
+
+State at the end of 2026-11-17 (runtime branch `everybodys-golf`, commit `8493a05`). Every boot below ran hidden with `RESOGUN_DISPLAY_MODE=windowed`, pad input from `RESOGUN_PAD_FILE` and frames from `RESOGUN_FRAME_DUMP_TRIGGER`.
+
+Reached, with frames in `docs/media`:
+
+- Title screen, autosave warning and the main menu's offline Store dialog (`2026-11-17-title-screen.png`, `-autosave-warning.png`, `-store-offline-dialog.png`).
+- Course 00 drawn in 3D behind "NOW LOADING" (`2026-11-17-course00-loading-render.png`).
+- The opening event with Suzuki and Hikari, with correct geometry and dialogue text (`2026-11-17-intro-event-fixed-geometry.png`).
+- Nickname Entry: the keyboard dialog returns a name and the game asks "Are you happy with ...?".
+- Customize Character, the character creator (`2026-11-17-character-creator.png`).
+
+Not reached: finishing the creator, any hole, any shot. No gameplay claim.
+
+Open rendering fault: character skin draws blue (Hikari, `2026-11-17-faces-fixed-blue-skin.png`) or white (the creator avatar) instead of a skin tone. Scenery and UI colors are right. Cause not found yet; a red/blue swap and a missing skin color input are both untested guesses. One log line may be related and is unexamined: `image view type Color1D is incompatible with image type Color2D`.
+
+Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
+
+### What fixed what (2026-11-17, second half)
+
+- Base package extraction was corrupt. LibOrbisPkg left zero-filled holes in 805 of 1,091 base files (found when `courseeffect.xb` entries failed zlib and the course load faulted at `0xeaddb4`). The base is now extracted with the Orbis CLI to `work/base-orbis` (1,114 files; only `sce_sys/license.info` skipped) and `work/game-1.17` links to it; `stage-manifest.json` names the new base. `work/base/uroot` is the old damaged copy: do not use it.
+- Scattered-triangle geometry: a draw-preparation worker read the vertex buffer table before the game rewrote it for the frame. The draw now compares each vertex buffer descriptor before using prepared inputs (`vk_rasterizer.cpp`). Found by switching the renderer's optimizations off one at a time with `RESOGUN_TOGGLE_FILE`.
+- Black faces: `v_writelane` was emitted as 0. Fixed by porting two hunks of the golf-fix v41 shadPS4 patch (`tools/golf-fix-pro-v41/source/golf-fix-v41.patch`, GPL-2.0-or-later).
+- PM4 type 0 packets are skipped with one warning per register instead of asserting.
+- Shader resource lists hold 128 images and 64 samplers; a draw with more bindings than the old limit threw.
+- A local PSN account answers sign-in and NpWebApi locally (`src/runtime_golf.c`). 31 add-on labels from the game's own entitlement table are reported installed. Whether the game shows those items is NOT_VERIFIED.
+
+### Switches
+
+- `GOLF_NP=offline`: signed-out console instead of the local account. `GOLF_ONLINE_ID=<name>`: the local online id (default `Golfer`).
+- `GOLF_ENTITLEMENTS=original`: report no add-ons.
+- `RESOGUN_IME_TEXT=<text>`: answer every keyboard dialog with this text (needed for unattended boots: the on-screen dialog waits for a real controller or keyboard).
+- `RESOGUN_FILE_TRACE_MATCH=<text>`: log every open whose path contains the text, found or not.
+- `RESOGUN_FAULT_PEEK=<reg><+|->0x<offset>`: print the string at that address in a fault report.
+- `RESOGUN_VERIFY_PREPARED=1`: compare what the draw-preparation workers read with a fresh read and log differences.
+- `RESOGUN_TOGGLE_FILE=<file>`: a number in the file switches renderer optimizations off while the game runs (bits in `gpu/shim/resogun_toggles.h`).
+
+### Network contract seen so far
+
+The game opens `https://ssps4.scej-network.jp:443/nmg-us/ss.info` (GET, five times in a boot). Nothing is sent. No NpWebApi entitlement request has been observed yet, so the S Ticket grant is not built.
+
+## Earlier findings (2026-11-17, first half)
 
 Latest bounded boot (90 s bound, 2026-11-17, build `EA10308E`, hidden desktop, windowed 1920x1080) ran the full 90 s and ended on the watchdog bound, with no fault and no missing import: 69 guest threads, 2,117 pad reads, 35 files opened, 202 MB read, 5,928 opens not found (mostly avatar model variants under `data/chara/model/avatar`; not yet checked whether those are expected probes or a path problem).
 
@@ -77,11 +118,11 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Done: orchestrator pinned (see ownership).
-2. Find why the game stays on "NOW LOADING": idle-PC run with a longer bound, read thread stacks, check the not-found opens.
-3. Continue one intentional runtime failure at a time until stable initialization; do not call a host window or registered display buffers gameplay.
-4. Locate AppContent entitlement/list and redemption paths and implement the built-in-DLC unlock provider with an original-entitlement test mode.
-5. Capture Golf's network request contracts before implementing local identity, rooms, peer transport, events, and rewards.
+1. Find why character skin draws blue or white.
+2. Finish the character creator and reach the first hole.
+3. Sound: an Ngs2 mixer.
+4. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
+5. Capture the game server's request contracts for the community server.
 
 ## Verification commands
 
@@ -96,4 +137,4 @@ Build through `tools/msys2/msys64/msys2_shell.cmd -defterm -clang64 -no-start`, 
 
 ## Evidence boundaries
 
-Guest rendering is shown for the loading screen only. No real menu, playable hole, multiplayer session, DLC unlock, or event reward has been demonstrated. The downloaded shadPS4/Golf-fix reference binaries have not been run. REA cannot currently analyze this ELF on Windows: Ghidra P0 accepts PE/raw targets only there, and REA's ELF-layout provider is Linux-only. Use the existing standalone Ghidra project until a supported REA route is configured.
+Rendering is shown for the title screen, menu dialogs, course 00 behind the loading text, the opening event and the character creator. No playable hole, multiplayer session, visible DLC item or event reward has been demonstrated. The golf-fix shadPS4 binary has not been run; only its source patch was read and two hunks ported. REA cannot currently analyze this ELF on Windows: Ghidra P0 accepts PE/raw targets only there, and REA's ELF-layout provider is Linux-only. Use the existing standalone Ghidra project until a supported REA route is configured.
