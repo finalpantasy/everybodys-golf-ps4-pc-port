@@ -28,14 +28,19 @@ Preparation is not a byte-exact ELF reconstruction; the parser reports unavailab
 
 ## Current blocker
 
-Latest bounded boot (90 s bound, 2026-11-17, build `A0F6C358`, hidden desktop, windowed 1920x1080) stopped at:
+Latest bounded boot (90 s bound, 2026-11-17, build `F3D384D7`, hidden desktop, windowed 1920x1080) stopped at:
 
 ```text
-STOP: first unsupported PS4 import: mPYgU4oYpuY#libSceNgs2 (index 683)
-Caller return offset: 0x10967a6; first argument: 0x1df90c0
+STOP: first unsupported PS4 import: whrS4oksXc4#libSceFont (index 480)
+Caller return offset: 0xc1ab5; first argument: 0x802ccba50
 ```
 
-This is the first call into the audio synthesis library. The game imports 11 `libSceNgs2` functions, none resolved to names yet, and neither Resogun nor DriveClub implements Ngs2. Contract analysis is delegated to a worker and lands in `analysis/ngs2-contracts.md`; do not implement before reading it. That boot reached 57 guest threads, 8 files opened and 3 file writes.
+`whrS4oksXc4` = `sceFontMemoryInit`. The game imports 22 `libSceFont`/`libSceFontFt` functions the runtime lacks. DriveClub's `src/runtime_font.c` covers 17 of them by name; five NIDs are unnamed. A worker is drafting the port and call-site evidence into `analysis/font-port/`; integrate from there. That boot reached 61 guest threads, 10 files opened and 8 file writes.
+
+Audio, same day:
+
+- `libSceNgs2` (11 imports, names in `src/import_names.inc`, all NID hashes verified): new `src/runtime_ngs2.c` gives systems, racks and voices real handles and out-fields and renders silence. No mixing yet, so the game will be silent until a mixer exists. Evidence: `analysis/ngs2-contracts.md`. Boot verified through audio init (SystemCreateWithAllocator and the RackCreateWithAllocator calls); RackQueryBufferSize, RackCreate, VoiceGetState and SystemRender were not observed in a boot.
+- `wVwPU50pS1c#libSceAudioOut` = `sceAudioOutSetMixLevelPadSpk(handle, level)`. Upstream had the port field and comment but no function. Added. Boot verified: advanced past it. The wrong-port-type error code was corrected to 0x8026000A after that boot; that one-line change is built into nothing yet (NOT_RUN).
 
 Resolved on 2026-11-17 by the Claude orchestrator (each NID checked by recomputing the SHA-1 NID hash; each caller read with `llvm-objdump` on `work/game-1.17-prepared/eboot.elf`):
 
@@ -69,7 +74,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 ## Next actions
 
 1. Done: orchestrator pinned (see ownership).
-2. Read `analysis/ngs2-contracts.md`, implement the evidenced `libSceNgs2` contracts (silent but correct first), rebuild, rerun the bounded boot on the hidden desktop.
+2. Integrate the font port from `analysis/font-port/` (read its NOTES.md first), rebuild, rerun the bounded boot on the hidden desktop.
 3. Continue one intentional runtime failure at a time until stable initialization; do not call a host window or registered display buffers gameplay.
 4. Locate AppContent entitlement/list and redemption paths and implement the built-in-DLC unlock provider with an original-entitlement test mode.
 5. Capture Golf's network request contracts before implementing local identity, rooms, peer transport, events, and rewards.
