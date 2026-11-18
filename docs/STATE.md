@@ -76,7 +76,7 @@ Result: the entitlement request `GET /v1/users/me/entitlements?entitlement_type=
 
 Telemetry: the poster declares the full JSON length and sends 2 KiB per `sceHttpSendRequest`. The runtime refused partial sends, and the game reopened the request every frame (6,268 opens in 250 s). Bodies are now assembled from chunks and each replay route has its own slot (Codex diffs): 37 opened, 37 answered.
 
-Open Course now reaches the "Select Open Course" screen, shows "Connecting..." and then "Server connection failed". The title queue repeats discovery, server time and property info, and no NpAuth request is created. Codex traced the next blocker to `sceNpMatching2CreateContextA` at `0xa7e1e1`, which the runtime answers SIGNED_OUT.
+Open Course (2026-11-18, runtime `da28e84`): the "Select Open Course" screen shows "Connecting..." and then "Server connection failed". The entry controller (`0xa5ada0`) needs byte `0x2c8245c`, which only the full boot-time title run sets (`analysis/online/title-queue-login-flag.md`). `GOLF_LOCAL_AUTH=1` had never taken effect (the resolver compared name prefixes against NID keys); with that fixed the run gets a local authorization code and sends `gameapi_login`. With the server's `--login-completion` reply the game accepts the login and then sends `gameapi_getboardlistnational` over plain http with an empty payload (66-byte multipart frame), so the run aborts there. The runtime now has a local NpMatching2 service (contexts, event `0x6f02`, world, lobby, join and member answers from `analysis/online/matching2-entry-contract.md`), not yet reached in a guest run. The Shop's `sdk:commerce` container batch is answered with one display-only, unpurchasable SKU per label; the Shop still loads.
 
 Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
@@ -160,7 +160,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Online entry: a local NpMatching2 service for the signed-in local account. `sceNpMatching2CreateContextA` and `sceNpMatching2ContextStart` must succeed and deliver context event 0x6f02, then world discovery, before the game asks for an NpAuth code and logs in to the title server.
+1. Online entry: find which login reply records the national board request builder (slot `0x2f`) needs, answer the rest of the login run (`0x26, 0x28, 0x25, 0x27, 0x10`, three info lists), then reach the Matching2 lobby from Open Course.
 2. S Tickets: the grant path works with `GOLF_TICKET_GRANTS=1` (101 tickets). Answer the `sdk:commerce` container request, then spend tickets in the Shop and check the limited-event gear in the game (NOT_RUN).
 3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
 4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
