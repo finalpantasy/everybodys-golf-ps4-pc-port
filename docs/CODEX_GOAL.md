@@ -15,7 +15,7 @@ You own the opposite side. Never edit the files above, never run the game or `ru
 Your workspace:
 
 - A separate git worktree of the runtime: `git -C external/resogun-recomp worktree add ../resogun-recomp-launcher -b golf-launcher everybodys-golf`. Build there with `bash build.sh`; its `out/` is yours.
-- New top-level folders in the main repo: `server/` and `analysis/online/`, on a branch named `codex/online`.
+- New top-level folders in the main repo: `server/` and `analysis/online/`. The main checkout is shared with the orchestrator, so do not switch branches, commit, stash or reset there. Leave your files uncommitted; the orchestrator commits them after review.
 
 ## Track 1: one executable, portable, flags (in the `golf-launcher` worktree)
 
@@ -39,7 +39,7 @@ Touch only launcher, loader argument parsing, setup, prepare, packaging and buil
 
 - Evidence first: no blanket success stubs, no claims about rendering, menus or playability.
 - No game files, keys, decompiled game code or build output in commits. Respect `.gitignore`.
-- Commit as `finalpantasy <289411238+finalpantasy@users.noreply.github.com>`. No personal names, emails or `C:\Users\...` paths in files or commit messages. Do not push; leave branches local for the orchestrator to review.
+- Commit as `finalpantasy <289411238+finalpantasy@users.noreply.github.com>`. No personal names, emails or `C:\Users\...` paths in files or commit messages. Commit only in your `golf-launcher` worktree. Do not push; leave that branch local for the orchestrator to review.
 - One heavy process at a time (a build counts), at BelowNormal priority, nothing over 10 minutes. Kill only processes you started, by PID.
 - American English.
 
