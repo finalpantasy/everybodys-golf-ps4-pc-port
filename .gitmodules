@@ -1,0 +1,4 @@
+[submodule "external/resogun-recomp"]
+	path = external/resogun-recomp
+	url = https://github.com/finalpantasy/resogun-recomp.git
+	branch = everybodys-golf

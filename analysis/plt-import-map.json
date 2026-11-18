@@ -1,0 +1,4379 @@
+{
+ "method": "Each 16-byte PLT stub is 'jmp *GOT(%rip); push imm32; jmp resolver'. The pushed imm32 is the index into analysis.json 'imports'. NID (before '#') joined to analysis/import-names.json for names (analysis.json import_name_hints as fallback) and to missing-imports.txt for implemented=false. Stub region scanned 0x10fcbd0-0x1100000. Validated: 0x10fdb90=252 sceNetCtlInit, 0x10fe210=356, 0x10fe220=357, 0x10fe2e0=369 match known values.",
+ "stubs": {
+  "0x10fcbd0": {
+   "index": 0,
+   "import": "fEoW6BJsPt4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcbe0": {
+   "index": 1,
+   "import": "-hn1tcVHq5Q#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcbf0": {
+   "index": 2,
+   "import": "k04jLXu3+Ic#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc00": {
+   "index": 3,
+   "import": "OJjm-QOIHlI#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc10": {
+   "index": 4,
+   "import": "pO96TwzOm5E#libkernel",
+   "name": "sceKernelGetDirectMemorySize",
+   "implemented": true
+  },
+  "0x10fcc20": {
+   "index": 5,
+   "import": "L-Q3LEjIbgA#libkernel",
+   "name": "sceKernelMapDirectMemory",
+   "implemented": true
+  },
+  "0x10fcc30": {
+   "index": 6,
+   "import": "Vla-Z+eXlxo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc40": {
+   "index": 7,
+   "import": "rTXw65xmLIA#libkernel",
+   "name": "sceKernelAllocateDirectMemory",
+   "implemented": true
+  },
+  "0x10fcc50": {
+   "index": 8,
+   "import": "mfHdJTIvhuo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc60": {
+   "index": 9,
+   "import": "3cUUypQzMiI#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc70": {
+   "index": 10,
+   "import": "tIhsqj0qsFE#s#s",
+   "name": "free",
+   "implemented": true
+  },
+  "0x10fcc80": {
+   "index": 11,
+   "import": "CkY0AVa-frg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcc90": {
+   "index": 12,
+   "import": "khbdMADH4cQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcca0": {
+   "index": 13,
+   "import": "usKbuvy2hQg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fccb0": {
+   "index": 14,
+   "import": "cfAXurvfl5o#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fccc0": {
+   "index": 15,
+   "import": "vkuuLfhnSZI#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fccd0": {
+   "index": 16,
+   "import": "lX+4FNUklF0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcce0": {
+   "index": 17,
+   "import": "XwLA5cTHjt4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fccf0": {
+   "index": 18,
+   "import": "gQX+4GDQjpM#s#s",
+   "name": "malloc",
+   "implemented": true
+  },
+  "0x10fcd00": {
+   "index": 19,
+   "import": "Y6Sl4Xw7gfA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd10": {
+   "index": 20,
+   "import": "+qitMEbkSWk#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd20": {
+   "index": 21,
+   "import": "eT2UsmTewbU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd30": {
+   "index": 22,
+   "import": "NFLs+dRJGNg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd40": {
+   "index": 23,
+   "import": "tQIo+GIPklo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd50": {
+   "index": 24,
+   "import": "Ovb2dSJOAuE#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd60": {
+   "index": 25,
+   "import": "xEszJVGpybs#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd70": {
+   "index": 26,
+   "import": "tcVi5SivF7Q#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd80": {
+   "index": 27,
+   "import": "ozMAr28BwSY#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcd90": {
+   "index": 28,
+   "import": "j4ViWNHEgww#s#s",
+   "name": "strlen",
+   "implemented": true
+  },
+  "0x10fcda0": {
+   "index": 29,
+   "import": "kiZSXIWd9vg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcdb0": {
+   "index": 30,
+   "import": "1jfXLRVzisc#libkernel",
+   "name": "sceKernelUsleep",
+   "implemented": true
+  },
+  "0x10fcdc0": {
+   "index": 31,
+   "import": "hMAe+TWS9mQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcdd0": {
+   "index": 32,
+   "import": "viiwFMaNamA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcde0": {
+   "index": 33,
+   "import": "Ls4tzzhimqQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcdf0": {
+   "index": 34,
+   "import": "VPbJwTCgME0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fce00": {
+   "index": 35,
+   "import": "DfivPArhucg#s#s",
+   "name": "memcmp",
+   "implemented": true
+  },
+  "0x10fce10": {
+   "index": 36,
+   "import": "4J2sUJmuHZQ#libkernel",
+   "name": "sceKernelGetProcessTime",
+   "implemented": true
+  },
+  "0x10fce20": {
+   "index": 37,
+   "import": "Vo5V8KAwCmk#libSceSystemService",
+   "name": "sceSystemServiceHideSplashScreen",
+   "implemented": true
+  },
+  "0x10fce30": {
+   "index": 38,
+   "import": "ZPD1YOKI+Kw#libSceRtc",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fce40": {
+   "index": 39,
+   "import": "tsvEmnenz48#s#s",
+   "name": "__cxa_atexit",
+   "implemented": true
+  },
+  "0x10fce50": {
+   "index": 40,
+   "import": "aI+OeCz8xrQ#libkernel",
+   "name": "scePthreadSelf",
+   "implemented": true
+  },
+  "0x10fce60": {
+   "index": 41,
+   "import": "cpCOXWMgha0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fce70": {
+   "index": 42,
+   "import": "6sJWiWSRuqk#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fce80": {
+   "index": 43,
+   "import": "aNz11fnnzi4#libkernel",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fce90": {
+   "index": 44,
+   "import": "eLdDw6l0-bU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcea0": {
+   "index": 45,
+   "import": "9yDWMxEFdJU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fceb0": {
+   "index": 46,
+   "import": "QW2jL1J5rwY#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcec0": {
+   "index": 47,
+   "import": "kALvdgEv5ME#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fced0": {
+   "index": 48,
+   "import": "sUP1hBaouOw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcee0": {
+   "index": 49,
+   "import": "zlfEH8FmyUA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcef0": {
+   "index": 50,
+   "import": "LTov9gMEqCU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf00": {
+   "index": 51,
+   "import": "8u8lPzUEq+U#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf10": {
+   "index": 52,
+   "import": "p6LrHjIQMdk#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf20": {
+   "index": 53,
+   "import": "iPBqs+YUUFw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf30": {
+   "index": 54,
+   "import": "2HnmKiLmV6s#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf40": {
+   "index": 55,
+   "import": "hqi8yMOCmG0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf50": {
+   "index": 56,
+   "import": "L1SBTkC+Cvw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf60": {
+   "index": 57,
+   "import": "1uJgoVq3bQU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf70": {
+   "index": 58,
+   "import": "P8F2oavZXtY#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf80": {
+   "index": 59,
+   "import": "V23qt24VPVs#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcf90": {
+   "index": 60,
+   "import": "DuW5ZqZv-70#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcfa0": {
+   "index": 61,
+   "import": "9nf8joUTSaQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcfb0": {
+   "index": 62,
+   "import": "hEQ2Yi4PJXA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcfc0": {
+   "index": 63,
+   "import": "5Xa2ACNECdo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcfd0": {
+   "index": 64,
+   "import": "N2f485TmJms#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcfe0": {
+   "index": 65,
+   "import": "rcQCUr0EaRU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fcff0": {
+   "index": 66,
+   "import": "8w-H19ip48I#libSceRtc",
+   "name": "sceRtcGetTick",
+   "implemented": true
+  },
+  "0x10fd000": {
+   "index": 67,
+   "import": "ueega6v3GUw#libSceRtc",
+   "name": "sceRtcSetTick",
+   "implemented": true
+  },
+  "0x10fd010": {
+   "index": 68,
+   "import": "NR1J0N7L2xY#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd020": {
+   "index": 69,
+   "import": "-5y2uJ62qS8#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd030": {
+   "index": 70,
+   "import": "MDc5cd8HfCA#libSceRtc",
+   "name": "sceRtcTickAddHours",
+   "implemented": true
+  },
+  "0x10fd040": {
+   "index": 71,
+   "import": "1Pk0qZQGeWo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd050": {
+   "index": 72,
+   "import": "SfQIZcqvvms#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd060": {
+   "index": 73,
+   "import": "SRI6S9B+-a4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd070": {
+   "index": 74,
+   "import": "ob5xAW4ln-0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd080": {
+   "index": 75,
+   "import": "9rAeANT2tyE#s#s",
+   "name": "__cxa_guard_release",
+   "implemented": true
+  },
+  "0x10fd090": {
+   "index": 76,
+   "import": "3GPpjQdAMTw#s#s",
+   "name": "__cxa_guard_acquire",
+   "implemented": true
+  },
+  "0x10fd0a0": {
+   "index": 77,
+   "import": "oVkZ8W8-Q8A#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd0b0": {
+   "index": 78,
+   "import": "zr094EQ39Ww#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd0c0": {
+   "index": 79,
+   "import": "18B2NS1y9UU#libSceRtc",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd0d0": {
+   "index": 80,
+   "import": "AEJdIVZTEmo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd0e0": {
+   "index": 81,
+   "import": "VUzjXknPPBs#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd0f0": {
+   "index": 82,
+   "import": "PtsB1Q9wsFA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd100": {
+   "index": 83,
+   "import": "aesyjrHVWy4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd110": {
+   "index": 84,
+   "import": "vU9svJtEnWc#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd120": {
+   "index": 85,
+   "import": "fL3O02ypZFE#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd130": {
+   "index": 86,
+   "import": "x01jxu+vxlc#libSceImeDialog",
+   "name": "sceImeDialogGetResult",
+   "implemented": true
+  },
+  "0x10fd140": {
+   "index": 87,
+   "import": "WkkeywLJcgU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd150": {
+   "index": 88,
+   "import": "Noj9PsJrsa8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd160": {
+   "index": 89,
+   "import": "CdWp0oHWGr0#libSceUserService",
+   "name": "sceUserServiceGetInitialUser",
+   "implemented": true
+  },
+  "0x10fd170": {
+   "index": 90,
+   "import": "NUeBrN7hzf0#libSceImeDialog",
+   "name": "sceImeDialogInit",
+   "implemented": true
+  },
+  "0x10fd180": {
+   "index": 91,
+   "import": "M1TvFst-jrM#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd190": {
+   "index": 92,
+   "import": "Q2V+iqvjgC0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd1a0": {
+   "index": 93,
+   "import": "2wz4rthdiy8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd1b0": {
+   "index": 94,
+   "import": "QJ5xVfKkni0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd1c0": {
+   "index": 95,
+   "import": "gyTyVn+bXMw#libSceImeDialog",
+   "name": "sceImeDialogTerm",
+   "implemented": true
+  },
+  "0x10fd1d0": {
+   "index": 96,
+   "import": "-9SIhUr4Iuo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd1e0": {
+   "index": 97,
+   "import": "stv1S3BKfgw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd1f0": {
+   "index": 98,
+   "import": "QxqK-IdpumU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd200": {
+   "index": 99,
+   "import": "IADmD4tScBY#libSceImeDialog",
+   "name": "sceImeDialogGetStatus",
+   "implemented": true
+  },
+  "0x10fd210": {
+   "index": 100,
+   "import": "bF4eWOM5ouo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd220": {
+   "index": 101,
+   "import": "hzsdjKbFD7g#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd230": {
+   "index": 102,
+   "import": "zS94yyJRSUs#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd240": {
+   "index": 103,
+   "import": "9rMML086SEE#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd250": {
+   "index": 104,
+   "import": "UWyL6KoR96U#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd260": {
+   "index": 105,
+   "import": "07O525HgICs#libSceRtc",
+   "name": "sceRtcTickAddSeconds",
+   "implemented": true
+  },
+  "0x10fd270": {
+   "index": 106,
+   "import": "mn-tf4QiFzk#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd280": {
+   "index": 107,
+   "import": "MZO7FXyAPU8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd290": {
+   "index": 108,
+   "import": "fPhymKNvK-A#libSceUserService",
+   "name": "sceUserServiceGetLoginUserIdList",
+   "implemented": true
+  },
+  "0x10fd2a0": {
+   "index": 109,
+   "import": "1xxcMiGu2fo#libSceUserService",
+   "name": "sceUserServiceGetUserName",
+   "implemented": true
+  },
+  "0x10fd2b0": {
+   "index": 110,
+   "import": "CyIK-i4XdgQ#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd2c0": {
+   "index": 111,
+   "import": "24m4Z4bUaoY#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd2d0": {
+   "index": 112,
+   "import": "fMP5NHUOaMk#libSceSysmodule",
+   "name": "sceSysmoduleIsLoaded",
+   "implemented": true
+  },
+  "0x10fd2e0": {
+   "index": 113,
+   "import": "4tPhsP6FpDI#libSceSaveDataDialog",
+   "name": "sceSaveDataDialogOpen",
+   "implemented": true
+  },
+  "0x10fd2f0": {
+   "index": 114,
+   "import": "g8cM39EUZ6o#libSceSysmodule",
+   "name": "sceSysmoduleLoadModule",
+   "implemented": true
+  },
+  "0x10fd300": {
+   "index": 115,
+   "import": "uoUpLGNkygk#libSceCommonDialog",
+   "name": "sceCommonDialogInitialize",
+   "implemented": true
+  },
+  "0x10fd310": {
+   "index": 116,
+   "import": "eR2bZFAAU0Q#libSceSysmodule",
+   "name": "sceSysmoduleUnloadModule",
+   "implemented": true
+  },
+  "0x10fd320": {
+   "index": 117,
+   "import": "fH46Lag88XY#libSceSaveDataDialog",
+   "name": "sceSaveDataDialogClose",
+   "implemented": true
+  },
+  "0x10fd330": {
+   "index": 118,
+   "import": "s9e3+YpRnzw#libSceSaveDataDialog",
+   "name": "sceSaveDataDialogInitialize",
+   "implemented": true
+  },
+  "0x10fd340": {
+   "index": 119,
+   "import": "-ZR+hG7aDHw#libkernel",
+   "name": "sceKernelSleep",
+   "implemented": true
+  },
+  "0x10fd350": {
+   "index": 120,
+   "import": "KK3Bdg1RWK0#libSceSaveDataDialog",
+   "name": "sceSaveDataDialogUpdateStatus",
+   "implemented": true
+  },
+  "0x10fd360": {
+   "index": 121,
+   "import": "YuH2FA7azqQ#libSceSaveDataDialog",
+   "name": "sceSaveDataDialogTerminate",
+   "implemented": true
+  },
+  "0x10fd370": {
+   "index": 122,
+   "import": "zO9UL3qIINQ#libSceRtc",
+   "name": "sceRtcGetCurrentNetworkTick",
+   "implemented": true
+  },
+  "0x10fd380": {
+   "index": 123,
+   "import": "cG1VE2HMl6c#libSceJson2",
+   "name": "_ZN3sce4Json6StringD1Ev",
+   "implemented": true
+  },
+  "0x10fd390": {
+   "index": 124,
+   "import": "5JmzZt8twAo#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd3a0": {
+   "index": 125,
+   "import": "BtqmpTRXHgk#libSceRtc",
+   "name": "sceRtcGetTime_t",
+   "implemented": true
+  },
+  "0x10fd3b0": {
+   "index": 126,
+   "import": "HJ8GpRT1aiw#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd3c0": {
+   "index": 127,
+   "import": "fZo48un7LK4#libSceSystemService",
+   "name": "sceSystemServiceParamGetInt",
+   "implemented": true
+  },
+  "0x10fd3d0": {
+   "index": 128,
+   "import": "EUH+EmT-v9E#libSceJson2",
+   "name": "_ZNK3sce4Json6String6lengthEv",
+   "implemented": true
+  },
+  "0x10fd3e0": {
+   "index": 129,
+   "import": "R7FDWtcN6f8#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd3f0": {
+   "index": 130,
+   "import": "ERuf9y0DY84#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd400": {
+   "index": 131,
+   "import": "OJPTonqdg0I#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd410": {
+   "index": 132,
+   "import": "qSmqLXXCPas#libSceJson2",
+   "name": "_ZN3sce4Json6StringC1Ev",
+   "implemented": true
+  },
+  "0x10fd420": {
+   "index": 133,
+   "import": "WTtYf+cNnXI#libSceJson2",
+   "name": "_ZN3sce4Json5ValueD1Ev",
+   "implemented": true
+  },
+  "0x10fd430": {
+   "index": 134,
+   "import": "JP-PtKMiI1E#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd440": {
+   "index": 135,
+   "import": "iZeYfOxtMRg#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd450": {
+   "index": 136,
+   "import": "0lLK8+kDqmE#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd460": {
+   "index": 137,
+   "import": "JT+t00a3TxA#libSceNpManager",
+   "name": "sceNpGetAccountCountryA",
+   "implemented": false
+  },
+  "0x10fd470": {
+   "index": 138,
+   "import": "x4AUdbhpRB0#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd480": {
+   "index": 139,
+   "import": "qBMjqyBn3OM#libSceJson2",
+   "name": "_ZN3sce4Json5ValueC1Ev",
+   "implemented": true
+  },
+  "0x10fd490": {
+   "index": 140,
+   "import": "L1KAkYWml-M#libSceJson2",
+   "name": "_ZNK3sce4Json6String5c_strEv",
+   "implemented": true
+  },
+  "0x10fd4a0": {
+   "index": 141,
+   "import": "9KUZFjI1IxA#libSceJson2",
+   "name": "_ZN3sce4Json6StringC1EPKc",
+   "implemented": true
+  },
+  "0x10fd4b0": {
+   "index": 142,
+   "import": "4zrm6VrgIAw#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd4c0": {
+   "index": 143,
+   "import": "sZIoMRGO+jk#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd4d0": {
+   "index": 144,
+   "import": "3xUXnmUkXfo#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd4e0": {
+   "index": 145,
+   "import": "dFCphqnd+a4#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd4f0": {
+   "index": 146,
+   "import": "zQtLRTqceMY#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd500": {
+   "index": 147,
+   "import": "1tKyG7RlMJo#libkernel",
+   "name": "scePthreadGetprio",
+   "implemented": true
+  },
+  "0x10fd510": {
+   "index": 148,
+   "import": "v7S7LhP2OJc#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fd520": {
+   "index": 149,
+   "import": "VqZX7POg2Mk#libSceNpMatching2",
+   "name": "sceNpMatching2SearchRoom",
+   "implemented": true
+  },
+  "0x10fd530": {
+   "index": 150,
+   "import": "iWQWrwiSt8A#libSceNet",
+   "name": "sceNetHtons",
+   "implemented": true
+  },
+  "0x10fd540": {
+   "index": 151,
+   "import": "ajvzc8e2upo#libSceNpMatching2",
+   "name": "sceNpMatching2CreateContextA",
+   "implemented": true
+  },
+  "0x10fd550": {
+   "index": 152,
+   "import": "JO4yuTuMoKI#libSceNetCtl",
+   "name": "sceNetCtlGetNatInfo",
+   "implemented": true
+  },
+  "0x10fd560": {
+   "index": 153,
+   "import": "Px0miD2LuW0#libSceRudp",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd570": {
+   "index": 154,
+   "import": "0cBgduPRR+M#libSceNetCtl",
+   "name": "sceNetCtlGetResult",
+   "implemented": false
+  },
+  "0x10fd580": {
+   "index": 155,
+   "import": "0UMeWRGnZKA#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterSignalingCallback",
+   "implemented": true
+  },
+  "0x10fd590": {
+   "index": 156,
+   "import": "rJNPJqDCpiI#libSceNpMatching2",
+   "name": "sceNpMatching2GetWorldInfoList",
+   "implemented": true
+  },
+  "0x10fd5a0": {
+   "index": 157,
+   "import": "uBESzz4CQws#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterRoomMessageCallback",
+   "implemented": true
+  },
+  "0x10fd5b0": {
+   "index": 158,
+   "import": "fQQfP87I7hs#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterContextCallback",
+   "implemented": true
+  },
+  "0x10fd5c0": {
+   "index": 159,
+   "import": "6UEembipgrM#libSceNpSignaling",
+   "name": "sceNpSignalingDeactivateConnection",
+   "implemented": false
+  },
+  "0x10fd5d0": {
+   "index": 160,
+   "import": "opDpl74pi2E#libSceNpMatching2",
+   "name": "sceNpMatching2SendRoomChatMessage",
+   "implemented": false
+  },
+  "0x10fd5e0": {
+   "index": 161,
+   "import": "10t3e5+JPnU#libSceNpMatching2",
+   "name": "sceNpMatching2Initialize",
+   "implemented": true
+  },
+  "0x10fd5f0": {
+   "index": 162,
+   "import": "26vWrPAWJfM#libSceNpMatching2",
+   "name": "sceNpMatching2GetRoomDataExternalList",
+   "implemented": true
+  },
+  "0x10fd600": {
+   "index": 163,
+   "import": "3hBvwqEwqj8#libSceRudp",
+   "name": "sceRudpEnd",
+   "implemented": false
+  },
+  "0x10fd610": {
+   "index": 164,
+   "import": "CAbbX6BuQZ0#libSceRudp",
+   "name": "sceRudpCreateContext",
+   "implemented": false
+  },
+  "0x10fd620": {
+   "index": 165,
+   "import": "Rqm2OnZMCz0#libSceNetCtl",
+   "name": "sceNetCtlUnregisterCallback",
+   "implemented": true
+  },
+  "0x10fd630": {
+   "index": 166,
+   "import": "BBbJ92uUdCg#libSceNpMatching2",
+   "name": "sceNpMatching2LeaveLobby",
+   "implemented": false
+  },
+  "0x10fd640": {
+   "index": 167,
+   "import": "gQ6cUriNpgs#libSceNpMatching2",
+   "name": "sceNpMatching2JoinRoomA",
+   "implemented": true
+  },
+  "0x10fd650": {
+   "index": 168,
+   "import": "bD-JizUb3JM#libSceNpSignaling",
+   "name": "sceNpSignalingGetConnectionStatus",
+   "implemented": false
+  },
+  "0x10fd660": {
+   "index": 169,
+   "import": "ZPLavCKqAB0#libSceNpSignaling",
+   "name": "sceNpSignalingActivateConnectionA",
+   "implemented": false
+  },
+  "0x10fd670": {
+   "index": 170,
+   "import": "Mqp3lJ+sjy4#libSceNpMatching2",
+   "name": "sceNpMatching2Terminate",
+   "implemented": true
+  },
+  "0x10fd680": {
+   "index": 171,
+   "import": "45ggEzakPJQ#libSceNet",
+   "name": "sceNetSocketClose",
+   "implemented": true
+  },
+  "0x10fd690": {
+   "index": 172,
+   "import": "Nz-ZE7ur32I#libSceNpMatching2",
+   "name": "sceNpMatching2DestroyContext",
+   "implemented": true
+  },
+  "0x10fd6a0": {
+   "index": 173,
+   "import": "DnPUsBAe8oI#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterLobbyMessageCallback",
+   "implemented": false
+  },
+  "0x10fd6b0": {
+   "index": 174,
+   "import": "7vjNQ6Z1op0#libSceNpMatching2",
+   "name": "sceNpMatching2ContextStart",
+   "implemented": true
+  },
+  "0x10fd6c0": {
+   "index": 175,
+   "import": "amuBfI-AQc4#libSceRudp",
+   "name": "sceRudpInit",
+   "implemented": false
+  },
+  "0x10fd6d0": {
+   "index": 176,
+   "import": "rZqWV3eXgOA#libSceRudp",
+   "name": "sceRudpRead",
+   "implemented": false
+  },
+  "0x10fd6e0": {
+   "index": 177,
+   "import": "9vA2aW+CHuA#libSceNet",
+   "name": "sceNetInetNtop",
+   "implemented": true
+  },
+  "0x10fd6f0": {
+   "index": 178,
+   "import": "+8e7wXLmjds#libSceNpMatching2",
+   "name": "sceNpMatching2SetDefaultRequestOptParam",
+   "implemented": true
+  },
+  "0x10fd700": {
+   "index": 179,
+   "import": "S9D8JSYIrjE#libSceNpMatching2",
+   "name": "sceNpMatching2SetRoomDataInternal",
+   "implemented": true
+  },
+  "0x10fd710": {
+   "index": 180,
+   "import": "LhCPctIICxQ#libSceNpMatching2",
+   "name": "sceNpMatching2GetServerId",
+   "implemented": true
+  },
+  "0x10fd720": {
+   "index": 181,
+   "import": "q7GK98-nYSE#libSceNpMatching2",
+   "name": "sceNpMatching2SetRoomDataExternal",
+   "implemented": true
+  },
+  "0x10fd730": {
+   "index": 182,
+   "import": "3KOuC4RmZZU#libSceNpSignaling",
+   "name": "sceNpSignalingInitialize",
+   "implemented": false
+  },
+  "0x10fd740": {
+   "index": 183,
+   "import": "KaPL3fbTLCA#libSceRudp",
+   "name": "sceRudpWrite",
+   "implemented": false
+  },
+  "0x10fd750": {
+   "index": 184,
+   "import": "SUEVes8gvmw#libSceRudp",
+   "name": "sceRudpSetEventHandler",
+   "implemented": false
+  },
+  "0x10fd760": {
+   "index": 185,
+   "import": "WxislcDAW5I#libSceNet",
+   "name": "sceNetShowNetstat",
+   "implemented": false
+  },
+  "0x10fd770": {
+   "index": 186,
+   "import": "hx+LIg-1koI#libSceNpSignaling",
+   "name": "sceNpSignalingDeleteContext",
+   "implemented": false
+  },
+  "0x10fd780": {
+   "index": 187,
+   "import": "n5JmImxTiZU#libSceNpMatching2",
+   "name": "sceNpMatching2JoinLobby",
+   "implemented": false
+  },
+  "0x10fd790": {
+   "index": 188,
+   "import": "OMYRTU0uc4w#libSceRudp",
+   "name": "sceRudpTerminate",
+   "implemented": false
+  },
+  "0x10fd7a0": {
+   "index": 189,
+   "import": "wIJsiqY+BMk#libSceRudp",
+   "name": "sceRudpGetContextStatus",
+   "implemented": false
+  },
+  "0x10fd7b0": {
+   "index": 190,
+   "import": "TSM6whtekok#libSceNet",
+   "name": "sceNetShutdown",
+   "implemented": true
+  },
+  "0x10fd7c0": {
+   "index": 191,
+   "import": "NPhw0UXaNrk#libSceNpSignaling",
+   "name": "sceNpSignalingTerminate",
+   "implemented": false
+  },
+  "0x10fd7d0": {
+   "index": 192,
+   "import": "Iw2h0Jrrb5U#libSceNpMatching2",
+   "name": "sceNpMatching2SendRoomMessage",
+   "implemented": false
+  },
+  "0x10fd7e0": {
+   "index": 193,
+   "import": "bErx49PgxyY#libSceNet",
+   "name": "sceNetBind",
+   "implemented": true
+  },
+  "0x10fd7f0": {
+   "index": 194,
+   "import": "4Nj7u5B5yCA#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterLobbyEventCallback",
+   "implemented": false
+  },
+  "0x10fd800": {
+   "index": 195,
+   "import": "l4SLBpKUDK4#libSceRudp",
+   "name": "sceRudpBind",
+   "implemented": false
+  },
+  "0x10fd810": {
+   "index": 196,
+   "import": "V6KSpKv9XJE#libSceNpMatching2",
+   "name": "sceNpMatching2CreateJoinRoomA",
+   "implemented": true
+  },
+  "0x10fd820": {
+   "index": 197,
+   "import": "-f6M4caNe8k#libSceNpMatching2",
+   "name": "sceNpMatching2ContextStop",
+   "implemented": true
+  },
+  "0x10fd830": {
+   "index": 198,
+   "import": "szEVu+edXV4#libSceRudp",
+   "name": "sceRudpInitiate",
+   "implemented": false
+  },
+  "0x10fd840": {
+   "index": 199,
+   "import": "B7cT9aVby7A#libSceNpSignaling",
+   "name": "sceNpSignalingGetConnectionFromPeerAddressA",
+   "implemented": false
+  },
+  "0x10fd850": {
+   "index": 200,
+   "import": "8Kcp5d-q1Uo#libSceNet",
+   "name": "sceNetInetPton",
+   "implemented": true
+  },
+  "0x10fd860": {
+   "index": 201,
+   "import": "wyvlEgZ-55w#libSceNpMatching2",
+   "name": "sceNpMatching2GetLobbyInfoList",
+   "implemented": false
+  },
+  "0x10fd870": {
+   "index": 202,
+   "import": "GNSN5849fjU#libSceNpMatching2",
+   "name": "sceNpMatching2SignalingCancelPeerNetInfo",
+   "implemented": false
+  },
+  "0x10fd880": {
+   "index": 203,
+   "import": "sAZqO2+5Qqo#libSceRudp",
+   "name": "sceRudpGetSizeReadable",
+   "implemented": false
+  },
+  "0x10fd890": {
+   "index": 204,
+   "import": "3Zl8BePTh9Y#libSceNpManager",
+   "name": "sceNpCheckCallback",
+   "implemented": true
+  },
+  "0x10fd8a0": {
+   "index": 205,
+   "import": "p+2EnxmaAMM#libSceNpMatching2",
+   "name": "sceNpMatching2RegisterRoomEventCallback",
+   "implemented": true
+  },
+  "0x10fd8b0": {
+   "index": 206,
+   "import": "Q4qBuN-c0ZM#libSceNet",
+   "name": "sceNetSocket",
+   "implemented": true
+  },
+  "0x10fd8c0": {
+   "index": 207,
+   "import": "CTy4PBhpWDw#libSceNpMatching2",
+   "name": "sceNpMatching2SignalingGetPeerNetInfoResult",
+   "implemented": false
+  },
+  "0x10fd8d0": {
+   "index": 208,
+   "import": "UJ+Z7Q+4ck0#libSceNetCtl",
+   "name": "sceNetCtlRegisterCallback",
+   "implemented": true
+  },
+  "0x10fd8e0": {
+   "index": 209,
+   "import": "BD6kfx442Do#libSceNpMatching2",
+   "name": "sceNpMatching2LeaveRoom",
+   "implemented": true
+  },
+  "0x10fd8f0": {
+   "index": 210,
+   "import": "zJGf8xjFnQE#libSceNet",
+   "name": "sceNetSocketAbort",
+   "implemented": true
+  },
+  "0x10fd900": {
+   "index": 211,
+   "import": "0yzYdZf0IwE#libSceRudp",
+   "name": "sceRudpSetOption",
+   "implemented": false
+  },
+  "0x10fd910": {
+   "index": 212,
+   "import": "1Z4Xxumgm+Y#libSceNpMatching2",
+   "name": "sceNpMatching2GetLobbyMemberDataInternalList",
+   "implemented": false
+  },
+  "0x10fd920": {
+   "index": 213,
+   "import": "tHD5FPFXtu4#libSceNpMatching2",
+   "name": "sceNpMatching2SignalingGetConnectionStatus",
+   "implemented": true
+  },
+  "0x10fd930": {
+   "index": 214,
+   "import": "6PBNpsgyaxw#libSceRudp",
+   "name": "sceRudpEnableInternalIOThread",
+   "implemented": false
+  },
+  "0x10fd940": {
+   "index": 215,
+   "import": "b4qaXPzMJxo#libSceNpSignaling",
+   "name": "sceNpSignalingTerminateConnection",
+   "implemented": false
+  },
+  "0x10fd950": {
+   "index": 216,
+   "import": "dDLNFdY8dws#libSceNpSignaling",
+   "name": "sceNpSignalingCreateContextA",
+   "implemented": false
+  },
+  "0x10fd960": {
+   "index": 217,
+   "import": "obuxdTiwkF8#libSceNetCtl",
+   "name": "sceNetCtlGetInfo",
+   "implemented": true
+  },
+  "0x10fd970": {
+   "index": 218,
+   "import": "1j3S3n-tTW4#libkernel",
+   "name": "sceKernelGetTscFrequency",
+   "implemented": true
+  },
+  "0x10fd980": {
+   "index": 219,
+   "import": "Xjoosiw+XPI#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd990": {
+   "index": 220,
+   "import": "-2IRUCO--PM#libkernel",
+   "name": "sceKernelReadTsc",
+   "implemented": true
+  },
+  "0x10fd9a0": {
+   "index": 221,
+   "import": "sOmU4vnx3s0#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd9b0": {
+   "index": 222,
+   "import": "XDncXQIJUSk#libSceNpManager",
+   "name": "sceNpGetOnlineId",
+   "implemented": false
+  },
+  "0x10fd9c0": {
+   "index": 223,
+   "import": "rbknaUjpqWo#libSceNpManager",
+   "name": "sceNpGetAccountIdA",
+   "implemented": true
+  },
+  "0x10fd9d0": {
+   "index": 224,
+   "import": "Va5FJ6TmNCw#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd9e0": {
+   "index": 225,
+   "import": "m5J28iw-QPs#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fd9f0": {
+   "index": 226,
+   "import": "UeuWT+yNdCQ#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fda00": {
+   "index": 227,
+   "import": "CN7EbEV7MFU#libSceAppContent",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fda10": {
+   "index": 228,
+   "import": "hcuQgD53UxM#s#s",
+   "name": "printf",
+   "implemented": true
+  },
+  "0x10fda20": {
+   "index": 229,
+   "import": "gI4t194c2W8#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fda30": {
+   "index": 230,
+   "import": "CL6y9q-XbuQ#libSceRtc",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fda40": {
+   "index": 231,
+   "import": "mXlxhmLNMPg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fda50": {
+   "index": 232,
+   "import": "q+9E0X3aWpU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fda60": {
+   "index": 233,
+   "import": "FIjXN2TkuTs#libSceJson2",
+   "name": "_ZN3sce4Json5Value5clearEv",
+   "implemented": true
+  },
+  "0x10fda70": {
+   "index": 234,
+   "import": "S5JxQnoGF3E#libSceJson2",
+   "name": "_ZN3sce4Json6Parser5parseERNS0_5ValueEPKcm",
+   "implemented": true
+  },
+  "0x10fda80": {
+   "index": 235,
+   "import": "epJ6x2LV0kU#libSceJson2",
+   "name": "_ZNK3sce4Json5Value9getStringEv",
+   "implemented": true
+  },
+  "0x10fda90": {
+   "index": 236,
+   "import": "cn9svYGWKDQ#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fdaa0": {
+   "index": 237,
+   "import": "HwDt5lD9Bfo#libSceJson2",
+   "name": "_ZNK3sce4Json5ValueixEPKc",
+   "implemented": true
+  },
+  "0x10fdab0": {
+   "index": 238,
+   "import": "DIxvoy7Ngvk#libSceJson2",
+   "name": "_ZNK3sce4Json5Value10getIntegerEv",
+   "implemented": true
+  },
+  "0x10fdac0": {
+   "index": 239,
+   "import": "Ec63y59l9tw#libSceNpManager",
+   "name": "sceNpSetNpTitleId",
+   "implemented": true
+  },
+  "0x10fdad0": {
+   "index": 240,
+   "import": "Ik-KpLTlf7Q#libSceHttp",
+   "name": "sceHttpTerm",
+   "implemented": true
+  },
+  "0x10fdae0": {
+   "index": 241,
+   "import": "iQw3iQPhvUQ#libSceNetCtl",
+   "name": "sceNetCtlCheckCallback",
+   "implemented": true
+  },
+  "0x10fdaf0": {
+   "index": 242,
+   "import": "Nlev7Lg8k3A#libSceNet",
+   "name": "sceNetInit",
+   "implemented": true
+  },
+  "0x10fdb00": {
+   "index": 243,
+   "import": "or0e885BlXo#libSceNpWebApi",
+   "name": "sceNpWebApiUtilityParseNpId",
+   "implemented": true
+  },
+  "0x10fdb10": {
+   "index": 244,
+   "import": "XlWbvieLj2M#libSceJson2",
+   "name": "_ZNK3sce4Json5ValueixEm",
+   "implemented": true
+  },
+  "0x10fdb20": {
+   "index": 245,
+   "import": "j3YMu1MVNNo#libSceUserService",
+   "name": "sceUserServiceInitialize",
+   "implemented": true
+  },
+  "0x10fdb30": {
+   "index": 246,
+   "import": "m9L3O6yst-U#libSceNpManager",
+   "name": "sceNpGetParentalControlInfoA",
+   "implemented": true
+  },
+  "0x10fdb40": {
+   "index": 247,
+   "import": "p-o74CnoNzY#libSceNpManager",
+   "name": "sceNpGetNpId",
+   "implemented": true
+  },
+  "0x10fdb50": {
+   "index": 248,
+   "import": "dgJBaeJnGpo#libSceNet",
+   "name": "sceNetPoolCreate",
+   "implemented": true
+  },
+  "0x10fdb60": {
+   "index": 249,
+   "import": "hw5KNqAAels#libSceNpManager",
+   "name": "sceNpRegisterNpReachabilityStateCallback",
+   "implemented": false
+  },
+  "0x10fdb70": {
+   "index": 250,
+   "import": "hdpVEUDFW3s#libSceSsl",
+   "name": "sceSslInit",
+   "implemented": true
+  },
+  "0x10fdb80": {
+   "index": 251,
+   "import": "0gYjPTR-6cY#libSceHttp",
+   "name": "sceHttpCreateTemplate",
+   "implemented": true
+  },
+  "0x10fdb90": {
+   "index": 252,
+   "import": "gky0+oaNM4k#libSceNetCtl",
+   "name": "sceNetCtlInit",
+   "implemented": false
+  },
+  "0x10fdba0": {
+   "index": 253,
+   "import": "Gaxrp3EWY-M#libSceNpManager",
+   "name": "sceNpNotifyPlusFeature",
+   "implemented": true
+  },
+  "0x10fdbb0": {
+   "index": 254,
+   "import": "A9cVMUtEp4Y#libSceHttp",
+   "name": "sceHttpInit",
+   "implemented": true
+  },
+  "0x10fdbc0": {
+   "index": 255,
+   "import": "GpLQDNKICac#libSceNpManager",
+   "name": "sceNpCreateRequest",
+   "implemented": false
+  },
+  "0x10fdbd0": {
+   "index": 256,
+   "import": "8Z2Jc5GvGDI#libSceNpManager",
+   "name": "sceNpCheckNpAvailabilityA",
+   "implemented": true
+  },
+  "0x10fdbe0": {
+   "index": 257,
+   "import": "A2CQ3kgSopQ#libSceNpManager",
+   "name": "sceNpSetContentRestriction",
+   "implemented": true
+  },
+  "0x10fdbf0": {
+   "index": 258,
+   "import": "RBw+4NukeGQ#libSceJson2",
+   "name": "_ZNK3sce4Json5Value5countEv",
+   "implemented": true
+  },
+  "0x10fdc00": {
+   "index": 259,
+   "import": "cTGkc6-TBlI#libSceNet",
+   "name": "sceNetTerm",
+   "implemented": false
+  },
+  "0x10fdc10": {
+   "index": 260,
+   "import": "qQJfO8HAiaY#libSceNpManager",
+   "name": "sceNpRegisterStateCallbackA",
+   "implemented": true
+  },
+  "0x10fdc20": {
+   "index": 261,
+   "import": "M3wFXbYQtAA#libSceNpManager",
+   "name": "sceNpUnregisterStateCallbackA",
+   "implemented": true
+  },
+  "0x10fdc30": {
+   "index": 262,
+   "import": "KfGZg2y73oM#libSceNpManager",
+   "name": "sceNpCheckNpReachability",
+   "implemented": false
+  },
+  "0x10fdc40": {
+   "index": 263,
+   "import": "4I8vEpuEhZ8#libSceHttp",
+   "name": "sceHttpDeleteTemplate",
+   "implemented": true
+  },
+  "0x10fdc50": {
+   "index": 264,
+   "import": "eQH7nWPcAgc#libSceNpManager",
+   "name": "sceNpGetState",
+   "implemented": true
+  },
+  "0x10fdc60": {
+   "index": 265,
+   "import": "0K1yQ6Lv-Yc#libSceSsl",
+   "name": "sceSslTerm",
+   "implemented": true
+  },
+  "0x10fdc70": {
+   "index": 266,
+   "import": "S7QTn72PrDw#libSceNpManager",
+   "name": "sceNpDeleteRequest",
+   "implemented": true
+  },
+  "0x10fdc80": {
+   "index": 267,
+   "import": "Z4wwCFiBELQ#libSceNetCtl",
+   "name": "sceNetCtlTerm",
+   "implemented": false
+  },
+  "0x10fdc90": {
+   "index": 268,
+   "import": "0z45PIH+SNI#libSceSaveData",
+   "name": "sceSaveDataMount2",
+   "implemented": true
+  },
+  "0x10fdca0": {
+   "index": 269,
+   "import": "BMR4F-Uek3E#libSceSaveData",
+   "name": "sceSaveDataUmount",
+   "implemented": true
+  },
+  "0x10fdcb0": {
+   "index": 270,
+   "import": "RQOqDbk3bSU#libSceSaveData",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fdcc0": {
+   "index": 271,
+   "import": "lU9YRFsgwSU#libSceSaveData",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fdcd0": {
+   "index": 272,
+   "import": "VwadwBBBJ80#libSceSaveData",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fdce0": {
+   "index": 273,
+   "import": "j8xKtiFj0SY#libSceSaveData",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fdcf0": {
+   "index": 274,
+   "import": "85zul--eGXs#libSceSaveData",
+   "name": "sceSaveDataSetParam",
+   "implemented": true
+  },
+  "0x10fdd00": {
+   "index": 275,
+   "import": "TywrFKCoLGY#libSceSaveData",
+   "name": "sceSaveDataInitialize3",
+   "implemented": true
+  },
+  "0x10fdd10": {
+   "index": 276,
+   "import": "yKDy8S5yLA0#libSceSaveData",
+   "name": "sceSaveDataTerminate",
+   "implemented": true
+  },
+  "0x10fdd20": {
+   "index": 277,
+   "import": "c88Yy54Mx0w#libSceSaveData",
+   "name": "sceSaveDataSaveIcon",
+   "implemented": true
+  },
+  "0x10fdd30": {
+   "index": 278,
+   "import": "hVYD7Ou2pCQ#libSceFiber",
+   "name": "_sceFiberInitializeImpl",
+   "implemented": true
+  },
+  "0x10fdd40": {
+   "index": 279,
+   "import": "JeNX5F-NzQU#libSceFiber",
+   "name": "sceFiberFinalize",
+   "implemented": true
+  },
+  "0x10fdd50": {
+   "index": 280,
+   "import": "a0LLrZWac0M#libSceFiber",
+   "name": "sceFiberRun",
+   "implemented": true
+  },
+  "0x10fdd60": {
+   "index": 281,
+   "import": "B0ZX2hx9DMw#libSceFiber",
+   "name": "sceFiberReturnToThread",
+   "implemented": true
+  },
+  "0x10fdd70": {
+   "index": 282,
+   "import": "K+gcnFFJKVc#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fdd80": {
+   "index": 283,
+   "import": "4wSze92BhLI#libkernel",
+   "name": "sceKernelWrite",
+   "implemented": true
+  },
+  "0x10fdd90": {
+   "index": 284,
+   "import": "1G3lF1Gg1k8#libkernel",
+   "name": "sceKernelOpen",
+   "implemented": true
+  },
+  "0x10fdda0": {
+   "index": 285,
+   "import": "SaKib2Ug0yI#libSceAppContent",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fddb0": {
+   "index": 286,
+   "import": "UK2Tl2DWUns#libkernel",
+   "name": "sceKernelClose",
+   "implemented": true
+  },
+  "0x10fddc0": {
+   "index": 287,
+   "import": "Cg4srZ6TKbU#libkernel",
+   "name": "sceKernelRead",
+   "implemented": true
+  },
+  "0x10fddd0": {
+   "index": 288,
+   "import": "buYbeLOGWmA#libSceAppContent",
+   "name": "sceAppContentTemporaryDataMount2",
+   "implemented": true
+  },
+  "0x10fdde0": {
+   "index": 289,
+   "import": "bcolXMmp6qQ#libSceAppContent",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fddf0": {
+   "index": 290,
+   "import": "oib76F-12fk#libkernel",
+   "name": "sceKernelLseek",
+   "implemented": true
+  },
+  "0x10fde00": {
+   "index": 291,
+   "import": "R9lA82OraNs#libSceAppContent",
+   "name": "sceAppContentInitialize",
+   "implemented": true
+  },
+  "0x10fde10": {
+   "index": 292,
+   "import": "xnd8BJzAxmk#libSceAppContent",
+   "name": "sceAppContentGetAddcontInfoList",
+   "implemented": false
+  },
+  "0x10fde20": {
+   "index": 293,
+   "import": "DQbtGaBKlaw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fde30": {
+   "index": 294,
+   "import": "Xbl-LYVFNEE#libSceJson2",
+   "name": "_ZN3sce4Json5Value21setNullAccessCallBackEPFRKS1_NS0_9ValueTypeEPS2_PvES6_",
+   "implemented": true
+  },
+  "0x10fde40": {
+   "index": 295,
+   "import": "dsqCVsNM0Zg#libSceNpCommerce",
+   "name": "sceNpCommerceHidePsStoreIcon",
+   "implemented": false
+  },
+  "0x10fde50": {
+   "index": 296,
+   "import": "DHmwsa6S8Tc#libSceNpCommerce",
+   "name": "sceNpCommerceShowPsStoreIcon",
+   "implemented": false
+  },
+  "0x10fde60": {
+   "index": 297,
+   "import": "zTwZdI8AZ5Y#libSceJson2",
+   "name": "_ZNK3sce4Json5Value10getBooleanEv",
+   "implemented": true
+  },
+  "0x10fde70": {
+   "index": 298,
+   "import": "T72hz6ffq08#libkernel",
+   "name": "scePthreadYield",
+   "implemented": true
+  },
+  "0x10fde80": {
+   "index": 299,
+   "import": "kn0yiYeExgA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fde90": {
+   "index": 300,
+   "import": "NxEI1KByvCI#libSceRtc",
+   "name": "sceRtcParseDateTime",
+   "implemented": true
+  },
+  "0x10fdea0": {
+   "index": 301,
+   "import": "bzQExy189ZI#s#s",
+   "name": "_init_env",
+   "implemented": true
+  },
+  "0x10fdeb0": {
+   "index": 302,
+   "import": "8G2LB+A3rzg#s#s",
+   "name": "atexit",
+   "implemented": true
+  },
+  "0x10fdec0": {
+   "index": 303,
+   "import": "XKRegsFpEpk#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fded0": {
+   "index": 304,
+   "import": "uMei1W9uyNo#s#s",
+   "name": "exit",
+   "implemented": true
+  },
+  "0x10fdee0": {
+   "index": 305,
+   "import": "9BcDykPmo1I#libkernel",
+   "name": "__error",
+   "implemented": true
+  },
+  "0x10fdef0": {
+   "index": 306,
+   "import": "KGKBeVcqJjc#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fdf00": {
+   "index": 307,
+   "import": "k1SwgkMSOM8#libSceRemoteplay",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fdf10": {
+   "index": 308,
+   "import": "QMFyLoqNxIg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fdf20": {
+   "index": 309,
+   "import": "2Of0f+3mhhE#libkernel",
+   "name": "scePthreadMutexDestroy",
+   "implemented": true
+  },
+  "0x10fdf30": {
+   "index": 310,
+   "import": "9UK1vLZQft4#libkernel",
+   "name": "scePthreadMutexLock",
+   "implemented": true
+  },
+  "0x10fdf40": {
+   "index": 311,
+   "import": "tn3VlD0hG60#libkernel",
+   "name": "scePthreadMutexUnlock",
+   "implemented": true
+  },
+  "0x10fdf50": {
+   "index": 312,
+   "import": "F8bUHwAG284#libkernel",
+   "name": "scePthreadMutexattrInit",
+   "implemented": true
+  },
+  "0x10fdf60": {
+   "index": 313,
+   "import": "cmo1RIYva9o#libkernel",
+   "name": "scePthreadMutexInit",
+   "implemented": true
+  },
+  "0x10fdf70": {
+   "index": 314,
+   "import": "smWEktiyyG0#libkernel",
+   "name": "scePthreadMutexattrDestroy",
+   "implemented": true
+  },
+  "0x10fdf80": {
+   "index": 315,
+   "import": "upoVrzMHFeE#libkernel",
+   "name": "scePthreadMutexTrylock",
+   "implemented": true
+  },
+  "0x10fdf90": {
+   "index": 316,
+   "import": "iMp8QpE+XO4#libkernel",
+   "name": "scePthreadMutexattrSettype",
+   "implemented": true
+  },
+  "0x10fdfa0": {
+   "index": 317,
+   "import": "4czppHBiriw#libkernel",
+   "name": "sceKernelSignalSema",
+   "implemented": true
+  },
+  "0x10fdfb0": {
+   "index": 318,
+   "import": "R1Jvn8bSCW8#libkernel",
+   "name": "sceKernelDeleteSema",
+   "implemented": true
+  },
+  "0x10fdfc0": {
+   "index": 319,
+   "import": "188x57JYp0g#libkernel",
+   "name": "sceKernelCreateSema",
+   "implemented": true
+  },
+  "0x10fdfd0": {
+   "index": 320,
+   "import": "Zxa0VhQVTsk#libkernel",
+   "name": "sceKernelWaitSema",
+   "implemented": true
+  },
+  "0x10fdfe0": {
+   "index": 321,
+   "import": "4DM06U2BNEY#libkernel",
+   "name": "sceKernelCancelSema",
+   "implemented": true
+  },
+  "0x10fdff0": {
+   "index": 322,
+   "import": "12wOHk8ywb0#libkernel",
+   "name": "sceKernelPollSema",
+   "implemented": false
+  },
+  "0x10fe000": {
+   "index": 323,
+   "import": "+r3rMFwItV4#libkernel",
+   "name": "sceKernelPread",
+   "implemented": true
+  },
+  "0x10fe010": {
+   "index": 324,
+   "import": "1-LFLmRFxxM#libkernel",
+   "name": "sceKernelMkdir",
+   "implemented": true
+  },
+  "0x10fe020": {
+   "index": 325,
+   "import": "eV9wAD2riIA#libkernel",
+   "name": "sceKernelStat",
+   "implemented": true
+  },
+  "0x10fe030": {
+   "index": 326,
+   "import": "j2AIqSqJP0w#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe040": {
+   "index": 327,
+   "import": "kBwCPsYX-m4#libkernel",
+   "name": "sceKernelFstat",
+   "implemented": true
+  },
+  "0x10fe050": {
+   "index": 328,
+   "import": "jbz9I9vkqkk#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe060": {
+   "index": 329,
+   "import": "eXbUSpEaTsA#libkernel",
+   "name": "scePthreadAttrSetinheritsched",
+   "implemented": true
+  },
+  "0x10fe070": {
+   "index": 330,
+   "import": "kDh-NfxgMtE#libkernel",
+   "name": "scePthreadCondSignal",
+   "implemented": true
+  },
+  "0x10fe080": {
+   "index": 331,
+   "import": "62KCwEMmzcM#libkernel",
+   "name": "scePthreadAttrDestroy",
+   "implemented": true
+  },
+  "0x10fe090": {
+   "index": 332,
+   "import": "4qGrR6eoP9Y#libkernel",
+   "name": "scePthreadDetach",
+   "implemented": true
+  },
+  "0x10fe0a0": {
+   "index": 333,
+   "import": "BmMjYxmew1w#libkernel",
+   "name": "scePthreadCondTimedwait",
+   "implemented": true
+  },
+  "0x10fe0b0": {
+   "index": 334,
+   "import": "g+PZd2hiacg#libkernel",
+   "name": "scePthreadCondDestroy",
+   "implemented": true
+  },
+  "0x10fe0c0": {
+   "index": 335,
+   "import": "onNY9Byn-W8#libkernel",
+   "name": "scePthreadJoin",
+   "implemented": true
+  },
+  "0x10fe0d0": {
+   "index": 336,
+   "import": "JGgj7Uvrl+A#libkernel",
+   "name": "scePthreadCondBroadcast",
+   "implemented": true
+  },
+  "0x10fe0e0": {
+   "index": 337,
+   "import": "2Tb92quprl0#libkernel",
+   "name": "scePthreadCondInit",
+   "implemented": true
+  },
+  "0x10fe0f0": {
+   "index": 338,
+   "import": "WKAXJ4XBPQ4#libkernel",
+   "name": "scePthreadCondWait",
+   "implemented": true
+  },
+  "0x10fe100": {
+   "index": 339,
+   "import": "4+h9EzwKF4I#libkernel",
+   "name": "scePthreadAttrSetschedpolicy",
+   "implemented": true
+  },
+  "0x10fe110": {
+   "index": 340,
+   "import": "DzES9hQF4f4#libkernel",
+   "name": "scePthreadAttrSetschedparam",
+   "implemented": true
+  },
+  "0x10fe120": {
+   "index": 341,
+   "import": "qBDmpCyGssE#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe130": {
+   "index": 342,
+   "import": "W0Hpm2X0uPE#libkernel",
+   "name": "scePthreadSetprio",
+   "implemented": true
+  },
+  "0x10fe140": {
+   "index": 343,
+   "import": "nsYoNRywwNg#libkernel",
+   "name": "scePthreadAttrInit",
+   "implemented": true
+  },
+  "0x10fe150": {
+   "index": 344,
+   "import": "-Wreprtu0Qs#libkernel",
+   "name": "scePthreadAttrSetdetachstate",
+   "implemented": true
+  },
+  "0x10fe160": {
+   "index": 345,
+   "import": "6UgtwV+0zb4#libkernel",
+   "name": "scePthreadCreate",
+   "implemented": true
+  },
+  "0x10fe170": {
+   "index": 346,
+   "import": "UTXzJbWhhTE#libkernel",
+   "name": "scePthreadAttrSetstacksize",
+   "implemented": true
+  },
+  "0x10fe180": {
+   "index": 347,
+   "import": "3kg7rT0NQIs#libkernel",
+   "name": "scePthreadExit",
+   "implemented": true
+  },
+  "0x10fe190": {
+   "index": 348,
+   "import": "KuOuD58hqn4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe1a0": {
+   "index": 349,
+   "import": "Ujf3KzMvRmI#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe1b0": {
+   "index": 350,
+   "import": "NDcSfcYZRC8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe1c0": {
+   "index": 351,
+   "import": "mtqDK9zkoIE#libSceNpUtility",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe1d0": {
+   "index": 352,
+   "import": "V4EVrruHuy8#libSceNpUtility",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe1e0": {
+   "index": 353,
+   "import": "vT9xhqPO6+0#libSceNpUtility",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe1f0": {
+   "index": 354,
+   "import": "wLaxchvEEnk#libSceNpUtility",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe200": {
+   "index": 355,
+   "import": "JBN6N-EY+3M#libSceHttp",
+   "name": "sceHttpsGetSslError",
+   "implemented": false
+  },
+  "0x10fe210": {
+   "index": 356,
+   "import": "f42K37mm5RM#libSceHttp",
+   "name": "sceHttpsEnableOption",
+   "implemented": false
+  },
+  "0x10fe220": {
+   "index": 357,
+   "import": "qgxDBjorUxs#libSceHttp",
+   "name": "sceHttpCreateConnectionWithURL",
+   "implemented": false
+  },
+  "0x10fe230": {
+   "index": 358,
+   "import": "1e2BNwI-XzE#libSceHttp",
+   "name": "sceHttpSendRequest",
+   "implemented": true
+  },
+  "0x10fe240": {
+   "index": 359,
+   "import": "P5pdoykPYTk#libSceHttp",
+   "name": "sceHttpReadData",
+   "implemented": true
+  },
+  "0x10fe250": {
+   "index": 360,
+   "import": "qe7oZ+v4PWA#libSceHttp",
+   "name": "sceHttpDeleteRequest",
+   "implemented": true
+  },
+  "0x10fe260": {
+   "index": 361,
+   "import": "xegFfZKBVlw#libSceHttp",
+   "name": "sceHttpSetSendTimeOut",
+   "implemented": true
+  },
+  "0x10fe270": {
+   "index": 362,
+   "import": "0S9tTH0uqTU#libSceHttp",
+   "name": "sceHttpSetConnectTimeOut",
+   "implemented": true
+  },
+  "0x10fe280": {
+   "index": 363,
+   "import": "0a2TBNfE3BU#libSceHttp",
+   "name": "sceHttpGetStatusCode",
+   "implemented": true
+  },
+  "0x10fe290": {
+   "index": 364,
+   "import": "DK+GoXCNT04#libSceHttp",
+   "name": "sceHttpsLoadCert",
+   "implemented": false
+  },
+  "0x10fe2a0": {
+   "index": 365,
+   "import": "yigr4V0-HTM#libSceHttp",
+   "name": "sceHttpSetRecvTimeOut",
+   "implemented": true
+  },
+  "0x10fe2b0": {
+   "index": 366,
+   "import": "Aeu5wVKkF9w#libSceHttp",
+   "name": "sceHttpCreateRequestWithURL",
+   "implemented": false
+  },
+  "0x10fe2c0": {
+   "index": 367,
+   "import": "yuO2H2Uvnos#libSceHttp",
+   "name": "sceHttpGetResponseContentLength",
+   "implemented": true
+  },
+  "0x10fe2d0": {
+   "index": 368,
+   "import": "EY28T2bkN7k#libSceHttp",
+   "name": "sceHttpAddRequestHeader",
+   "implemented": true
+  },
+  "0x10fe2e0": {
+   "index": 369,
+   "import": "htyBOoWeS58#libSceHttp",
+   "name": "sceHttpsSetSslCallback",
+   "implemented": false
+  },
+  "0x10fe2f0": {
+   "index": 370,
+   "import": "mSQCxzWTwVI#libSceHttp",
+   "name": "sceHttpsDisableOption",
+   "implemented": false
+  },
+  "0x10fe300": {
+   "index": 371,
+   "import": "hvG6GfBMXg8#libSceHttp",
+   "name": "sceHttpAbortRequest",
+   "implemented": true
+  },
+  "0x10fe310": {
+   "index": 372,
+   "import": "P6A3ytpsiYc#libSceHttp",
+   "name": "sceHttpDeleteConnection",
+   "implemented": true
+  },
+  "0x10fe320": {
+   "index": 373,
+   "import": "gjSyfzSsDcE#libSceNpAuth",
+   "name": "sceNpAuthPollAsync",
+   "implemented": false
+  },
+  "0x10fe330": {
+   "index": 374,
+   "import": "N+mr7GjTvr8#libSceNpAuth",
+   "name": "sceNpAuthCreateAsyncRequest",
+   "implemented": false
+  },
+  "0x10fe340": {
+   "index": 375,
+   "import": "H8wG9Bk-nPc#libSceNpAuth",
+   "name": "sceNpAuthDeleteRequest",
+   "implemented": true
+  },
+  "0x10fe350": {
+   "index": 376,
+   "import": "qAUXQ9GdWp8#libSceNpAuth",
+   "name": "sceNpAuthGetAuthorizationCodeA",
+   "implemented": true
+  },
+  "0x10fe360": {
+   "index": 377,
+   "import": "GFhVUpRmbHE#libSceNpManager",
+   "name": "sceNpInGameMessageInitialize",
+   "implemented": true
+  },
+  "0x10fe370": {
+   "index": 378,
+   "import": "+anuSx2avHQ#libSceNpManager",
+   "name": "sceNpInGameMessageDeleteHandle",
+   "implemented": true
+  },
+  "0x10fe380": {
+   "index": 379,
+   "import": "s4UEa5iBJdc#libSceNpManager",
+   "name": "sceNpInGameMessageCreateHandle",
+   "implemented": true
+  },
+  "0x10fe390": {
+   "index": 380,
+   "import": "PQDFxcnqxtw#libSceNpManager",
+   "name": "sceNpInGameMessageSendDataA",
+   "implemented": true
+  },
+  "0x10fe3a0": {
+   "index": 381,
+   "import": "bMG3cVmUmuk#libSceNpManager",
+   "name": "sceNpInGameMessageTerminate",
+   "implemented": true
+  },
+  "0x10fe3b0": {
+   "index": 382,
+   "import": "IkL62FMpIpo#libSceNpManager",
+   "name": "sceNpInGameMessagePrepareA",
+   "implemented": true
+  },
+  "0x10fe3c0": {
+   "index": 383,
+   "import": "Nd91WaWmG2w#libSceNet",
+   "name": "sceNetResolverStartNtoa",
+   "implemented": false
+  },
+  "0x10fe3d0": {
+   "index": 384,
+   "import": "C4UgDHHPvdw#libSceNet",
+   "name": "sceNetResolverCreate",
+   "implemented": true
+  },
+  "0x10fe3e0": {
+   "index": 385,
+   "import": "kJlYH5uMAWI#libSceNet",
+   "name": "sceNetResolverDestroy",
+   "implemented": true
+  },
+  "0x10fe3f0": {
+   "index": 386,
+   "import": "t7b6dmpQNiI#libSceNpTus",
+   "name": "sceNpTusPollAsync",
+   "implemented": true
+  },
+  "0x10fe400": {
+   "index": 387,
+   "import": "xzG8mG9YlKY#libSceNpTus",
+   "name": "sceNpTusGetDataAAsync",
+   "implemented": true
+  },
+  "0x10fe410": {
+   "index": 388,
+   "import": "CcIH40dYS88#libSceNpTus",
+   "name": "sceNpTusDeleteRequest",
+   "implemented": true
+  },
+  "0x10fe420": {
+   "index": 389,
+   "import": "3bh2aBvvmvM#libSceNpTus",
+   "name": "sceNpTusCreateRequest",
+   "implemented": true
+  },
+  "0x10fe430": {
+   "index": 390,
+   "import": "2eq1bMwgZYo#libSceNpTus",
+   "name": "sceNpTusAbortRequest",
+   "implemented": true
+  },
+  "0x10fe440": {
+   "index": 391,
+   "import": "H3uq7x0sZOI#libSceNpTus",
+   "name": "sceNpTusDeleteNpTitleCtx",
+   "implemented": true
+  },
+  "0x10fe450": {
+   "index": 392,
+   "import": "1n-dGukBgnY#libSceNpTus",
+   "name": "sceNpTusCreateNpTitleCtxA",
+   "implemented": true
+  },
+  "0x10fe460": {
+   "index": 393,
+   "import": "4u58d6g6uwU#libSceNpTus",
+   "name": "sceNpTusSetDataAAsync",
+   "implemented": true
+  },
+  "0x10fe470": {
+   "index": 394,
+   "import": "M2BUB+DNEGE#libSceNpWebApi",
+   "name": "sceNpWebApiCreateExtdPushEventFilter",
+   "implemented": true
+  },
+  "0x10fe480": {
+   "index": 395,
+   "import": "CQtPRSF6Ds8#libSceNpWebApi",
+   "name": "sceNpWebApiReadData",
+   "implemented": true
+  },
+  "0x10fe490": {
+   "index": 396,
+   "import": "XUjdsSTTZ3U#libSceNpWebApi",
+   "name": "sceNpWebApiDeleteContext",
+   "implemented": true
+  },
+  "0x10fe4a0": {
+   "index": 397,
+   "import": "noQgleu+KLE#libSceNpWebApi",
+   "name": "sceNpWebApiDeleteRequest",
+   "implemented": true
+  },
+  "0x10fe4b0": {
+   "index": 398,
+   "import": "5Mn7TYwpl30#libSceNpWebApi",
+   "name": "sceNpWebApiDeleteHandle",
+   "implemented": true
+  },
+  "0x10fe4c0": {
+   "index": 399,
+   "import": "79M-JqvvGo0#libSceNpWebApi",
+   "name": "sceNpWebApiCreateHandle",
+   "implemented": true
+  },
+  "0x10fe4d0": {
+   "index": 400,
+   "import": "PqCY25FMzPs#libSceNpWebApi",
+   "name": "sceNpWebApiUnregisterExtdPushEventCallback",
+   "implemented": true
+  },
+  "0x10fe4e0": {
+   "index": 401,
+   "import": "G3AnLNdRBjE#libSceNpWebApi",
+   "name": "sceNpWebApiInitialize",
+   "implemented": true
+  },
+  "0x10fe4f0": {
+   "index": 402,
+   "import": "zk6c65xoyO0#libSceNpWebApi",
+   "name": "sceNpWebApiCreateContextA",
+   "implemented": true
+  },
+  "0x10fe500": {
+   "index": 403,
+   "import": "rdgs5Z1MyFw#libSceNpWebApi",
+   "name": "sceNpWebApiCreateRequest",
+   "implemented": true
+  },
+  "0x10fe510": {
+   "index": 404,
+   "import": "KjNeZ-29ysQ#libSceNpWebApi",
+   "name": "sceNpWebApiSendRequest2",
+   "implemented": true
+  },
+  "0x10fe520": {
+   "index": 405,
+   "import": "asz3TtIqGF8#libSceNpWebApi",
+   "name": "sceNpWebApiTerminate",
+   "implemented": true
+  },
+  "0x10fe530": {
+   "index": 406,
+   "import": "jhXKGQJ4egI#libSceNpWebApi",
+   "name": "sceNpWebApiRegisterExtdPushEventCallbackA",
+   "implemented": true
+  },
+  "0x10fe540": {
+   "index": 407,
+   "import": "ur5SShyG0dk#libSceNpUtility",
+   "name": "sceNpWordFilterPollAsync",
+   "implemented": true
+  },
+  "0x10fe550": {
+   "index": 408,
+   "import": "6p9jvljuvsw#libSceNpUtility",
+   "name": "sceNpWordFilterCreateTitleCtxA",
+   "implemented": true
+  },
+  "0x10fe560": {
+   "index": 409,
+   "import": "IEB+vgVoQbw#libSceNpUtility",
+   "name": "sceNpWordFilterCreateAsyncRequest",
+   "implemented": true
+  },
+  "0x10fe570": {
+   "index": 410,
+   "import": "PYFS1H70bDs#libSceNpUtility",
+   "name": "sceNpWordFilterDeleteRequest",
+   "implemented": true
+  },
+  "0x10fe580": {
+   "index": 411,
+   "import": "1dMndqL-QgE#libSceNpUtility",
+   "name": "sceNpWordFilterCensorComment",
+   "implemented": true
+  },
+  "0x10fe590": {
+   "index": 412,
+   "import": "t0P5z5yuFPA#libSceNpUtility",
+   "name": "sceNpWordFilterDeleteTitleCtx",
+   "implemented": true
+  },
+  "0x10fe5a0": {
+   "index": 413,
+   "import": "r42bWcQbtZY#libSceNpCommerce",
+   "name": "sceNpCommerceDialogGetResult",
+   "implemented": true
+  },
+  "0x10fe5b0": {
+   "index": 414,
+   "import": "eiqMCt9UshI#libSceNpManager",
+   "name": "sceNpCreateAsyncRequest",
+   "implemented": true
+  },
+  "0x10fe5c0": {
+   "index": 415,
+   "import": "0aR2aWmQal4#libSceNpCommerce",
+   "name": "sceNpCommerceDialogInitialize",
+   "implemented": true
+  },
+  "0x10fe5d0": {
+   "index": 416,
+   "import": "DfSCDRA3EjY#libSceNpCommerce",
+   "name": "sceNpCommerceDialogOpen",
+   "implemented": true
+  },
+  "0x10fe5e0": {
+   "index": 417,
+   "import": "OzKvTvg3ZYU#libSceNpManager",
+   "name": "sceNpAbortRequest",
+   "implemented": true
+  },
+  "0x10fe5f0": {
+   "index": 418,
+   "import": "r6MyYJkryz8#libSceNpManager",
+   "name": "sceNpCheckPlus",
+   "implemented": true
+  },
+  "0x10fe600": {
+   "index": 419,
+   "import": "LR5cwFMMCVE#libSceNpCommerce",
+   "name": "sceNpCommerceDialogUpdateStatus",
+   "implemented": true
+  },
+  "0x10fe610": {
+   "index": 420,
+   "import": "m-I92Ab50W8#libSceNpCommerce",
+   "name": "sceNpCommerceDialogTerminate",
+   "implemented": true
+  },
+  "0x10fe620": {
+   "index": 421,
+   "import": "uqcPJLWL08M#libSceNpManager",
+   "name": "sceNpPollAsync",
+   "implemented": true
+  },
+  "0x10fe630": {
+   "index": 422,
+   "import": "rQFVBXp-Cxg#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe640": {
+   "index": 423,
+   "import": "MpxhMh8QFro#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe650": {
+   "index": 424,
+   "import": "Qazy8LmXTvw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe660": {
+   "index": 425,
+   "import": "xeYO4u7uyJ0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe670": {
+   "index": 426,
+   "import": "uodLYyUip20#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe680": {
+   "index": 427,
+   "import": "lbB+UlZqVG0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe690": {
+   "index": 428,
+   "import": "MUjC4lbHrK4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe6a0": {
+   "index": 429,
+   "import": "BQ3tey0JmQM#libSceCommonDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe6b0": {
+   "index": 430,
+   "import": "haVZE9FgKqE#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogUpdateStatus",
+   "implemented": false
+  },
+  "0x10fe6c0": {
+   "index": 431,
+   "import": "0Sp9vJcB1-w#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogTerminate",
+   "implemented": false
+  },
+  "0x10fe6d0": {
+   "index": 432,
+   "import": "lDqxaY1UbEo#libSceMsgDialog",
+   "name": "sceMsgDialogInitialize",
+   "implemented": true
+  },
+  "0x10fe6e0": {
+   "index": 433,
+   "import": "+Y1acHGomGQ#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogClose",
+   "implemented": true
+  },
+  "0x10fe6f0": {
+   "index": 434,
+   "import": "b06Hh0DPEaE#libSceMsgDialog",
+   "name": "sceMsgDialogOpen",
+   "implemented": true
+  },
+  "0x10fe700": {
+   "index": 435,
+   "import": "HTrcDKlFKuM#libSceMsgDialog",
+   "name": "sceMsgDialogClose",
+   "implemented": true
+  },
+  "0x10fe710": {
+   "index": 436,
+   "import": "ECEzk+K9L2k#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogTerminate",
+   "implemented": true
+  },
+  "0x10fe720": {
+   "index": 437,
+   "import": "0nV21JjYCH8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe730": {
+   "index": 438,
+   "import": "nrQRlLKzdwE#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogOpenA",
+   "implemented": false
+  },
+  "0x10fe740": {
+   "index": 439,
+   "import": "Lr8ovHH9l6A#libSceMsgDialog",
+   "name": "sceMsgDialogGetResult",
+   "implemented": true
+  },
+  "0x10fe750": {
+   "index": 440,
+   "import": "6fIC3XKt2k0#libSceMsgDialog",
+   "name": "sceMsgDialogUpdateStatus",
+   "implemented": true
+  },
+  "0x10fe760": {
+   "index": 441,
+   "import": "WmYDzdC4EHI#libSceIme",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe770": {
+   "index": 442,
+   "import": "ePw-kqZmelo#libSceMsgDialog",
+   "name": "sceMsgDialogTerminate",
+   "implemented": true
+  },
+  "0x10fe780": {
+   "index": 443,
+   "import": "-4GCfYdNF1s#libSceIme",
+   "name": "sceImeUpdate",
+   "implemented": true
+  },
+  "0x10fe790": {
+   "index": 444,
+   "import": "frwz3eyuA6w#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogUpdateStatus",
+   "implemented": true
+  },
+  "0x10fe7a0": {
+   "index": 445,
+   "import": "JlpJVoRWv7U#libSceSigninDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe7b0": {
+   "index": 446,
+   "import": "RPydv-Jr1bc#libSceIme",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe7c0": {
+   "index": 447,
+   "import": "TmVP8LzcFcY#libSceIme",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe7d0": {
+   "index": 448,
+   "import": "2L-W-ZYn2Qo#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogInitialize",
+   "implemented": true
+  },
+  "0x10fe7e0": {
+   "index": 449,
+   "import": "vN9sTP63WT8#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogOpenA",
+   "implemented": true
+  },
+  "0x10fe7f0": {
+   "index": 450,
+   "import": "Lg+NCE6pTwQ#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogInitialize",
+   "implemented": false
+  },
+  "0x10fe800": {
+   "index": 451,
+   "import": "Bw31liTFT3A#libSceSigninDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe810": {
+   "index": 452,
+   "import": "hK0CCljzJmY#libSceNpFriendListDialog",
+   "name": "sceNpFriendListDialogGetResultA",
+   "implemented": true
+  },
+  "0x10fe820": {
+   "index": 453,
+   "import": "mlYGfmqE3fQ#libSceSigninDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe830": {
+   "index": 454,
+   "import": "wkwjz0Xdo2A#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogClose",
+   "implemented": false
+  },
+  "0x10fe840": {
+   "index": 455,
+   "import": "WLxUN2WMim8#libSceIme",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe850": {
+   "index": 456,
+   "import": "nqG7rqnYw1U#libSceSigninDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe860": {
+   "index": 457,
+   "import": "CWVW78Qc3fI#libSceMsgDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe870": {
+   "index": 458,
+   "import": "8rhLl1-0W-o#libSceNpProfileDialog",
+   "name": "sceNpProfileDialogGetResult",
+   "implemented": false
+  },
+  "0x10fe880": {
+   "index": 459,
+   "import": "LXlmS6PvJdU#libSceSigninDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe890": {
+   "index": 460,
+   "import": "oBmw4xrmfKs#libSceImeDialog",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe8a0": {
+   "index": 461,
+   "import": "28xmRUFao68#libSceNpTrophy",
+   "name": "sceNpTrophyUnlockTrophy",
+   "implemented": true
+  },
+  "0x10fe8b0": {
+   "index": 462,
+   "import": "GNcF4oidY0Y#libSceNpTrophy",
+   "name": "sceNpTrophyDestroyHandle",
+   "implemented": true
+  },
+  "0x10fe8c0": {
+   "index": 463,
+   "import": "q7U6tEAQf7c#libSceNpTrophy",
+   "name": "sceNpTrophyCreateHandle",
+   "implemented": true
+  },
+  "0x10fe8d0": {
+   "index": 464,
+   "import": "aTnHs7W-9Uk#libSceNpTrophy",
+   "name": "sceNpTrophyAbortHandle",
+   "implemented": false
+  },
+  "0x10fe8e0": {
+   "index": 465,
+   "import": "TJCAxto9SEU#libSceNpTrophy",
+   "name": "sceNpTrophyRegisterContext",
+   "implemented": true
+  },
+  "0x10fe8f0": {
+   "index": 466,
+   "import": "E1Wrwd07Lr8#libSceNpTrophy",
+   "name": "sceNpTrophyDestroyContext",
+   "implemented": true
+  },
+  "0x10fe900": {
+   "index": 467,
+   "import": "XbkjbobZlCY#libSceNpTrophy",
+   "name": "sceNpTrophyCreateContext",
+   "implemented": true
+  },
+  "0x10fe910": {
+   "index": 468,
+   "import": "7pNKcscKrf8#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe920": {
+   "index": 469,
+   "import": "AV6ipCNa4Rw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe930": {
+   "index": 470,
+   "import": "fffwELXNVFA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe940": {
+   "index": 471,
+   "import": "kHg45qPC6f0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fe950": {
+   "index": 472,
+   "import": "WaSFJoRWXaI#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe960": {
+   "index": 473,
+   "import": "cKYtVmeSTcw#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe970": {
+   "index": 474,
+   "import": "IQtleGLL5pQ#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe980": {
+   "index": 475,
+   "import": "gdUCnU0gHdI#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe990": {
+   "index": 476,
+   "import": "FXP359ygujs#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9a0": {
+   "index": 477,
+   "import": "3G4zhgKuxE8#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9b0": {
+   "index": 478,
+   "import": "TMtqoFQjjbA#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9c0": {
+   "index": 479,
+   "import": "mz2iTY0MK4A#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9d0": {
+   "index": 480,
+   "import": "whrS4oksXc4#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9e0": {
+   "index": 481,
+   "import": "oM+XCzVG3oM#libSceFontFt",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fe9f0": {
+   "index": 482,
+   "import": "n590hj5Oe-k#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea00": {
+   "index": 483,
+   "import": "h6hIgxXEiEc#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea10": {
+   "index": 484,
+   "import": "Xx974EW-QFY#libSceFontFt",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea20": {
+   "index": 485,
+   "import": "N1EBMeGhf7E#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea30": {
+   "index": 486,
+   "import": "6vGCkkQJOcI#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea40": {
+   "index": 487,
+   "import": "exAxkyVLt0s#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea50": {
+   "index": 488,
+   "import": "SsRbbCiWoGw#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea60": {
+   "index": 489,
+   "import": "vzHs3C8lWJk#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea70": {
+   "index": 490,
+   "import": "3OdRkSjOcog#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea80": {
+   "index": 491,
+   "import": "1QjhKxrsOB8#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fea90": {
+   "index": 492,
+   "import": "v0phZwa4R5o#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feaa0": {
+   "index": 493,
+   "import": "imxVx8lm+KM#libSceFont",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feab0": {
+   "index": 494,
+   "import": "xk0AcarP3V4#libScePad",
+   "name": "scePadOpen",
+   "implemented": true
+  },
+  "0x10feac0": {
+   "index": 495,
+   "import": "hv1luiJrqQM#libScePad",
+   "name": "scePadInit",
+   "implemented": true
+  },
+  "0x10fead0": {
+   "index": 496,
+   "import": "6ncge5+l5Qs#libScePad",
+   "name": "scePadClose",
+   "implemented": true
+  },
+  "0x10feae0": {
+   "index": 497,
+   "import": "lUoqwTQu4Go#libSceUserService",
+   "name": "sceUserServiceGetUserColor",
+   "implemented": true
+  },
+  "0x10feaf0": {
+   "index": 498,
+   "import": "yH17Q6NWtVg#libSceUserService",
+   "name": "sceUserServiceGetEvent",
+   "implemented": true
+  },
+  "0x10feb00": {
+   "index": 499,
+   "import": "YndgXqQVV7c#libScePad",
+   "name": "scePadReadState",
+   "implemented": true
+  },
+  "0x10feb10": {
+   "index": 500,
+   "import": "RaqxZIf6DvE#libSceMouse",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feb20": {
+   "index": 501,
+   "import": "Qs0wWulgl7U#libSceMouse",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feb30": {
+   "index": 502,
+   "import": "eaFXjfJv3xs#libSceIme",
+   "name": "sceImeKeyboardOpen",
+   "implemented": true
+  },
+  "0x10feb40": {
+   "index": 503,
+   "import": "dKadqZFgKKQ#libSceIme",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feb50": {
+   "index": 504,
+   "import": "x8qnXqh-tiM#libSceMouse",
+   "name": null,
+   "implemented": false
+  },
+  "0x10feb60": {
+   "index": 505,
+   "import": "yFVnOdGxvZY#libScePad",
+   "name": "scePadSetVibration",
+   "implemented": true
+  },
+  "0x10feb70": {
+   "index": 506,
+   "import": "PMVehSlfZ94#libSceIme",
+   "name": "sceImeKeyboardClose",
+   "implemented": true
+  },
+  "0x10feb80": {
+   "index": 507,
+   "import": "ZC17w3vB5Lo#libSceAvPlayer",
+   "name": "sceAvPlayerStop",
+   "implemented": true
+  },
+  "0x10feb90": {
+   "index": 508,
+   "import": "ET4Gr-Uu07s#libSceAvPlayer",
+   "name": "sceAvPlayerStart",
+   "implemented": true
+  },
+  "0x10feba0": {
+   "index": 509,
+   "import": "w5moABNwnRY#libSceAvPlayer",
+   "name": "sceAvPlayerResume",
+   "implemented": true
+  },
+  "0x10febb0": {
+   "index": 510,
+   "import": "hdTyRzCXQeQ#libSceAvPlayer",
+   "name": "sceAvPlayerStreamCount",
+   "implemented": true
+  },
+  "0x10febc0": {
+   "index": 511,
+   "import": "NkJwDzKmIlw#libSceAvPlayer",
+   "name": "sceAvPlayerClose",
+   "implemented": true
+  },
+  "0x10febd0": {
+   "index": 512,
+   "import": "d8FcbzfAdQw#libSceAvPlayer",
+   "name": "sceAvPlayerGetStreamInfo",
+   "implemented": true
+  },
+  "0x10febe0": {
+   "index": 513,
+   "import": "ODJK2sn9w4A#libSceAvPlayer",
+   "name": "sceAvPlayerEnableStream",
+   "implemented": true
+  },
+  "0x10febf0": {
+   "index": 514,
+   "import": "BOVKAzRmuTQ#libSceAvPlayer",
+   "name": "sceAvPlayerDisableStream",
+   "implemented": true
+  },
+  "0x10fec00": {
+   "index": 515,
+   "import": "KMcEa+rHsIo#libSceAvPlayer",
+   "name": "sceAvPlayerAddSource",
+   "implemented": true
+  },
+  "0x10fec10": {
+   "index": 516,
+   "import": "aS66RI0gGgo#libSceAvPlayer",
+   "name": "sceAvPlayerInit",
+   "implemented": true
+  },
+  "0x10fec20": {
+   "index": 517,
+   "import": "UbQoYawOsfY#libSceAvPlayer",
+   "name": "sceAvPlayerIsActive",
+   "implemented": true
+  },
+  "0x10fec30": {
+   "index": 518,
+   "import": "HD1YKVU26-M#libSceAvPlayer",
+   "name": "sceAvPlayerPostInit",
+   "implemented": true
+  },
+  "0x10fec40": {
+   "index": 519,
+   "import": "9y5v+fGN4Wk#libSceAvPlayer",
+   "name": "sceAvPlayerPause",
+   "implemented": true
+  },
+  "0x10fec50": {
+   "index": 520,
+   "import": "OVths0xGfho#libSceAvPlayer",
+   "name": "sceAvPlayerSetLooping",
+   "implemented": true
+  },
+  "0x10fec60": {
+   "index": 521,
+   "import": "JdksQu8pNdQ#libSceAvPlayer",
+   "name": "sceAvPlayerGetVideoDataEx",
+   "implemented": true
+  },
+  "0x10fec70": {
+   "index": 522,
+   "import": "LxcEU+ICu8U#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fec80": {
+   "index": 523,
+   "import": "KdP-nULpuGw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fec90": {
+   "index": 524,
+   "import": "7oxv3PPCumo#libkernel",
+   "name": null,
+   "implemented": true
+  },
+  "0x10feca0": {
+   "index": 525,
+   "import": "9bfdLIyuwCY#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fecb0": {
+   "index": 526,
+   "import": "pzUa7KEoydw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fecc0": {
+   "index": 527,
+   "import": "hwVSPCmp5tM#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fecd0": {
+   "index": 528,
+   "import": "W6SiVSiCDtI#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fece0": {
+   "index": 529,
+   "import": "2SKEx6bSq-4#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fecf0": {
+   "index": 530,
+   "import": "VOx8NGmHXTs#libkernel",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fed00": {
+   "index": 531,
+   "import": "C0f7TJcbfac#libkernel",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fed10": {
+   "index": 532,
+   "import": "iF1iQHzxBJU#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fed20": {
+   "index": 533,
+   "import": "rVjRvHJ0X6c#libkernel",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fed30": {
+   "index": 534,
+   "import": "3qxgM4ezETA#libkernel",
+   "name": "scePthreadAttrSetaffinity",
+   "implemented": true
+  },
+  "0x10fed40": {
+   "index": 535,
+   "import": "zgXifHT9ErY#libSceVideoOut",
+   "name": "sceVideoOutIsFlipPending",
+   "implemented": true
+  },
+  "0x10fed50": {
+   "index": 536,
+   "import": "i6-sR91Wt-4#libSceVideoOut",
+   "name": "sceVideoOutSetBufferAttribute",
+   "implemented": true
+  },
+  "0x10fed60": {
+   "index": 537,
+   "import": "1FZBKy8HeNU#libSceVideoOut",
+   "name": "sceVideoOutGetVblankStatus",
+   "implemented": true
+  },
+  "0x10fed70": {
+   "index": 538,
+   "import": "CBiu4mCE1DA#libSceVideoOut",
+   "name": "sceVideoOutSetFlipRate",
+   "implemented": true
+  },
+  "0x10fed80": {
+   "index": 539,
+   "import": "Up36PTk687E#libSceVideoOut",
+   "name": "sceVideoOutOpen",
+   "implemented": true
+  },
+  "0x10fed90": {
+   "index": 540,
+   "import": "N5KDtkIjjJ4#libSceVideoOut",
+   "name": "sceVideoOutUnregisterBuffers",
+   "implemented": true
+  },
+  "0x10feda0": {
+   "index": 541,
+   "import": "1n37q1Bvc5Y#libSceSystemService",
+   "name": "sceSystemServiceGetDisplaySafeAreaInfo",
+   "implemented": true
+  },
+  "0x10fedb0": {
+   "index": 542,
+   "import": "HXzjK9yI30k#libSceVideoOut",
+   "name": "sceVideoOutAddFlipEvent",
+   "implemented": true
+  },
+  "0x10fedc0": {
+   "index": 543,
+   "import": "jMNwqYr4R-k#libSceRtc",
+   "name": "sceRtcGetTickResolution",
+   "implemented": true
+  },
+  "0x10fedd0": {
+   "index": 544,
+   "import": "IOdgHlCGU-k#libSceVideoOut",
+   "name": "sceVideoOutSubmitChangeBufferAttribute",
+   "implemented": true
+  },
+  "0x10fede0": {
+   "index": 545,
+   "import": "6kPnj51T62Y#libSceVideoOut",
+   "name": "sceVideoOutGetResolutionStatus",
+   "implemented": true
+  },
+  "0x10fedf0": {
+   "index": 546,
+   "import": "w3BY+tAEiQY#libSceVideoOut",
+   "name": "sceVideoOutRegisterBuffers",
+   "implemented": true
+  },
+  "0x10fee00": {
+   "index": 547,
+   "import": "Xru92wHJRmg#libSceVideoOut",
+   "name": "sceVideoOutAddVblankEvent",
+   "implemented": true
+  },
+  "0x10fee10": {
+   "index": 548,
+   "import": "fzyMKs9kim0#libkernel",
+   "name": "sceKernelWaitEqueue",
+   "implemented": true
+  },
+  "0x10fee20": {
+   "index": 549,
+   "import": "pjkDsgxli6c#libSceVideoOut",
+   "name": "sceVideoOutModeSetAny_",
+   "implemented": true
+  },
+  "0x10fee30": {
+   "index": 550,
+   "import": "pv9CI5VC+R0#libSceVideoOut",
+   "name": "sceVideoOutAdjustColor",
+   "implemented": true
+  },
+  "0x10fee40": {
+   "index": 551,
+   "import": "D0OdFMjp46I#libkernel",
+   "name": "sceKernelCreateEqueue",
+   "implemented": true
+  },
+  "0x10fee50": {
+   "index": 552,
+   "import": "N1bEoJ4SRw4#libSceVideoOut",
+   "name": "sceVideoOutConfigureOutputMode_",
+   "implemented": true
+  },
+  "0x10fee60": {
+   "index": 553,
+   "import": "aZK8lNei-Qw#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fee70": {
+   "index": 554,
+   "import": "DYhhWbJSeRg#libSceVideoOut",
+   "name": "sceVideoOutColorSettingsSetGamma",
+   "implemented": true
+  },
+  "0x10fee80": {
+   "index": 555,
+   "import": "j6RaAUlaLv0#libSceVideoOut",
+   "name": "sceVideoOutWaitVblank",
+   "implemented": true
+  },
+  "0x10fee90": {
+   "index": 556,
+   "import": "kGVLc3htQE8#libSceVideoOut",
+   "name": "sceVideoOutGetDeviceCapabilityInfo",
+   "implemented": true
+  },
+  "0x10feea0": {
+   "index": 557,
+   "import": "SbU3dwp80lQ#libSceVideoOut",
+   "name": "sceVideoOutGetFlipStatus",
+   "implemented": true
+  },
+  "0x10feeb0": {
+   "index": 558,
+   "import": "U46NwOiJpys#libSceVideoOut",
+   "name": "sceVideoOutSubmitFlip",
+   "implemented": true
+  },
+  "0x10feec0": {
+   "index": 559,
+   "import": "WslcK1FQcGI#libkernel",
+   "name": "sceKernelIsNeoMode",
+   "implemented": true
+  },
+  "0x10feed0": {
+   "index": 560,
+   "import": "Y7aJ1uydPMo#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10feee0": {
+   "index": 561,
+   "import": "QrZZdJ8XsX0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10feef0": {
+   "index": 562,
+   "import": "AqBioC2vF3I#libScePosix",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fef00": {
+   "index": 563,
+   "import": "FN4gaPmuFV8#libScePosix",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fef10": {
+   "index": 564,
+   "import": "AHxyhN96dy4#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fef20": {
+   "index": 565,
+   "import": "bY-PO6JhzhQ#libScePosix",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fef30": {
+   "index": 566,
+   "import": "E6ao34wPw+U#libScePosix",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fef40": {
+   "index": 567,
+   "import": "YQ0navp+YIc#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fef50": {
+   "index": 568,
+   "import": "wLlFkwG9UcQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fef60": {
+   "index": 569,
+   "import": "pDBDcY6uLSA#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10fef70": {
+   "index": 570,
+   "import": "GrQ9s4IrNaQ#libSceAudioOut",
+   "name": "sceAudioOutGetPortState",
+   "implemented": true
+  },
+  "0x10fef80": {
+   "index": 571,
+   "import": "s1--uE9mBFw#libSceAudioOut",
+   "name": "sceAudioOutClose",
+   "implemented": true
+  },
+  "0x10fef90": {
+   "index": 572,
+   "import": "ekNvsT22rsY#libSceAudioOut",
+   "name": "sceAudioOutOpen",
+   "implemented": true
+  },
+  "0x10fefa0": {
+   "index": 573,
+   "import": "JfEPXVxhFqA#libSceAudioOut",
+   "name": "sceAudioOutInit",
+   "implemented": true
+  },
+  "0x10fefb0": {
+   "index": 574,
+   "import": "QOQtbeDqsT4#libSceAudioOut",
+   "name": "sceAudioOutOutput",
+   "implemented": true
+  },
+  "0x10fefc0": {
+   "index": 575,
+   "import": "w3PdaSTSwGE#libSceAudioOut",
+   "name": "sceAudioOutOutputs",
+   "implemented": true
+  },
+  "0x10fefd0": {
+   "index": 576,
+   "import": "wVwPU50pS1c#libSceAudioOut",
+   "name": null,
+   "implemented": false
+  },
+  "0x10fefe0": {
+   "index": 577,
+   "import": "jiItzS6+22g#libSceGnmDriver",
+   "name": "sceGnmInsertSetMarker",
+   "implemented": true
+  },
+  "0x10feff0": {
+   "index": 578,
+   "import": "HlTPoZ-oY7Y#libSceGnmDriver",
+   "name": "sceGnmDrawIndex",
+   "implemented": true
+  },
+  "0x10ff000": {
+   "index": 579,
+   "import": "gAhCn6UiU4Y#libSceGnmDriver",
+   "name": "sceGnmSetVsShader",
+   "implemented": true
+  },
+  "0x10ff010": {
+   "index": 580,
+   "import": "mLVL7N7BVBg#libSceGnmDriver",
+   "name": "sceGnmUpdatePsShader350",
+   "implemented": true
+  },
+  "0x10ff020": {
+   "index": 581,
+   "import": "+AFvOEXrKJk#libSceGnmDriver",
+   "name": "sceGnmSetEmbeddedVsShader",
+   "implemented": true
+  },
+  "0x10ff030": {
+   "index": 582,
+   "import": "FUHG8sQ3R58#libSceGnmDriver",
+   "name": "sceGnmSetEsShader",
+   "implemented": true
+  },
+  "0x10ff040": {
+   "index": 583,
+   "import": "1qXLHIpROPE#libSceGnmDriver",
+   "name": "sceGnmInsertWaitFlipDone",
+   "implemented": true
+  },
+  "0x10ff050": {
+   "index": 584,
+   "import": "cFCp0NX8wf0#libSceGnmDriver",
+   "name": "sceGnmSetVgtControl",
+   "implemented": true
+  },
+  "0x10ff060": {
+   "index": 585,
+   "import": "V31V01UiScY#libSceGnmDriver",
+   "name": "sceGnmUpdateVsShader",
+   "implemented": true
+  },
+  "0x10ff070": {
+   "index": 586,
+   "import": "Z43vKp5k7r0#libSceGnmDriver",
+   "name": "sceGnmDispatchIndirect",
+   "implemented": true
+  },
+  "0x10ff080": {
+   "index": 587,
+   "import": "0BzLGljcwBo#libSceGnmDriver",
+   "name": "sceGnmDispatchDirect",
+   "implemented": true
+  },
+  "0x10ff090": {
+   "index": 588,
+   "import": "oYM+YzfCm2Y#libSceGnmDriver",
+   "name": "sceGnmDrawIndexOffset",
+   "implemented": true
+  },
+  "0x10ff0a0": {
+   "index": 589,
+   "import": "cUCo8OvArrw#libSceGnmDriver",
+   "name": "sceGnmDrawIndirectCountMulti",
+   "implemented": true
+  },
+  "0x10ff0b0": {
+   "index": 590,
+   "import": "VJNjFtqiF5w#libSceGnmDriver",
+   "name": "sceGnmSetHsShader",
+   "implemented": true
+  },
+  "0x10ff0c0": {
+   "index": 591,
+   "import": "GGsn7jMTxw4#libSceGnmDriver",
+   "name": "sceGnmDrawIndexAuto",
+   "implemented": true
+  },
+  "0x10ff0d0": {
+   "index": 592,
+   "import": "4v+otIIdjqg#libSceGnmDriver",
+   "name": "sceGnmDrawIndirect",
+   "implemented": true
+  },
+  "0x10ff0e0": {
+   "index": 593,
+   "import": "vckdzbQ46SI#libSceGnmDriver",
+   "name": "sceGnmSetLsShader",
+   "implemented": true
+  },
+  "0x10ff0f0": {
+   "index": 594,
+   "import": "im2ZuItabu4#libSceGnmDriver",
+   "name": "sceGnmDrawInitToDefaultContextState400",
+   "implemented": true
+  },
+  "0x10ff100": {
+   "index": 595,
+   "import": "Kx-h-nWQJ8A#libSceGnmDriver",
+   "name": "sceGnmSetCsShaderWithModifier",
+   "implemented": true
+  },
+  "0x10ff110": {
+   "index": 596,
+   "import": "7qZVNgEu+SY#libSceGnmDriver",
+   "name": "sceGnmInsertPopMarker",
+   "implemented": true
+  },
+  "0x10ff120": {
+   "index": 597,
+   "import": "jHdPvIzlpKc#libSceGnmDriver",
+   "name": "sceGnmDrawIndexMultiInstanced",
+   "implemented": true
+  },
+  "0x10ff130": {
+   "index": 598,
+   "import": "X9Omw9dwv5M#libSceGnmDriver",
+   "name": "sceGnmSetEmbeddedPsShader",
+   "implemented": true
+  },
+  "0x10ff140": {
+   "index": 599,
+   "import": "stDSYW2SBVM#libSceGnmDriver",
+   "name": "sceGnmDrawOpaqueAuto",
+   "implemented": true
+  },
+  "0x10ff150": {
+   "index": 600,
+   "import": "Kl0Z3LH07QI#libSceGnmDriver",
+   "name": "sceGnmLogicalTcaUnitToPhysical",
+   "implemented": true
+  },
+  "0x10ff160": {
+   "index": 601,
+   "import": "GNlx+y7xPdE#libSceGnmDriver",
+   "name": "sceGnmUpdateHsShader",
+   "implemented": true
+  },
+  "0x10ff170": {
+   "index": 602,
+   "import": "MYRtYhojKdA#libSceGnmDriver",
+   "name": "sceGnmResetVgtControl",
+   "implemented": true
+  },
+  "0x10ff180": {
+   "index": 603,
+   "import": "UJwNuMBcUAk#libSceGnmDriver",
+   "name": "sceGnmSetGsShader",
+   "implemented": true
+  },
+  "0x10ff190": {
+   "index": 604,
+   "import": "5uFKckiJYRM#libSceGnmDriver",
+   "name": "sceGnmSetPsShader350",
+   "implemented": true
+  },
+  "0x10ff1a0": {
+   "index": 605,
+   "import": "thbPcG7E7qk#libSceGnmDriver",
+   "name": "sceGnmDrawIndexIndirectCountMulti",
+   "implemented": true
+  },
+  "0x10ff1b0": {
+   "index": 606,
+   "import": "yb2cRhagD1I#libSceGnmDriver",
+   "name": "sceGnmDrawInitDefaultHardwareState350",
+   "implemented": true
+  },
+  "0x10ff1c0": {
+   "index": 607,
+   "import": "nLM2i2+65hA#libSceGnmDriver",
+   "name": "sceGnmUpdateGsShader",
+   "implemented": true
+  },
+  "0x10ff1d0": {
+   "index": 608,
+   "import": "W1Etj-jlW7Y#libSceGnmDriver",
+   "name": "sceGnmInsertPushMarker",
+   "implemented": true
+  },
+  "0x10ff1e0": {
+   "index": 609,
+   "import": "ED9-Fjr8Ta4#libSceGnmDriver",
+   "name": "sceGnmDrawIndexIndirect",
+   "implemented": true
+  },
+  "0x10ff1f0": {
+   "index": 610,
+   "import": "aPIZJTXC+cU#libSceGnmDriver",
+   "name": "sceGnmInsertPushColorMarker",
+   "implemented": true
+  },
+  "0x10ff200": {
+   "index": 611,
+   "import": "URDgJcXhQOs#libSceGnmDriver",
+   "name": "sceGnmInsertThreadTraceMarker",
+   "implemented": true
+  },
+  "0x10ff210": {
+   "index": 612,
+   "import": "aj3L-iaFmyk#libSceGnmDriver",
+   "name": "sceGnmInsertSetColorMarker",
+   "implemented": true
+  },
+  "0x10ff220": {
+   "index": 613,
+   "import": "dewXw5roLs0#libSceGnmDriver",
+   "name": "sceGnmGetPhysicalCounterFromVirtualized",
+   "implemented": true
+  },
+  "0x10ff230": {
+   "index": 614,
+   "import": "RU74kek-N0c#libSceGnmDriver",
+   "name": "sceGnmLogicalCuMaskToPhysicalCuMask",
+   "implemented": true
+  },
+  "0x10ff240": {
+   "index": 615,
+   "import": "ArSg-TGinhk#libSceGnmDriver",
+   "name": "sceGnmUnmapComputeQueue",
+   "implemented": true
+  },
+  "0x10ff250": {
+   "index": 616,
+   "import": "HHo1BAljZO8#libSceGnmDriver",
+   "name": "sceGnmDisableMipStatsReport",
+   "implemented": true
+  },
+  "0x10ff260": {
+   "index": 617,
+   "import": "TLV4mswiZ4A#libSceGnmDriver",
+   "name": "sceGnmDriverCaptureInProgress",
+   "implemented": true
+  },
+  "0x10ff270": {
+   "index": 618,
+   "import": "byXlqupd8cE#libSceGnmDriver",
+   "name": "sceGnmDingDongForWorkload",
+   "implemented": true
+  },
+  "0x10ff280": {
+   "index": 619,
+   "import": "fzJdEihTFV4#libSceGnmDriver",
+   "name": "sceGnmGetProtectionFaultTimeStamp",
+   "implemented": true
+  },
+  "0x10ff290": {
+   "index": 620,
+   "import": "UtObDRQiGbs#libSceGnmDriver",
+   "name": "sceGnmDestroyWorkloadStream",
+   "implemented": true
+  },
+  "0x10ff2a0": {
+   "index": 621,
+   "import": "UoYY0DWMC0U#libSceGnmDriver",
+   "name": "sceGnmGetEqEventType",
+   "implemented": true
+  },
+  "0x10ff2b0": {
+   "index": 622,
+   "import": "26PM5Mzl8zc#libSceGnmDriver",
+   "name": "sceGnmLogicalCuIndexToPhysicalCuIndex",
+   "implemented": true
+  },
+  "0x10ff2c0": {
+   "index": 623,
+   "import": "tZCSL5ulnB4#libSceGnmDriver",
+   "name": "sceGnmGetGpuInfoStatus",
+   "implemented": true
+  },
+  "0x10ff2d0": {
+   "index": 624,
+   "import": "A+uGq+3KFtQ#libSceGnmDriver",
+   "name": "sceGnmMapComputeQueueWithPriority",
+   "implemented": true
+  },
+  "0x10ff2e0": {
+   "index": 625,
+   "import": "29oKvKXzEZo#libSceGnmDriver",
+   "name": "sceGnmMapComputeQueue",
+   "implemented": true
+  },
+  "0x10ff2f0": {
+   "index": 626,
+   "import": "zwY0YV91TTI#libSceGnmDriver",
+   "name": "sceGnmSubmitCommandBuffers",
+   "implemented": true
+  },
+  "0x10ff300": {
+   "index": 627,
+   "import": "jtkqXpAOY6w#libSceGnmDriver",
+   "name": "sceGnmSetGsRingSizes",
+   "implemented": true
+  },
+  "0x10ff310": {
+   "index": 628,
+   "import": "R6z1xM3pW-w#libSceGnmDriver",
+   "name": "sceGnmDriverTraceInProgress",
+   "implemented": true
+  },
+  "0x10ff320": {
+   "index": 629,
+   "import": "ihxrbsoSKWc#libSceGnmDriver",
+   "name": "sceGnmBeginWorkload",
+   "implemented": true
+  },
+  "0x10ff330": {
+   "index": 630,
+   "import": "H7-fgvEutM0#libSceGnmDriver",
+   "name": "sceGnmGetEqTimeStamp",
+   "implemented": true
+  },
+  "0x10ff340": {
+   "index": 631,
+   "import": "bX5IbRvECXk#libSceGnmDriver",
+   "name": "sceGnmDingDong",
+   "implemented": true
+  },
+  "0x10ff350": {
+   "index": 632,
+   "import": "u9YKpRRHe-M#libSceGnmDriver",
+   "name": "sceRazorCaptureImmediate",
+   "implemented": true
+  },
+  "0x10ff360": {
+   "index": 633,
+   "import": "nEyFbYUloIM#libSceGnmDriver",
+   "name": "sceGnmGetShaderProgramBaseAddress",
+   "implemented": true
+  },
+  "0x10ff370": {
+   "index": 634,
+   "import": "f33OrruQYbM#libSceGnmDriver",
+   "name": "sceRazorIsLoaded",
+   "implemented": true
+  },
+  "0x10ff380": {
+   "index": 635,
+   "import": "iBt3Oe00Kvc#libSceGnmDriver",
+   "name": "sceGnmFlushGarlic",
+   "implemented": true
+  },
+  "0x10ff390": {
+   "index": 636,
+   "import": "jg33rEKLfVs#libSceGnmDriver",
+   "name": "sceGnmIsUserPaEnabled",
+   "implemented": true
+  },
+  "0x10ff3a0": {
+   "index": 637,
+   "import": "iFirFzgYsvw#libSceGnmDriver",
+   "name": "sceGnmGetLastWaitedAddress",
+   "implemented": true
+  },
+  "0x10ff3b0": {
+   "index": 638,
+   "import": "XiyzNZ9J4nQ#libSceGnmDriver",
+   "name": "sceGnmSetWaveLimitMultipliers",
+   "implemented": true
+  },
+  "0x10ff3c0": {
+   "index": 639,
+   "import": "KnldROUkWJY#libSceGnmDriver",
+   "name": "sceGnmGetNumTcaUnits",
+   "implemented": true
+  },
+  "0x10ff3d0": {
+   "index": 640,
+   "import": "jRcI8VcgTz4#libSceGnmDriver",
+   "name": "sceGnmSubmitCommandBuffersForWorkload",
+   "implemented": true
+  },
+  "0x10ff3e0": {
+   "index": 641,
+   "import": "PVT+fuoS9gU#libSceGnmDriver",
+   "name": "sceGnmDeleteEqEvent",
+   "implemented": true
+  },
+  "0x10ff3f0": {
+   "index": 642,
+   "import": "FFVZcCu3zWU#libSceGnmDriver",
+   "name": "sceGnmGetOffChipTessellationBufferSize",
+   "implemented": true
+  },
+  "0x10ff400": {
+   "index": 643,
+   "import": "f85orjx7qts#libSceGnmDriver",
+   "name": "sceGnmRequestMipStatsReportAndReset",
+   "implemented": true
+  },
+  "0x10ff410": {
+   "index": 644,
+   "import": "d88anrgNoKY#libSceGnmDriver",
+   "name": "sceGnmDriverTriggerCapture",
+   "implemented": true
+  },
+  "0x10ff420": {
+   "index": 645,
+   "import": "qpGITzPE+Zc#libSceGnmDriver",
+   "name": "sceGnmDebugHardwareStatus",
+   "implemented": true
+  },
+  "0x10ff430": {
+   "index": 646,
+   "import": "yvZ73uQUqrk#libSceGnmDriver",
+   "name": "sceGnmSubmitDone",
+   "implemented": true
+  },
+  "0x10ff440": {
+   "index": 647,
+   "import": "oL4hGI1PMpw#libSceGnmDriver",
+   "name": "sceGnmGetGpuBlockStatus",
+   "implemented": true
+  },
+  "0x10ff450": {
+   "index": 648,
+   "import": "k7iGTvDQPLQ#libSceGnmDriver",
+   "name": "sceGnmGetShaderStatus",
+   "implemented": true
+  },
+  "0x10ff460": {
+   "index": 649,
+   "import": "Fa3x75OOLRA#libSceGnmDriver",
+   "name": "sceGnmEndWorkload",
+   "implemented": true
+  },
+  "0x10ff470": {
+   "index": 650,
+   "import": "b0xyllnVY-I#libSceGnmDriver",
+   "name": "sceGnmAddEqEvent",
+   "implemented": true
+  },
+  "0x10ff480": {
+   "index": 651,
+   "import": "gObODli-OH8#libSceGnmDriver",
+   "name": "sceGnmRequestFlipAndSubmitDone",
+   "implemented": true
+  },
+  "0x10ff490": {
+   "index": 652,
+   "import": "+xuDhxlWRPg#libSceGnmDriver",
+   "name": "sceGnmSetupMipStatsReport",
+   "implemented": true
+  },
+  "0x10ff4a0": {
+   "index": 653,
+   "import": "5udAm+6boVg#libSceGnmDriver",
+   "name": "sceGnmCreateWorkloadStream",
+   "implemented": true
+  },
+  "0x10ff4b0": {
+   "index": 654,
+   "import": "ln33zjBrfjk#libSceGnmDriver",
+   "name": "sceGnmGetTheTessellationFactorRingBufferBaseAddress",
+   "implemented": true
+  },
+  "0x10ff4c0": {
+   "index": 655,
+   "import": "b08AgtPlHPg#libSceGnmDriver",
+   "name": "sceGnmAreSubmitsAllowed",
+   "implemented": true
+  },
+  "0x10ff4d0": {
+   "index": 656,
+   "import": "Ga6r7H6Y0RI#libSceGnmDriver",
+   "name": "sceGnmSubmitAndFlipCommandBuffersForWorkload",
+   "implemented": true
+  },
+  "0x10ff4e0": {
+   "index": 657,
+   "import": "6YRHhh5mHCs#libSceGnmDriver",
+   "name": "sceGnmRequestFlipAndSubmitDoneForWorkload",
+   "implemented": true
+  },
+  "0x10ff4f0": {
+   "index": 658,
+   "import": "xbxNatawohc#libSceGnmDriver",
+   "name": "sceGnmSubmitAndFlipCommandBuffers",
+   "implemented": true
+  },
+  "0x10ff500": {
+   "index": 659,
+   "import": "Q7t4VEYLafI#libSceGnmDriver",
+   "name": "sceGnmValidationRegisterMemoryCheckCallback",
+   "implemented": true
+  },
+  "0x10ff510": {
+   "index": 660,
+   "import": "hsZPf1lON7E#libSceGnmDriver",
+   "name": "sceGnmValidateDrawCommandBuffers",
+   "implemented": true
+  },
+  "0x10ff520": {
+   "index": 661,
+   "import": "rTIV11nMQuM#libSceGnmDriver",
+   "name": "sceGnmValidateOnSubmitEnabled",
+   "implemented": true
+  },
+  "0x10ff530": {
+   "index": 662,
+   "import": "qGP74T5OWJc#libSceGnmDriver",
+   "name": "sceGnmValidateDispatchCommandBuffers",
+   "implemented": true
+  },
+  "0x10ff540": {
+   "index": 663,
+   "import": "BgM3t3LvcNk#libSceGnmDriver",
+   "name": "sceGnmValidateDisableDiagnostics2",
+   "implemented": true
+  },
+  "0x10ff550": {
+   "index": 664,
+   "import": "SXw4dZEkgpA#libSceGnmDriver",
+   "name": "sceGnmValidateDisableDiagnostics",
+   "implemented": true
+  },
+  "0x10ff560": {
+   "index": 665,
+   "import": "RX7XCNSaL6I#libSceGnmDriver",
+   "name": "sceGnmValidateGetDiagnosticInfo",
+   "implemented": true
+  },
+  "0x10ff570": {
+   "index": 666,
+   "import": "MBMa6EFu4Ko#libSceGnmDriver",
+   "name": "sceGnmValidateResetState",
+   "implemented": true
+  },
+  "0x10ff580": {
+   "index": 667,
+   "import": "HzMN7ANqYEc#libSceGnmDriver",
+   "name": "sceGnmValidateGetVersion",
+   "implemented": true
+  },
+  "0x10ff590": {
+   "index": 668,
+   "import": "5SHGNwLXBV4#libSceGnmDriver",
+   "name": "sceGnmValidateGetDiagnostics",
+   "implemented": true
+  },
+  "0x10ff5a0": {
+   "index": 669,
+   "import": "wED4ZXCFJT0#libSceGnmDriver",
+   "name": "sceGnmDispatchIndirectOnMec",
+   "implemented": true
+  },
+  "0x10ff5b0": {
+   "index": 670,
+   "import": "ffrNQOshows#libSceGnmDriver",
+   "name": "sceGnmComputeWaitOnAddress",
+   "implemented": true
+  },
+  "0x10ff5c0": {
+   "index": 671,
+   "import": "nF6bFRUBRAU#libSceGnmDriver",
+   "name": "sceGnmDispatchInitDefaultHardwareState",
+   "implemented": true
+  },
+  "0x10ff5d0": {
+   "index": 672,
+   "import": "EJapNl2+pgU#libSceGnmDriver",
+   "name": "sceGnmComputeWaitSemaphore",
+   "implemented": true
+  },
+  "0x10ff5e0": {
+   "index": 673,
+   "import": "NfvOrNzy6sk#libSceGnmDriver",
+   "name": "sceGnmInsertDingDongMarker",
+   "implemented": true
+  },
+  "0x10ff5f0": {
+   "index": 674,
+   "import": "Ou3iL1abvng#libkernel",
+   "name": "__stack_chk_fail",
+   "implemented": true
+  },
+  "0x10ff600": {
+   "index": 675,
+   "import": "Q3VBxCXhUHs#s#s",
+   "name": "memcpy",
+   "implemented": true
+  },
+  "0x10ff610": {
+   "index": 676,
+   "import": "K7RlrTkI-mw#libSceNet",
+   "name": "sceNetPoolDestroy",
+   "implemented": true
+  },
+  "0x10ff620": {
+   "index": 677,
+   "import": "PDxS48xGQLs#libSceHttp",
+   "name": "sceHttpSetChunkedTransferEnabled",
+   "implemented": false
+  },
+  "0x10ff630": {
+   "index": 678,
+   "import": "cLV4aiT9JpA#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff640": {
+   "index": 679,
+   "import": "U546k6orxQo#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff650": {
+   "index": 680,
+   "import": "lCqD7oycmIM#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff660": {
+   "index": 681,
+   "import": "MwmHz8pAdAo#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff670": {
+   "index": 682,
+   "import": "0eFLVCfWVds#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff680": {
+   "index": 683,
+   "import": "mPYgU4oYpuY#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff690": {
+   "index": 684,
+   "import": "u-WrYDaJA3k#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff6a0": {
+   "index": 685,
+   "import": "i0VnXM-C9fc#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff6b0": {
+   "index": 686,
+   "import": "uu94irFOGpA#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff6c0": {
+   "index": 687,
+   "import": "-TOuuAQ-buE#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff6d0": {
+   "index": 688,
+   "import": "rEh728kXk3w#libSceNgs2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff6e0": {
+   "index": 689,
+   "import": "DOwXL+FQMEY#libSceSsl",
+   "name": "sceSslGetSerialNumber",
+   "implemented": true
+  },
+  "0x10ff6f0": {
+   "index": 690,
+   "import": "YaaDbDwKpFM#libSceAudio3d",
+   "name": "sceAudio3dPortGetQueueLevel",
+   "implemented": true
+  },
+  "0x10ff700": {
+   "index": 691,
+   "import": "UmCvjSmuZIw#libSceAudio3d",
+   "name": "sceAudio3dInitialize",
+   "implemented": true
+  },
+  "0x10ff710": {
+   "index": 692,
+   "import": "OyVqOeVNtSk#libSceAudio3d",
+   "name": "sceAudio3dPortClose",
+   "implemented": true
+  },
+  "0x10ff720": {
+   "index": 693,
+   "import": "VEVhZ9qd4ZY#libSceAudio3d",
+   "name": "sceAudio3dPortPush",
+   "implemented": true
+  },
+  "0x10ff730": {
+   "index": 694,
+   "import": "8mql9OcQnd4#libkernel",
+   "name": "sceKernelDeleteEventFlag",
+   "implemented": true
+  },
+  "0x10ff740": {
+   "index": 695,
+   "import": "Yq9bfUQ0uJg#libSceAudio3d",
+   "name": "sceAudio3dPortSetAttribute",
+   "implemented": true
+  },
+  "0x10ff750": {
+   "index": 696,
+   "import": "WW1TS2iz5yc#libSceAudio3d",
+   "name": "sceAudio3dTerminate",
+   "implemented": true
+  },
+  "0x10ff760": {
+   "index": 697,
+   "import": "JTvBflhYazQ#libkernel",
+   "name": "sceKernelWaitEventFlag",
+   "implemented": true
+  },
+  "0x10ff770": {
+   "index": 698,
+   "import": "lw0qrdSjZt8#libSceAudio3d",
+   "name": "sceAudio3dPortAdvance",
+   "implemented": true
+  },
+  "0x10ff780": {
+   "index": 699,
+   "import": "1HXxo-+1qCw#libSceAudio3d",
+   "name": "sceAudio3dObjectUnreserve",
+   "implemented": true
+  },
+  "0x10ff790": {
+   "index": 700,
+   "import": "BpFoboUJoZU#libkernel",
+   "name": "sceKernelCreateEventFlag",
+   "implemented": true
+  },
+  "0x10ff7a0": {
+   "index": 701,
+   "import": "jO2tec4dJ2M#libSceAudio3d",
+   "name": "sceAudio3dObjectReserve",
+   "implemented": true
+  },
+  "0x10ff7b0": {
+   "index": 702,
+   "import": "4uyHN9q4ZeU#libSceAudio3d",
+   "name": "sceAudio3dObjectSetAttributes",
+   "implemented": true
+  },
+  "0x10ff7c0": {
+   "index": 703,
+   "import": "XeDDK0xJWQA#libSceAudio3d",
+   "name": "sceAudio3dPortOpen",
+   "implemented": true
+  },
+  "0x10ff7d0": {
+   "index": 704,
+   "import": "IOnSvHzqu6A#libkernel",
+   "name": "sceKernelSetEventFlag",
+   "implemented": true
+  },
+  "0x10ff7e0": {
+   "index": 705,
+   "import": "EI-5-jlq2dE#libkernel",
+   "name": "scePthreadGetthreadid",
+   "implemented": true
+  },
+  "0x10ff7f0": {
+   "index": 706,
+   "import": "8+s5BzZjxSg#libkernel",
+   "name": "scePthreadAttrGetaffinity",
+   "implemented": true
+  },
+  "0x10ff800": {
+   "index": 707,
+   "import": "x1X76arYMxU#libkernel",
+   "name": "scePthreadAttrGet",
+   "implemented": true
+  },
+  "0x10ff810": {
+   "index": 708,
+   "import": "-fA+7ZlGDQs#libkernel",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff820": {
+   "index": 709,
+   "import": "efhK-YSUYYQ#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10ff830": {
+   "index": 710,
+   "import": "8zTFvBIAIN8#s#s",
+   "name": "memset",
+   "implemented": true
+  },
+  "0x10ff840": {
+   "index": 711,
+   "import": "MELi-cKqWq0#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10ff850": {
+   "index": 712,
+   "import": "BB+kb08Tl9A#libkernel",
+   "name": "scePthreadRwlockDestroy",
+   "implemented": true
+  },
+  "0x10ff860": {
+   "index": 713,
+   "import": "6ULAa0fq4jA#libkernel",
+   "name": "scePthreadRwlockInit",
+   "implemented": true
+  },
+  "0x10ff870": {
+   "index": 714,
+   "import": "Ox9i0c7L5w0#libkernel",
+   "name": "scePthreadRwlockRdlock",
+   "implemented": true
+  },
+  "0x10ff880": {
+   "index": 715,
+   "import": "+L98PIbGttk#libkernel",
+   "name": "scePthreadRwlockUnlock",
+   "implemented": true
+  },
+  "0x10ff890": {
+   "index": 716,
+   "import": "mqdNorrB+gI#libkernel",
+   "name": "scePthreadRwlockWrlock",
+   "implemented": true
+  },
+  "0x10ff8a0": {
+   "index": 717,
+   "import": "bt3CTBKmGyI#libkernel",
+   "name": "scePthreadSetaffinity",
+   "implemented": true
+  },
+  "0x10ff8b0": {
+   "index": 718,
+   "import": "Cxwy7wHq4J0#libSceJson2",
+   "name": "_ZN3sce4Json11Initializer10initializeEPKNS0_13InitParameterE",
+   "implemented": true
+  },
+  "0x10ff8c0": {
+   "index": 719,
+   "import": "PR5k1penBLM#libSceJson2",
+   "name": null,
+   "implemented": false
+  },
+  "0x10ff8d0": {
+   "index": 720,
+   "import": "cK6bYHf-Q5E#libSceJson2",
+   "name": "_ZN3sce4Json11InitializerC1Ev",
+   "implemented": true
+  },
+  "0x10ff8e0": {
+   "index": 721,
+   "import": "RujUxbr3haM#libSceJson2",
+   "name": "_ZN3sce4Json11InitializerD1Ev",
+   "implemented": true
+  },
+  "0x10ff8f0": {
+   "index": 722,
+   "import": "i-XwZjw0OOY#libSceJson2",
+   "name": "_ZN3sce4Json12MemAllocator11notifyErrorEimPv",
+   "implemented": true
+  },
+  "0x10ff900": {
+   "index": 723,
+   "import": "-hJRce8wn1U#libSceJson2",
+   "name": "_ZN3sce4Json12MemAllocatorC2Ev",
+   "implemented": true
+  },
+  "0x10ff910": {
+   "index": 724,
+   "import": "OcAgPxcq5Vk#libSceJson2",
+   "name": "_ZN3sce4Json12MemAllocatorD2Ev",
+   "implemented": true
+  },
+  "0x10ff920": {
+   "index": 725,
+   "import": "9fs1btfLoUs#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10ff930": {
+   "index": 726,
+   "import": "vNe1w4diLCs#libkernel",
+   "name": "__tls_get_addr",
+   "implemented": true
+  },
+  "0x10ff940": {
+   "index": 727,
+   "import": "f1zwJ3jAI2k#s#s",
+   "name": null,
+   "implemented": true
+  },
+  "0x10ff950": {
+   "index": 728,
+   "import": "+P6FRGH4LfA#s#s",
+   "name": "memmove",
+   "implemented": true
+  }
+ }
+}

@@ -1,0 +1,42 @@
+# Game packages, archives and anything from the dump
+*.pkg
+*.rar
+/Everybodys.Golf.DLC-CUSA04687/
+/hako.txt
+*.rap
+*.rif
+*.lic
+*.key
+keys/
+licenses/
+
+# Staged game data, prepared images, shaders, saves, build output
+/work/
+out/
+*.elf
+*.spv
+saves/
+*.log
+*.dmp
+
+# Decompiled game code and the Ghidra project
+/analysis/ghidra/
+/analysis/golf-functions.c
+/analysis/reference/
+
+# Reference clones (the runtime is the submodule external/resogun-recomp)
+/external/driveclub-recomp/
+/external/LibOrbisPkg/
+
+# Tool downloads
+/tools/msys2/
+/tools/ghidra/
+/tools/jdk25/
+/tools/shadps4*/
+/tools/golf-fix*/
+/tools/orbis*/
+/tools/home/
+/tools/staging/
+
+# Local agent handoff notes
+/docs/CLAUDE_TAKEOVER.md

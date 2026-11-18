@@ -1,0 +1,5867 @@
+{
+  "schema_version": 1,
+  "source": "work/game-1.17-prepared/link.json",
+  "counts": {
+    "total": 884,
+    "resolved": 713,
+    "ambiguous": 1,
+    "unresolved": 170
+  },
+  "imports": [
+    {
+      "import": "pO96TwzOm5E#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetDirectMemorySize"
+      ]
+    },
+    {
+      "import": "L-Q3LEjIbgA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelMapDirectMemory"
+      ]
+    },
+    {
+      "import": "rTXw65xmLIA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelAllocateDirectMemory"
+      ]
+    },
+    {
+      "import": "1jfXLRVzisc#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelUsleep"
+      ]
+    },
+    {
+      "import": "4J2sUJmuHZQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetProcessTime"
+      ]
+    },
+    {
+      "import": "Vo5V8KAwCmk#libSceSystemService",
+      "status": "resolved",
+      "candidates": [
+        "sceSystemServiceHideSplashScreen"
+      ]
+    },
+    {
+      "import": "ZPD1YOKI+Kw#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "aI+OeCz8xrQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadSelf"
+      ]
+    },
+    {
+      "import": "aNz11fnnzi4#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "8w-H19ip48I#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcGetTick"
+      ]
+    },
+    {
+      "import": "ueega6v3GUw#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcSetTick"
+      ]
+    },
+    {
+      "import": "NR1J0N7L2xY#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "-5y2uJ62qS8#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "MDc5cd8HfCA#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcTickAddHours"
+      ]
+    },
+    {
+      "import": "18B2NS1y9UU#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "x01jxu+vxlc#libSceImeDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceImeDialogGetResult"
+      ]
+    },
+    {
+      "import": "CdWp0oHWGr0#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceGetInitialUser"
+      ]
+    },
+    {
+      "import": "NUeBrN7hzf0#libSceImeDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceImeDialogInit"
+      ]
+    },
+    {
+      "import": "M1TvFst-jrM#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "gyTyVn+bXMw#libSceImeDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceImeDialogTerm"
+      ]
+    },
+    {
+      "import": "IADmD4tScBY#libSceImeDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceImeDialogGetStatus"
+      ]
+    },
+    {
+      "import": "07O525HgICs#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcTickAddSeconds"
+      ]
+    },
+    {
+      "import": "mn-tf4QiFzk#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "fPhymKNvK-A#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceGetLoginUserIdList"
+      ]
+    },
+    {
+      "import": "1xxcMiGu2fo#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceGetUserName"
+      ]
+    },
+    {
+      "import": "CyIK-i4XdgQ#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "fMP5NHUOaMk#libSceSysmodule",
+      "status": "resolved",
+      "candidates": [
+        "sceSysmoduleIsLoaded"
+      ]
+    },
+    {
+      "import": "4tPhsP6FpDI#libSceSaveDataDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataDialogOpen"
+      ]
+    },
+    {
+      "import": "g8cM39EUZ6o#libSceSysmodule",
+      "status": "resolved",
+      "candidates": [
+        "sceSysmoduleLoadModule"
+      ]
+    },
+    {
+      "import": "uoUpLGNkygk#libSceCommonDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceCommonDialogInitialize"
+      ]
+    },
+    {
+      "import": "eR2bZFAAU0Q#libSceSysmodule",
+      "status": "resolved",
+      "candidates": [
+        "sceSysmoduleUnloadModule"
+      ]
+    },
+    {
+      "import": "fH46Lag88XY#libSceSaveDataDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataDialogClose"
+      ]
+    },
+    {
+      "import": "s9e3+YpRnzw#libSceSaveDataDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataDialogInitialize"
+      ]
+    },
+    {
+      "import": "-ZR+hG7aDHw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelSleep"
+      ]
+    },
+    {
+      "import": "KK3Bdg1RWK0#libSceSaveDataDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "YuH2FA7azqQ#libSceSaveDataDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataDialogTerminate"
+      ]
+    },
+    {
+      "import": "zO9UL3qIINQ#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcGetCurrentNetworkTick"
+      ]
+    },
+    {
+      "import": "cG1VE2HMl6c#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json6StringD1Ev"
+      ]
+    },
+    {
+      "import": "5JmzZt8twAo#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "BtqmpTRXHgk#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcGetTime_t"
+      ]
+    },
+    {
+      "import": "HJ8GpRT1aiw#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "fZo48un7LK4#libSceSystemService",
+      "status": "resolved",
+      "candidates": [
+        "sceSystemServiceParamGetInt"
+      ]
+    },
+    {
+      "import": "EUH+EmT-v9E#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json6String6lengthEv"
+      ]
+    },
+    {
+      "import": "R7FDWtcN6f8#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "ERuf9y0DY84#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "OJPTonqdg0I#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "qSmqLXXCPas#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json6StringC1Ev"
+      ]
+    },
+    {
+      "import": "WTtYf+cNnXI#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json5ValueD1Ev"
+      ]
+    },
+    {
+      "import": "JP-PtKMiI1E#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "iZeYfOxtMRg#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "0lLK8+kDqmE#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "JT+t00a3TxA#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetAccountCountryA"
+      ]
+    },
+    {
+      "import": "x4AUdbhpRB0#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "qBMjqyBn3OM#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json5ValueC1Ev"
+      ]
+    },
+    {
+      "import": "L1KAkYWml-M#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json6String5c_strEv"
+      ]
+    },
+    {
+      "import": "9KUZFjI1IxA#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json6StringC1EPKc"
+      ]
+    },
+    {
+      "import": "4zrm6VrgIAw#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "sZIoMRGO+jk#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "3xUXnmUkXfo#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "dFCphqnd+a4#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "zQtLRTqceMY#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "1tKyG7RlMJo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadGetprio"
+      ]
+    },
+    {
+      "import": "VqZX7POg2Mk#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SearchRoom"
+      ]
+    },
+    {
+      "import": "iWQWrwiSt8A#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetHtons"
+      ]
+    },
+    {
+      "import": "ajvzc8e2upo#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2CreateContextA"
+      ]
+    },
+    {
+      "import": "JO4yuTuMoKI#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlGetNatInfo"
+      ]
+    },
+    {
+      "import": "Px0miD2LuW0#libSceRudp",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "0cBgduPRR+M#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlGetResult"
+      ]
+    },
+    {
+      "import": "0UMeWRGnZKA#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterSignalingCallback"
+      ]
+    },
+    {
+      "import": "rJNPJqDCpiI#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetWorldInfoList"
+      ]
+    },
+    {
+      "import": "uBESzz4CQws#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterRoomMessageCallback"
+      ]
+    },
+    {
+      "import": "fQQfP87I7hs#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterContextCallback"
+      ]
+    },
+    {
+      "import": "6UEembipgrM#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingDeactivateConnection"
+      ]
+    },
+    {
+      "import": "opDpl74pi2E#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SendRoomChatMessage"
+      ]
+    },
+    {
+      "import": "10t3e5+JPnU#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2Initialize"
+      ]
+    },
+    {
+      "import": "26vWrPAWJfM#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetRoomDataExternalList"
+      ]
+    },
+    {
+      "import": "3hBvwqEwqj8#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpEnd"
+      ]
+    },
+    {
+      "import": "CAbbX6BuQZ0#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpCreateContext"
+      ]
+    },
+    {
+      "import": "Rqm2OnZMCz0#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlUnregisterCallback"
+      ]
+    },
+    {
+      "import": "BBbJ92uUdCg#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2LeaveLobby"
+      ]
+    },
+    {
+      "import": "gQ6cUriNpgs#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2JoinRoomA"
+      ]
+    },
+    {
+      "import": "bD-JizUb3JM#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingGetConnectionStatus"
+      ]
+    },
+    {
+      "import": "ZPLavCKqAB0#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingActivateConnectionA"
+      ]
+    },
+    {
+      "import": "Mqp3lJ+sjy4#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2Terminate"
+      ]
+    },
+    {
+      "import": "45ggEzakPJQ#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetSocketClose"
+      ]
+    },
+    {
+      "import": "Nz-ZE7ur32I#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2DestroyContext"
+      ]
+    },
+    {
+      "import": "DnPUsBAe8oI#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterLobbyMessageCallback"
+      ]
+    },
+    {
+      "import": "7vjNQ6Z1op0#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2ContextStart"
+      ]
+    },
+    {
+      "import": "amuBfI-AQc4#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpInit"
+      ]
+    },
+    {
+      "import": "rZqWV3eXgOA#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpRead"
+      ]
+    },
+    {
+      "import": "9vA2aW+CHuA#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetInetNtop"
+      ]
+    },
+    {
+      "import": "+8e7wXLmjds#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetDefaultRequestOptParam"
+      ]
+    },
+    {
+      "import": "S9D8JSYIrjE#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetRoomDataInternal"
+      ]
+    },
+    {
+      "import": "LhCPctIICxQ#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetServerId"
+      ]
+    },
+    {
+      "import": "q7GK98-nYSE#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetRoomDataExternal"
+      ]
+    },
+    {
+      "import": "3KOuC4RmZZU#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingInitialize"
+      ]
+    },
+    {
+      "import": "KaPL3fbTLCA#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpWrite"
+      ]
+    },
+    {
+      "import": "SUEVes8gvmw#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpSetEventHandler"
+      ]
+    },
+    {
+      "import": "WxislcDAW5I#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetShowNetstat"
+      ]
+    },
+    {
+      "import": "hx+LIg-1koI#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingDeleteContext"
+      ]
+    },
+    {
+      "import": "n5JmImxTiZU#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2JoinLobby"
+      ]
+    },
+    {
+      "import": "OMYRTU0uc4w#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpTerminate"
+      ]
+    },
+    {
+      "import": "wIJsiqY+BMk#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpGetContextStatus"
+      ]
+    },
+    {
+      "import": "TSM6whtekok#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetShutdown"
+      ]
+    },
+    {
+      "import": "NPhw0UXaNrk#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingTerminate"
+      ]
+    },
+    {
+      "import": "Iw2h0Jrrb5U#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SendRoomMessage"
+      ]
+    },
+    {
+      "import": "bErx49PgxyY#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetBind"
+      ]
+    },
+    {
+      "import": "4Nj7u5B5yCA#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterLobbyEventCallback"
+      ]
+    },
+    {
+      "import": "l4SLBpKUDK4#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpBind"
+      ]
+    },
+    {
+      "import": "V6KSpKv9XJE#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2CreateJoinRoomA"
+      ]
+    },
+    {
+      "import": "-f6M4caNe8k#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2ContextStop"
+      ]
+    },
+    {
+      "import": "szEVu+edXV4#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpInitiate"
+      ]
+    },
+    {
+      "import": "B7cT9aVby7A#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingGetConnectionFromPeerAddressA"
+      ]
+    },
+    {
+      "import": "8Kcp5d-q1Uo#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetInetPton"
+      ]
+    },
+    {
+      "import": "wyvlEgZ-55w#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetLobbyInfoList"
+      ]
+    },
+    {
+      "import": "GNSN5849fjU#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingCancelPeerNetInfo"
+      ]
+    },
+    {
+      "import": "sAZqO2+5Qqo#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpGetSizeReadable"
+      ]
+    },
+    {
+      "import": "3Zl8BePTh9Y#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckCallback"
+      ]
+    },
+    {
+      "import": "p+2EnxmaAMM#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2RegisterRoomEventCallback"
+      ]
+    },
+    {
+      "import": "Q4qBuN-c0ZM#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetSocket"
+      ]
+    },
+    {
+      "import": "CTy4PBhpWDw#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingGetPeerNetInfoResult"
+      ]
+    },
+    {
+      "import": "UJ+Z7Q+4ck0#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlRegisterCallback"
+      ]
+    },
+    {
+      "import": "BD6kfx442Do#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2LeaveRoom"
+      ]
+    },
+    {
+      "import": "zJGf8xjFnQE#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetSocketAbort"
+      ]
+    },
+    {
+      "import": "0yzYdZf0IwE#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpSetOption"
+      ]
+    },
+    {
+      "import": "1Z4Xxumgm+Y#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetLobbyMemberDataInternalList"
+      ]
+    },
+    {
+      "import": "tHD5FPFXtu4#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingGetConnectionStatus"
+      ]
+    },
+    {
+      "import": "6PBNpsgyaxw#libSceRudp",
+      "status": "resolved",
+      "candidates": [
+        "sceRudpEnableInternalIOThread"
+      ]
+    },
+    {
+      "import": "b4qaXPzMJxo#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingTerminateConnection"
+      ]
+    },
+    {
+      "import": "dDLNFdY8dws#libSceNpSignaling",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSignalingCreateContextA"
+      ]
+    },
+    {
+      "import": "obuxdTiwkF8#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlGetInfo"
+      ]
+    },
+    {
+      "import": "1j3S3n-tTW4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetTscFrequency"
+      ]
+    },
+    {
+      "import": "Xjoosiw+XPI#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "-2IRUCO--PM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelReadTsc"
+      ]
+    },
+    {
+      "import": "sOmU4vnx3s0#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "XDncXQIJUSk#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetOnlineId"
+      ]
+    },
+    {
+      "import": "rbknaUjpqWo#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetAccountIdA"
+      ]
+    },
+    {
+      "import": "Va5FJ6TmNCw#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "m5J28iw-QPs#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "UeuWT+yNdCQ#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "CN7EbEV7MFU#libSceAppContent",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "gI4t194c2W8#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "CL6y9q-XbuQ#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "FIjXN2TkuTs#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json5Value5clearEv"
+      ]
+    },
+    {
+      "import": "S5JxQnoGF3E#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json6Parser5parseERNS0_5ValueEPKcm"
+      ]
+    },
+    {
+      "import": "epJ6x2LV0kU#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5Value9getStringEv"
+      ]
+    },
+    {
+      "import": "cn9svYGWKDQ#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "HwDt5lD9Bfo#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5ValueixEPKc"
+      ]
+    },
+    {
+      "import": "DIxvoy7Ngvk#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5Value10getIntegerEv"
+      ]
+    },
+    {
+      "import": "Ec63y59l9tw#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSetNpTitleId"
+      ]
+    },
+    {
+      "import": "Ik-KpLTlf7Q#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpTerm"
+      ]
+    },
+    {
+      "import": "iQw3iQPhvUQ#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlCheckCallback"
+      ]
+    },
+    {
+      "import": "Nlev7Lg8k3A#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetInit"
+      ]
+    },
+    {
+      "import": "or0e885BlXo#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiUtilityParseNpId"
+      ]
+    },
+    {
+      "import": "XlWbvieLj2M#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5ValueixEm"
+      ]
+    },
+    {
+      "import": "j3YMu1MVNNo#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceInitialize"
+      ]
+    },
+    {
+      "import": "m9L3O6yst-U#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetParentalControlInfoA"
+      ]
+    },
+    {
+      "import": "p-o74CnoNzY#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetNpId"
+      ]
+    },
+    {
+      "import": "dgJBaeJnGpo#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetPoolCreate"
+      ]
+    },
+    {
+      "import": "hw5KNqAAels#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpRegisterNpReachabilityStateCallback"
+      ]
+    },
+    {
+      "import": "hdpVEUDFW3s#libSceSsl",
+      "status": "resolved",
+      "candidates": [
+        "sceSslInit"
+      ]
+    },
+    {
+      "import": "0gYjPTR-6cY#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpCreateTemplate"
+      ]
+    },
+    {
+      "import": "gky0+oaNM4k#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlInit"
+      ]
+    },
+    {
+      "import": "Gaxrp3EWY-M#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpNotifyPlusFeature"
+      ]
+    },
+    {
+      "import": "A9cVMUtEp4Y#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpInit"
+      ]
+    },
+    {
+      "import": "GpLQDNKICac#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCreateRequest"
+      ]
+    },
+    {
+      "import": "8Z2Jc5GvGDI#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckNpAvailabilityA"
+      ]
+    },
+    {
+      "import": "A2CQ3kgSopQ#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSetContentRestriction"
+      ]
+    },
+    {
+      "import": "RBw+4NukeGQ#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5Value5countEv"
+      ]
+    },
+    {
+      "import": "cTGkc6-TBlI#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetTerm"
+      ]
+    },
+    {
+      "import": "qQJfO8HAiaY#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpRegisterStateCallbackA"
+      ]
+    },
+    {
+      "import": "M3wFXbYQtAA#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpUnregisterStateCallbackA"
+      ]
+    },
+    {
+      "import": "KfGZg2y73oM#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckNpReachability"
+      ]
+    },
+    {
+      "import": "4I8vEpuEhZ8#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpDeleteTemplate"
+      ]
+    },
+    {
+      "import": "eQH7nWPcAgc#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetState"
+      ]
+    },
+    {
+      "import": "0K1yQ6Lv-Yc#libSceSsl",
+      "status": "resolved",
+      "candidates": [
+        "sceSslTerm"
+      ]
+    },
+    {
+      "import": "S7QTn72PrDw#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpDeleteRequest"
+      ]
+    },
+    {
+      "import": "Z4wwCFiBELQ#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlTerm"
+      ]
+    },
+    {
+      "import": "0z45PIH+SNI#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataMount2"
+      ]
+    },
+    {
+      "import": "BMR4F-Uek3E#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataUmount"
+      ]
+    },
+    {
+      "import": "RQOqDbk3bSU#libSceSaveData",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "lU9YRFsgwSU#libSceSaveData",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "VwadwBBBJ80#libSceSaveData",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "j8xKtiFj0SY#libSceSaveData",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "85zul--eGXs#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataSetParam"
+      ]
+    },
+    {
+      "import": "TywrFKCoLGY#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataInitialize3"
+      ]
+    },
+    {
+      "import": "yKDy8S5yLA0#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataTerminate"
+      ]
+    },
+    {
+      "import": "c88Yy54Mx0w#libSceSaveData",
+      "status": "resolved",
+      "candidates": [
+        "sceSaveDataSaveIcon"
+      ]
+    },
+    {
+      "import": "hVYD7Ou2pCQ#libSceFiber",
+      "status": "resolved",
+      "candidates": [
+        "_sceFiberInitializeImpl"
+      ]
+    },
+    {
+      "import": "JeNX5F-NzQU#libSceFiber",
+      "status": "resolved",
+      "candidates": [
+        "sceFiberFinalize"
+      ]
+    },
+    {
+      "import": "a0LLrZWac0M#libSceFiber",
+      "status": "resolved",
+      "candidates": [
+        "sceFiberRun"
+      ]
+    },
+    {
+      "import": "B0ZX2hx9DMw#libSceFiber",
+      "status": "resolved",
+      "candidates": [
+        "sceFiberReturnToThread"
+      ]
+    },
+    {
+      "import": "4wSze92BhLI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelWrite"
+      ]
+    },
+    {
+      "import": "1G3lF1Gg1k8#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelOpen"
+      ]
+    },
+    {
+      "import": "SaKib2Ug0yI#libSceAppContent",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "UK2Tl2DWUns#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelClose"
+      ]
+    },
+    {
+      "import": "Cg4srZ6TKbU#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelRead"
+      ]
+    },
+    {
+      "import": "buYbeLOGWmA#libSceAppContent",
+      "status": "resolved",
+      "candidates": [
+        "sceAppContentTemporaryDataMount2"
+      ]
+    },
+    {
+      "import": "bcolXMmp6qQ#libSceAppContent",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "oib76F-12fk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelLseek"
+      ]
+    },
+    {
+      "import": "R9lA82OraNs#libSceAppContent",
+      "status": "resolved",
+      "candidates": [
+        "sceAppContentInitialize"
+      ]
+    },
+    {
+      "import": "xnd8BJzAxmk#libSceAppContent",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Xbl-LYVFNEE#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json5Value21setNullAccessCallBackEPFRKS1_NS0_9ValueTypeEPS2_PvES6_"
+      ]
+    },
+    {
+      "import": "dsqCVsNM0Zg#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceHidePsStoreIcon"
+      ]
+    },
+    {
+      "import": "DHmwsa6S8Tc#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceShowPsStoreIcon"
+      ]
+    },
+    {
+      "import": "zTwZdI8AZ5Y#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZNK3sce4Json5Value10getBooleanEv"
+      ]
+    },
+    {
+      "import": "T72hz6ffq08#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadYield"
+      ]
+    },
+    {
+      "import": "NxEI1KByvCI#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcParseDateTime"
+      ]
+    },
+    {
+      "import": "9BcDykPmo1I#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__error"
+      ]
+    },
+    {
+      "import": "k1SwgkMSOM8#libSceRemoteplay",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "2Of0f+3mhhE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexDestroy"
+      ]
+    },
+    {
+      "import": "9UK1vLZQft4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexLock"
+      ]
+    },
+    {
+      "import": "tn3VlD0hG60#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexUnlock"
+      ]
+    },
+    {
+      "import": "F8bUHwAG284#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexattrInit"
+      ]
+    },
+    {
+      "import": "cmo1RIYva9o#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexInit"
+      ]
+    },
+    {
+      "import": "smWEktiyyG0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexattrDestroy"
+      ]
+    },
+    {
+      "import": "upoVrzMHFeE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexTrylock"
+      ]
+    },
+    {
+      "import": "iMp8QpE+XO4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexattrSettype"
+      ]
+    },
+    {
+      "import": "4czppHBiriw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelSignalSema"
+      ]
+    },
+    {
+      "import": "R1Jvn8bSCW8#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDeleteSema"
+      ]
+    },
+    {
+      "import": "188x57JYp0g#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelCreateSema"
+      ]
+    },
+    {
+      "import": "Zxa0VhQVTsk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelWaitSema"
+      ]
+    },
+    {
+      "import": "4DM06U2BNEY#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "12wOHk8ywb0#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "+r3rMFwItV4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelPread"
+      ]
+    },
+    {
+      "import": "1-LFLmRFxxM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelMkdir"
+      ]
+    },
+    {
+      "import": "eV9wAD2riIA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelStat"
+      ]
+    },
+    {
+      "import": "j2AIqSqJP0w#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "kBwCPsYX-m4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelFstat"
+      ]
+    },
+    {
+      "import": "eXbUSpEaTsA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetinheritsched"
+      ]
+    },
+    {
+      "import": "kDh-NfxgMtE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondSignal"
+      ]
+    },
+    {
+      "import": "62KCwEMmzcM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrDestroy"
+      ]
+    },
+    {
+      "import": "4qGrR6eoP9Y#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadDetach"
+      ]
+    },
+    {
+      "import": "BmMjYxmew1w#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondTimedwait"
+      ]
+    },
+    {
+      "import": "g+PZd2hiacg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondDestroy"
+      ]
+    },
+    {
+      "import": "onNY9Byn-W8#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadJoin"
+      ]
+    },
+    {
+      "import": "JGgj7Uvrl+A#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondBroadcast"
+      ]
+    },
+    {
+      "import": "2Tb92quprl0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondInit"
+      ]
+    },
+    {
+      "import": "WKAXJ4XBPQ4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondWait"
+      ]
+    },
+    {
+      "import": "4+h9EzwKF4I#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetschedpolicy"
+      ]
+    },
+    {
+      "import": "DzES9hQF4f4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetschedparam"
+      ]
+    },
+    {
+      "import": "qBDmpCyGssE#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "W0Hpm2X0uPE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadSetprio"
+      ]
+    },
+    {
+      "import": "nsYoNRywwNg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrInit"
+      ]
+    },
+    {
+      "import": "-Wreprtu0Qs#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetdetachstate"
+      ]
+    },
+    {
+      "import": "6UgtwV+0zb4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCreate"
+      ]
+    },
+    {
+      "import": "UTXzJbWhhTE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetstacksize"
+      ]
+    },
+    {
+      "import": "3kg7rT0NQIs#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadExit"
+      ]
+    },
+    {
+      "import": "mtqDK9zkoIE#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "V4EVrruHuy8#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "vT9xhqPO6+0#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "wLaxchvEEnk#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "JBN6N-EY+3M#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpsGetSslError"
+      ]
+    },
+    {
+      "import": "f42K37mm5RM#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpsEnableOption"
+      ]
+    },
+    {
+      "import": "qgxDBjorUxs#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpCreateConnectionWithURL"
+      ]
+    },
+    {
+      "import": "1e2BNwI-XzE#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpSendRequest"
+      ]
+    },
+    {
+      "import": "P5pdoykPYTk#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpReadData"
+      ]
+    },
+    {
+      "import": "qe7oZ+v4PWA#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpDeleteRequest"
+      ]
+    },
+    {
+      "import": "xegFfZKBVlw#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpSetSendTimeOut"
+      ]
+    },
+    {
+      "import": "0S9tTH0uqTU#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpSetConnectTimeOut"
+      ]
+    },
+    {
+      "import": "0a2TBNfE3BU#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpGetStatusCode"
+      ]
+    },
+    {
+      "import": "DK+GoXCNT04#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpsLoadCert"
+      ]
+    },
+    {
+      "import": "yigr4V0-HTM#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpSetRecvTimeOut"
+      ]
+    },
+    {
+      "import": "Aeu5wVKkF9w#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpCreateRequestWithURL"
+      ]
+    },
+    {
+      "import": "yuO2H2Uvnos#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpGetResponseContentLength"
+      ]
+    },
+    {
+      "import": "EY28T2bkN7k#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpAddRequestHeader"
+      ]
+    },
+    {
+      "import": "htyBOoWeS58#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpsSetSslCallback"
+      ]
+    },
+    {
+      "import": "mSQCxzWTwVI#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpsDisableOption"
+      ]
+    },
+    {
+      "import": "hvG6GfBMXg8#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpAbortRequest"
+      ]
+    },
+    {
+      "import": "P6A3ytpsiYc#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpDeleteConnection"
+      ]
+    },
+    {
+      "import": "gjSyfzSsDcE#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthPollAsync"
+      ]
+    },
+    {
+      "import": "N+mr7GjTvr8#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthCreateAsyncRequest"
+      ]
+    },
+    {
+      "import": "H8wG9Bk-nPc#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthDeleteRequest"
+      ]
+    },
+    {
+      "import": "qAUXQ9GdWp8#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthGetAuthorizationCodeA"
+      ]
+    },
+    {
+      "import": "GFhVUpRmbHE#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessageInitialize"
+      ]
+    },
+    {
+      "import": "+anuSx2avHQ#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessageDeleteHandle"
+      ]
+    },
+    {
+      "import": "s4UEa5iBJdc#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessageCreateHandle"
+      ]
+    },
+    {
+      "import": "PQDFxcnqxtw#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessageSendDataA"
+      ]
+    },
+    {
+      "import": "bMG3cVmUmuk#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessageTerminate"
+      ]
+    },
+    {
+      "import": "IkL62FMpIpo#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpInGameMessagePrepareA"
+      ]
+    },
+    {
+      "import": "Nd91WaWmG2w#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetResolverStartNtoa"
+      ]
+    },
+    {
+      "import": "C4UgDHHPvdw#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetResolverCreate"
+      ]
+    },
+    {
+      "import": "kJlYH5uMAWI#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetResolverDestroy"
+      ]
+    },
+    {
+      "import": "t7b6dmpQNiI#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusPollAsync"
+      ]
+    },
+    {
+      "import": "xzG8mG9YlKY#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataAAsync"
+      ]
+    },
+    {
+      "import": "CcIH40dYS88#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusDeleteRequest"
+      ]
+    },
+    {
+      "import": "3bh2aBvvmvM#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusCreateRequest"
+      ]
+    },
+    {
+      "import": "2eq1bMwgZYo#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAbortRequest"
+      ]
+    },
+    {
+      "import": "H3uq7x0sZOI#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusDeleteNpTitleCtx"
+      ]
+    },
+    {
+      "import": "1n-dGukBgnY#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusCreateNpTitleCtxA"
+      ]
+    },
+    {
+      "import": "4u58d6g6uwU#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetDataAAsync"
+      ]
+    },
+    {
+      "import": "M2BUB+DNEGE#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateExtdPushEventFilter"
+      ]
+    },
+    {
+      "import": "CQtPRSF6Ds8#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiReadData"
+      ]
+    },
+    {
+      "import": "XUjdsSTTZ3U#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeleteContext"
+      ]
+    },
+    {
+      "import": "noQgleu+KLE#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeleteRequest"
+      ]
+    },
+    {
+      "import": "5Mn7TYwpl30#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeleteHandle"
+      ]
+    },
+    {
+      "import": "79M-JqvvGo0#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateHandle"
+      ]
+    },
+    {
+      "import": "PqCY25FMzPs#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiUnregisterExtdPushEventCallback"
+      ]
+    },
+    {
+      "import": "G3AnLNdRBjE#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiInitialize"
+      ]
+    },
+    {
+      "import": "zk6c65xoyO0#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateContextA"
+      ]
+    },
+    {
+      "import": "rdgs5Z1MyFw#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateRequest"
+      ]
+    },
+    {
+      "import": "KjNeZ-29ysQ#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiSendRequest2"
+      ]
+    },
+    {
+      "import": "asz3TtIqGF8#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiTerminate"
+      ]
+    },
+    {
+      "import": "jhXKGQJ4egI#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiRegisterExtdPushEventCallbackA"
+      ]
+    },
+    {
+      "import": "ur5SShyG0dk#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterPollAsync"
+      ]
+    },
+    {
+      "import": "6p9jvljuvsw#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterCreateTitleCtxA"
+      ]
+    },
+    {
+      "import": "IEB+vgVoQbw#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterCreateAsyncRequest"
+      ]
+    },
+    {
+      "import": "PYFS1H70bDs#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterDeleteRequest"
+      ]
+    },
+    {
+      "import": "1dMndqL-QgE#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterCensorComment"
+      ]
+    },
+    {
+      "import": "t0P5z5yuFPA#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterDeleteTitleCtx"
+      ]
+    },
+    {
+      "import": "r42bWcQbtZY#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceDialogGetResult"
+      ]
+    },
+    {
+      "import": "eiqMCt9UshI#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCreateAsyncRequest"
+      ]
+    },
+    {
+      "import": "0aR2aWmQal4#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceDialogInitialize"
+      ]
+    },
+    {
+      "import": "DfSCDRA3EjY#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceDialogOpen"
+      ]
+    },
+    {
+      "import": "OzKvTvg3ZYU#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAbortRequest"
+      ]
+    },
+    {
+      "import": "r6MyYJkryz8#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckPlus"
+      ]
+    },
+    {
+      "import": "LR5cwFMMCVE#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "m-I92Ab50W8#libSceNpCommerce",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCommerceDialogTerminate"
+      ]
+    },
+    {
+      "import": "uqcPJLWL08M#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpPollAsync"
+      ]
+    },
+    {
+      "import": "BQ3tey0JmQM#libSceCommonDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "haVZE9FgKqE#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "0Sp9vJcB1-w#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogTerminate"
+      ]
+    },
+    {
+      "import": "lDqxaY1UbEo#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogInitialize"
+      ]
+    },
+    {
+      "import": "+Y1acHGomGQ#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogClose"
+      ]
+    },
+    {
+      "import": "b06Hh0DPEaE#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogOpen"
+      ]
+    },
+    {
+      "import": "HTrcDKlFKuM#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogClose"
+      ]
+    },
+    {
+      "import": "ECEzk+K9L2k#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogTerminate"
+      ]
+    },
+    {
+      "import": "nrQRlLKzdwE#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogOpenA"
+      ]
+    },
+    {
+      "import": "Lr8ovHH9l6A#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogGetResult"
+      ]
+    },
+    {
+      "import": "6fIC3XKt2k0#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "WmYDzdC4EHI#libSceIme",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "ePw-kqZmelo#libSceMsgDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceMsgDialogTerminate"
+      ]
+    },
+    {
+      "import": "-4GCfYdNF1s#libSceIme",
+      "status": "resolved",
+      "candidates": [
+        "sceImeUpdate"
+      ]
+    },
+    {
+      "import": "frwz3eyuA6w#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "JlpJVoRWv7U#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "RPydv-Jr1bc#libSceIme",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "TmVP8LzcFcY#libSceIme",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "2L-W-ZYn2Qo#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogInitialize"
+      ]
+    },
+    {
+      "import": "vN9sTP63WT8#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogOpenA"
+      ]
+    },
+    {
+      "import": "Lg+NCE6pTwQ#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogInitialize"
+      ]
+    },
+    {
+      "import": "Bw31liTFT3A#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "hK0CCljzJmY#libSceNpFriendListDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpFriendListDialogGetResultA"
+      ]
+    },
+    {
+      "import": "mlYGfmqE3fQ#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "wkwjz0Xdo2A#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogClose"
+      ]
+    },
+    {
+      "import": "WLxUN2WMim8#libSceIme",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "nqG7rqnYw1U#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "CWVW78Qc3fI#libSceMsgDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "8rhLl1-0W-o#libSceNpProfileDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpProfileDialogGetResult"
+      ]
+    },
+    {
+      "import": "LXlmS6PvJdU#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "oBmw4xrmfKs#libSceImeDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "28xmRUFao68#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyUnlockTrophy"
+      ]
+    },
+    {
+      "import": "GNcF4oidY0Y#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyDestroyHandle"
+      ]
+    },
+    {
+      "import": "q7U6tEAQf7c#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyCreateHandle"
+      ]
+    },
+    {
+      "import": "aTnHs7W-9Uk#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyAbortHandle"
+      ]
+    },
+    {
+      "import": "TJCAxto9SEU#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyRegisterContext"
+      ]
+    },
+    {
+      "import": "E1Wrwd07Lr8#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyDestroyContext"
+      ]
+    },
+    {
+      "import": "XbkjbobZlCY#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyCreateContext"
+      ]
+    },
+    {
+      "import": "WaSFJoRWXaI#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "cKYtVmeSTcw#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "IQtleGLL5pQ#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "gdUCnU0gHdI#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "FXP359ygujs#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "3G4zhgKuxE8#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "TMtqoFQjjbA#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "mz2iTY0MK4A#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "whrS4oksXc4#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "oM+XCzVG3oM#libSceFontFt",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "n590hj5Oe-k#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "h6hIgxXEiEc#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Xx974EW-QFY#libSceFontFt",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "N1EBMeGhf7E#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "6vGCkkQJOcI#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "exAxkyVLt0s#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "SsRbbCiWoGw#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "vzHs3C8lWJk#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "3OdRkSjOcog#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "1QjhKxrsOB8#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "v0phZwa4R5o#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "imxVx8lm+KM#libSceFont",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "xk0AcarP3V4#libScePad",
+      "status": "resolved",
+      "candidates": [
+        "scePadOpen"
+      ]
+    },
+    {
+      "import": "hv1luiJrqQM#libScePad",
+      "status": "resolved",
+      "candidates": [
+        "scePadInit"
+      ]
+    },
+    {
+      "import": "6ncge5+l5Qs#libScePad",
+      "status": "resolved",
+      "candidates": [
+        "scePadClose"
+      ]
+    },
+    {
+      "import": "lUoqwTQu4Go#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceGetUserColor"
+      ]
+    },
+    {
+      "import": "yH17Q6NWtVg#libSceUserService",
+      "status": "resolved",
+      "candidates": [
+        "sceUserServiceGetEvent"
+      ]
+    },
+    {
+      "import": "YndgXqQVV7c#libScePad",
+      "status": "resolved",
+      "candidates": [
+        "scePadReadState"
+      ]
+    },
+    {
+      "import": "RaqxZIf6DvE#libSceMouse",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Qs0wWulgl7U#libSceMouse",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "eaFXjfJv3xs#libSceIme",
+      "status": "resolved",
+      "candidates": [
+        "sceImeKeyboardOpen"
+      ]
+    },
+    {
+      "import": "dKadqZFgKKQ#libSceIme",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "x8qnXqh-tiM#libSceMouse",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "yFVnOdGxvZY#libScePad",
+      "status": "resolved",
+      "candidates": [
+        "scePadSetVibration"
+      ]
+    },
+    {
+      "import": "PMVehSlfZ94#libSceIme",
+      "status": "resolved",
+      "candidates": [
+        "sceImeKeyboardClose"
+      ]
+    },
+    {
+      "import": "ZC17w3vB5Lo#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerStop"
+      ]
+    },
+    {
+      "import": "ET4Gr-Uu07s#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerStart"
+      ]
+    },
+    {
+      "import": "w5moABNwnRY#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerResume"
+      ]
+    },
+    {
+      "import": "hdTyRzCXQeQ#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerStreamCount"
+      ]
+    },
+    {
+      "import": "NkJwDzKmIlw#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerClose"
+      ]
+    },
+    {
+      "import": "d8FcbzfAdQw#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerGetStreamInfo"
+      ]
+    },
+    {
+      "import": "ODJK2sn9w4A#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerEnableStream"
+      ]
+    },
+    {
+      "import": "BOVKAzRmuTQ#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerDisableStream"
+      ]
+    },
+    {
+      "import": "KMcEa+rHsIo#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerAddSource"
+      ]
+    },
+    {
+      "import": "aS66RI0gGgo#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerInit"
+      ]
+    },
+    {
+      "import": "UbQoYawOsfY#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerIsActive"
+      ]
+    },
+    {
+      "import": "HD1YKVU26-M#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerPostInit"
+      ]
+    },
+    {
+      "import": "9y5v+fGN4Wk#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerPause"
+      ]
+    },
+    {
+      "import": "OVths0xGfho#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerSetLooping"
+      ]
+    },
+    {
+      "import": "JdksQu8pNdQ#libSceAvPlayer",
+      "status": "resolved",
+      "candidates": [
+        "sceAvPlayerGetVideoDataEx"
+      ]
+    },
+    {
+      "import": "7oxv3PPCumo#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "9bfdLIyuwCY#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "hwVSPCmp5tM#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "2SKEx6bSq-4#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "VOx8NGmHXTs#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "C0f7TJcbfac#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "rVjRvHJ0X6c#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "3qxgM4ezETA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrSetaffinity"
+      ]
+    },
+    {
+      "import": "zgXifHT9ErY#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutIsFlipPending"
+      ]
+    },
+    {
+      "import": "i6-sR91Wt-4#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutSetBufferAttribute"
+      ]
+    },
+    {
+      "import": "1FZBKy8HeNU#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutGetVblankStatus"
+      ]
+    },
+    {
+      "import": "CBiu4mCE1DA#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutSetFlipRate"
+      ]
+    },
+    {
+      "import": "Up36PTk687E#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutOpen"
+      ]
+    },
+    {
+      "import": "N5KDtkIjjJ4#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutUnregisterBuffers"
+      ]
+    },
+    {
+      "import": "1n37q1Bvc5Y#libSceSystemService",
+      "status": "resolved",
+      "candidates": [
+        "sceSystemServiceGetDisplaySafeAreaInfo"
+      ]
+    },
+    {
+      "import": "HXzjK9yI30k#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutAddFlipEvent"
+      ]
+    },
+    {
+      "import": "jMNwqYr4R-k#libSceRtc",
+      "status": "resolved",
+      "candidates": [
+        "sceRtcGetTickResolution"
+      ]
+    },
+    {
+      "import": "IOdgHlCGU-k#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutSubmitChangeBufferAttribute"
+      ]
+    },
+    {
+      "import": "6kPnj51T62Y#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutGetResolutionStatus"
+      ]
+    },
+    {
+      "import": "w3BY+tAEiQY#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutRegisterBuffers"
+      ]
+    },
+    {
+      "import": "Xru92wHJRmg#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutAddVblankEvent"
+      ]
+    },
+    {
+      "import": "fzyMKs9kim0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelWaitEqueue"
+      ]
+    },
+    {
+      "import": "pjkDsgxli6c#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutModeSetAny_"
+      ]
+    },
+    {
+      "import": "pv9CI5VC+R0#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutAdjustColor"
+      ]
+    },
+    {
+      "import": "D0OdFMjp46I#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelCreateEqueue"
+      ]
+    },
+    {
+      "import": "N1bEoJ4SRw4#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutConfigureOutputMode_"
+      ]
+    },
+    {
+      "import": "DYhhWbJSeRg#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutColorSettingsSetGamma"
+      ]
+    },
+    {
+      "import": "j6RaAUlaLv0#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutWaitVblank"
+      ]
+    },
+    {
+      "import": "kGVLc3htQE8#libSceVideoOut",
+      "status": "ambiguous",
+      "candidates": [
+        "sceVideoOutGetDeviceCapabilityInfo",
+        "sceVideoOutGetDeviceCapabilityInfo_"
+      ]
+    },
+    {
+      "import": "SbU3dwp80lQ#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutGetFlipStatus"
+      ]
+    },
+    {
+      "import": "U46NwOiJpys#libSceVideoOut",
+      "status": "resolved",
+      "candidates": [
+        "sceVideoOutSubmitFlip"
+      ]
+    },
+    {
+      "import": "WslcK1FQcGI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelIsNeoMode"
+      ]
+    },
+    {
+      "import": "AqBioC2vF3I#libScePosix",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "FN4gaPmuFV8#libScePosix",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "bY-PO6JhzhQ#libScePosix",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "E6ao34wPw+U#libScePosix",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "GrQ9s4IrNaQ#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutGetPortState"
+      ]
+    },
+    {
+      "import": "s1--uE9mBFw#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutClose"
+      ]
+    },
+    {
+      "import": "ekNvsT22rsY#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutOpen"
+      ]
+    },
+    {
+      "import": "JfEPXVxhFqA#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutInit"
+      ]
+    },
+    {
+      "import": "QOQtbeDqsT4#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutOutput"
+      ]
+    },
+    {
+      "import": "w3PdaSTSwGE#libSceAudioOut",
+      "status": "resolved",
+      "candidates": [
+        "sceAudioOutOutputs"
+      ]
+    },
+    {
+      "import": "wVwPU50pS1c#libSceAudioOut",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "jiItzS6+22g#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertSetMarker"
+      ]
+    },
+    {
+      "import": "HlTPoZ-oY7Y#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndex"
+      ]
+    },
+    {
+      "import": "gAhCn6UiU4Y#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetVsShader"
+      ]
+    },
+    {
+      "import": "mLVL7N7BVBg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUpdatePsShader350"
+      ]
+    },
+    {
+      "import": "+AFvOEXrKJk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetEmbeddedVsShader"
+      ]
+    },
+    {
+      "import": "FUHG8sQ3R58#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetEsShader"
+      ]
+    },
+    {
+      "import": "1qXLHIpROPE#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertWaitFlipDone"
+      ]
+    },
+    {
+      "import": "cFCp0NX8wf0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetVgtControl"
+      ]
+    },
+    {
+      "import": "V31V01UiScY#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUpdateVsShader"
+      ]
+    },
+    {
+      "import": "Z43vKp5k7r0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDispatchIndirect"
+      ]
+    },
+    {
+      "import": "0BzLGljcwBo#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDispatchDirect"
+      ]
+    },
+    {
+      "import": "oYM+YzfCm2Y#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndexOffset"
+      ]
+    },
+    {
+      "import": "cUCo8OvArrw#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndirectCountMulti"
+      ]
+    },
+    {
+      "import": "VJNjFtqiF5w#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetHsShader"
+      ]
+    },
+    {
+      "import": "GGsn7jMTxw4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndexAuto"
+      ]
+    },
+    {
+      "import": "4v+otIIdjqg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndirect"
+      ]
+    },
+    {
+      "import": "vckdzbQ46SI#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetLsShader"
+      ]
+    },
+    {
+      "import": "im2ZuItabu4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawInitToDefaultContextState400"
+      ]
+    },
+    {
+      "import": "Kx-h-nWQJ8A#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetCsShaderWithModifier"
+      ]
+    },
+    {
+      "import": "7qZVNgEu+SY#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertPopMarker"
+      ]
+    },
+    {
+      "import": "jHdPvIzlpKc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndexMultiInstanced"
+      ]
+    },
+    {
+      "import": "X9Omw9dwv5M#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetEmbeddedPsShader"
+      ]
+    },
+    {
+      "import": "stDSYW2SBVM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawOpaqueAuto"
+      ]
+    },
+    {
+      "import": "Kl0Z3LH07QI#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmLogicalTcaUnitToPhysical"
+      ]
+    },
+    {
+      "import": "GNlx+y7xPdE#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUpdateHsShader"
+      ]
+    },
+    {
+      "import": "MYRtYhojKdA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmResetVgtControl"
+      ]
+    },
+    {
+      "import": "UJwNuMBcUAk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetGsShader"
+      ]
+    },
+    {
+      "import": "5uFKckiJYRM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetPsShader350"
+      ]
+    },
+    {
+      "import": "thbPcG7E7qk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndexIndirectCountMulti"
+      ]
+    },
+    {
+      "import": "yb2cRhagD1I#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawInitDefaultHardwareState350"
+      ]
+    },
+    {
+      "import": "nLM2i2+65hA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUpdateGsShader"
+      ]
+    },
+    {
+      "import": "W1Etj-jlW7Y#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertPushMarker"
+      ]
+    },
+    {
+      "import": "ED9-Fjr8Ta4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDrawIndexIndirect"
+      ]
+    },
+    {
+      "import": "aPIZJTXC+cU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertPushColorMarker"
+      ]
+    },
+    {
+      "import": "URDgJcXhQOs#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertThreadTraceMarker"
+      ]
+    },
+    {
+      "import": "aj3L-iaFmyk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertSetColorMarker"
+      ]
+    },
+    {
+      "import": "dewXw5roLs0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetPhysicalCounterFromVirtualized"
+      ]
+    },
+    {
+      "import": "RU74kek-N0c#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmLogicalCuMaskToPhysicalCuMask"
+      ]
+    },
+    {
+      "import": "ArSg-TGinhk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUnmapComputeQueue"
+      ]
+    },
+    {
+      "import": "HHo1BAljZO8#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDisableMipStatsReport"
+      ]
+    },
+    {
+      "import": "TLV4mswiZ4A#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDriverCaptureInProgress"
+      ]
+    },
+    {
+      "import": "byXlqupd8cE#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDingDongForWorkload"
+      ]
+    },
+    {
+      "import": "fzJdEihTFV4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetProtectionFaultTimeStamp"
+      ]
+    },
+    {
+      "import": "UtObDRQiGbs#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDestroyWorkloadStream"
+      ]
+    },
+    {
+      "import": "UoYY0DWMC0U#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetEqEventType"
+      ]
+    },
+    {
+      "import": "26PM5Mzl8zc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmLogicalCuIndexToPhysicalCuIndex"
+      ]
+    },
+    {
+      "import": "tZCSL5ulnB4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetGpuInfoStatus"
+      ]
+    },
+    {
+      "import": "A+uGq+3KFtQ#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmMapComputeQueueWithPriority"
+      ]
+    },
+    {
+      "import": "29oKvKXzEZo#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmMapComputeQueue"
+      ]
+    },
+    {
+      "import": "zwY0YV91TTI#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSubmitCommandBuffers"
+      ]
+    },
+    {
+      "import": "jtkqXpAOY6w#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetGsRingSizes"
+      ]
+    },
+    {
+      "import": "R6z1xM3pW-w#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDriverTraceInProgress"
+      ]
+    },
+    {
+      "import": "ihxrbsoSKWc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmBeginWorkload"
+      ]
+    },
+    {
+      "import": "H7-fgvEutM0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetEqTimeStamp"
+      ]
+    },
+    {
+      "import": "bX5IbRvECXk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDingDong"
+      ]
+    },
+    {
+      "import": "u9YKpRRHe-M#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceRazorCaptureImmediate"
+      ]
+    },
+    {
+      "import": "nEyFbYUloIM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetShaderProgramBaseAddress"
+      ]
+    },
+    {
+      "import": "f33OrruQYbM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceRazorIsLoaded"
+      ]
+    },
+    {
+      "import": "iBt3Oe00Kvc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmFlushGarlic"
+      ]
+    },
+    {
+      "import": "jg33rEKLfVs#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmIsUserPaEnabled"
+      ]
+    },
+    {
+      "import": "iFirFzgYsvw#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetLastWaitedAddress"
+      ]
+    },
+    {
+      "import": "XiyzNZ9J4nQ#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetWaveLimitMultipliers"
+      ]
+    },
+    {
+      "import": "KnldROUkWJY#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetNumTcaUnits"
+      ]
+    },
+    {
+      "import": "jRcI8VcgTz4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSubmitCommandBuffersForWorkload"
+      ]
+    },
+    {
+      "import": "PVT+fuoS9gU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDeleteEqEvent"
+      ]
+    },
+    {
+      "import": "FFVZcCu3zWU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetOffChipTessellationBufferSize"
+      ]
+    },
+    {
+      "import": "f85orjx7qts#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRequestMipStatsReportAndReset"
+      ]
+    },
+    {
+      "import": "d88anrgNoKY#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDriverTriggerCapture"
+      ]
+    },
+    {
+      "import": "qpGITzPE+Zc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDebugHardwareStatus"
+      ]
+    },
+    {
+      "import": "yvZ73uQUqrk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSubmitDone"
+      ]
+    },
+    {
+      "import": "oL4hGI1PMpw#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetGpuBlockStatus"
+      ]
+    },
+    {
+      "import": "k7iGTvDQPLQ#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetShaderStatus"
+      ]
+    },
+    {
+      "import": "Fa3x75OOLRA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmEndWorkload"
+      ]
+    },
+    {
+      "import": "b0xyllnVY-I#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmAddEqEvent"
+      ]
+    },
+    {
+      "import": "gObODli-OH8#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRequestFlipAndSubmitDone"
+      ]
+    },
+    {
+      "import": "+xuDhxlWRPg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetupMipStatsReport"
+      ]
+    },
+    {
+      "import": "5udAm+6boVg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmCreateWorkloadStream"
+      ]
+    },
+    {
+      "import": "ln33zjBrfjk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetTheTessellationFactorRingBufferBaseAddress"
+      ]
+    },
+    {
+      "import": "b08AgtPlHPg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmAreSubmitsAllowed"
+      ]
+    },
+    {
+      "import": "Ga6r7H6Y0RI#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSubmitAndFlipCommandBuffersForWorkload"
+      ]
+    },
+    {
+      "import": "6YRHhh5mHCs#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRequestFlipAndSubmitDoneForWorkload"
+      ]
+    },
+    {
+      "import": "xbxNatawohc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSubmitAndFlipCommandBuffers"
+      ]
+    },
+    {
+      "import": "Q7t4VEYLafI#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidationRegisterMemoryCheckCallback"
+      ]
+    },
+    {
+      "import": "hsZPf1lON7E#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateDrawCommandBuffers"
+      ]
+    },
+    {
+      "import": "rTIV11nMQuM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateOnSubmitEnabled"
+      ]
+    },
+    {
+      "import": "qGP74T5OWJc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateDispatchCommandBuffers"
+      ]
+    },
+    {
+      "import": "BgM3t3LvcNk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateDisableDiagnostics2"
+      ]
+    },
+    {
+      "import": "SXw4dZEkgpA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateDisableDiagnostics"
+      ]
+    },
+    {
+      "import": "RX7XCNSaL6I#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateGetDiagnosticInfo"
+      ]
+    },
+    {
+      "import": "MBMa6EFu4Ko#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateResetState"
+      ]
+    },
+    {
+      "import": "HzMN7ANqYEc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateGetVersion"
+      ]
+    },
+    {
+      "import": "5SHGNwLXBV4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmValidateGetDiagnostics"
+      ]
+    },
+    {
+      "import": "wED4ZXCFJT0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDispatchIndirectOnMec"
+      ]
+    },
+    {
+      "import": "ffrNQOshows#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmComputeWaitOnAddress"
+      ]
+    },
+    {
+      "import": "nF6bFRUBRAU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmDispatchInitDefaultHardwareState"
+      ]
+    },
+    {
+      "import": "EJapNl2+pgU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmComputeWaitSemaphore"
+      ]
+    },
+    {
+      "import": "NfvOrNzy6sk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmInsertDingDongMarker"
+      ]
+    },
+    {
+      "import": "Ou3iL1abvng#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__stack_chk_fail"
+      ]
+    },
+    {
+      "import": "K7RlrTkI-mw#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetPoolDestroy"
+      ]
+    },
+    {
+      "import": "PDxS48xGQLs#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpSetChunkedTransferEnabled"
+      ]
+    },
+    {
+      "import": "cLV4aiT9JpA#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "U546k6orxQo#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "lCqD7oycmIM#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "MwmHz8pAdAo#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "0eFLVCfWVds#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "mPYgU4oYpuY#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "u-WrYDaJA3k#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "i0VnXM-C9fc#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "uu94irFOGpA#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "-TOuuAQ-buE#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "rEh728kXk3w#libSceNgs2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "DOwXL+FQMEY#libSceSsl",
+      "status": "resolved",
+      "candidates": [
+        "sceSslGetSerialNumber"
+      ]
+    },
+    {
+      "import": "YaaDbDwKpFM#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortGetQueueLevel"
+      ]
+    },
+    {
+      "import": "UmCvjSmuZIw#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dInitialize"
+      ]
+    },
+    {
+      "import": "OyVqOeVNtSk#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortClose"
+      ]
+    },
+    {
+      "import": "VEVhZ9qd4ZY#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortPush"
+      ]
+    },
+    {
+      "import": "8mql9OcQnd4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDeleteEventFlag"
+      ]
+    },
+    {
+      "import": "Yq9bfUQ0uJg#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortSetAttribute"
+      ]
+    },
+    {
+      "import": "WW1TS2iz5yc#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dTerminate"
+      ]
+    },
+    {
+      "import": "JTvBflhYazQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelWaitEventFlag"
+      ]
+    },
+    {
+      "import": "lw0qrdSjZt8#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortAdvance"
+      ]
+    },
+    {
+      "import": "1HXxo-+1qCw#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dObjectUnreserve"
+      ]
+    },
+    {
+      "import": "BpFoboUJoZU#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelCreateEventFlag"
+      ]
+    },
+    {
+      "import": "jO2tec4dJ2M#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dObjectReserve"
+      ]
+    },
+    {
+      "import": "4uyHN9q4ZeU#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dObjectSetAttributes"
+      ]
+    },
+    {
+      "import": "XeDDK0xJWQA#libSceAudio3d",
+      "status": "resolved",
+      "candidates": [
+        "sceAudio3dPortOpen"
+      ]
+    },
+    {
+      "import": "IOnSvHzqu6A#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelSetEventFlag"
+      ]
+    },
+    {
+      "import": "EI-5-jlq2dE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadGetthreadid"
+      ]
+    },
+    {
+      "import": "8+s5BzZjxSg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrGetaffinity"
+      ]
+    },
+    {
+      "import": "x1X76arYMxU#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadAttrGet"
+      ]
+    },
+    {
+      "import": "-fA+7ZlGDQs#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "BB+kb08Tl9A#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockDestroy"
+      ]
+    },
+    {
+      "import": "6ULAa0fq4jA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockInit"
+      ]
+    },
+    {
+      "import": "Ox9i0c7L5w0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockRdlock"
+      ]
+    },
+    {
+      "import": "+L98PIbGttk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockUnlock"
+      ]
+    },
+    {
+      "import": "mqdNorrB+gI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockWrlock"
+      ]
+    },
+    {
+      "import": "bt3CTBKmGyI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadSetaffinity"
+      ]
+    },
+    {
+      "import": "Cxwy7wHq4J0#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json11Initializer10initializeEPKNS0_13InitParameterE"
+      ]
+    },
+    {
+      "import": "PR5k1penBLM#libSceJson2",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "cK6bYHf-Q5E#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json11InitializerC1Ev"
+      ]
+    },
+    {
+      "import": "RujUxbr3haM#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json11InitializerD1Ev"
+      ]
+    },
+    {
+      "import": "i-XwZjw0OOY#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json12MemAllocator11notifyErrorEimPv"
+      ]
+    },
+    {
+      "import": "-hJRce8wn1U#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json12MemAllocatorC2Ev"
+      ]
+    },
+    {
+      "import": "OcAgPxcq5Vk#libSceJson2",
+      "status": "resolved",
+      "candidates": [
+        "_ZN3sce4Json12MemAllocatorD2Ev"
+      ]
+    },
+    {
+      "import": "vNe1w4diLCs#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__tls_get_addr"
+      ]
+    },
+    {
+      "import": "f7uOxY9mM1U#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__stack_chk_guard"
+      ]
+    },
+    {
+      "import": "pB-yGZ2nQ9o#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "WhCc1w3EhSI#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "rNhWz+lvOMU#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "OMDRKKAZ8I4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDebugRaiseException"
+      ]
+    },
+    {
+      "import": "zE-wXIZjLoM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDebugRaiseExceptionOnReleaseMode"
+      ]
+    },
+    {
+      "import": "-o5uEDpN+oY#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelConvertUtcToLocaltime"
+      ]
+    },
+    {
+      "import": "14bOACANTBo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadOnce"
+      ]
+    },
+    {
+      "import": "eoht7mQOCmo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadGetspecific"
+      ]
+    },
+    {
+      "import": "geDaqgH9lTg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadKeyCreate"
+      ]
+    },
+    {
+      "import": "PrdHuuDekhY#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadKeyDelete"
+      ]
+    },
+    {
+      "import": "+BzXYkqYeLE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadSetspecific"
+      ]
+    },
+    {
+      "import": "n88vx3C5nW8#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "gettimeofday"
+      ]
+    },
+    {
+      "import": "0NTHN1NKONI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelConvertLocaltimeToUtc"
+      ]
+    },
+    {
+      "import": "VADc3MNQ3cM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "signal"
+      ]
+    },
+    {
+      "import": "yS8U2TGCe1A#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "nanosleep"
+      ]
+    },
+    {
+      "import": "959qrazPIrg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetProcParam"
+      ]
+    },
+    {
+      "import": "JaRMy+QcpeU#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "3PtV6p3QNX4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadEqual"
+      ]
+    },
+    {
+      "import": "IafI2PxcPnQ#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "NhpspxdjEKU#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "p5EcQeEeJAE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_sceKernelRtldSetApplicationHeapAPI"
+      ]
+    },
+    {
+      "import": "py6L8jiVAN8#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "-YTW+qXc3CQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelInternalMemoryGetModuleSegmentInfo"
+      ]
+    },
+    {
+      "import": "jh+8XiK4LeE#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "mL8NDH86iQI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelMapNamedFlexibleMemory"
+      ]
+    },
+    {
+      "import": "3k6kx-zOOSQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelMlock"
+      ]
+    },
+    {
+      "import": "cQke9UuBQOk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelMunmap"
+      ]
+    },
+    {
+      "import": "Wl2o5hOVZdw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelPrintBacktraceWithModuleInfo"
+      ]
+    },
+    {
+      "import": "NWtTN10cJzE#libSceLibcInternalExt",
+      "status": "resolved",
+      "candidates": [
+        "sceLibcHeapGetTraceInfo"
+      ]
+    },
+    {
+      "import": "DRuBt2pvICk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_read"
+      ]
+    },
+    {
+      "import": "FxVZqBAA7ks#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_write"
+      ]
+    },
+    {
+      "import": "bnZxYgAFeA0#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Fjc4-n1+y2g#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__elf_phdr_match_addr"
+      ]
+    },
+    {
+      "import": "kbw4UHHSYy0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__pthread_cxa_finalize"
+      ]
+    },
+    {
+      "import": "f7KBOafysXo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetModuleInfoFromAddr"
+      ]
+    },
+    {
+      "import": "6Z83sYWFlA8#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_exit"
+      ]
+    },
+    {
+      "import": "hHlZQUnlxSM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "getrusage"
+      ]
+    },
+    {
+      "import": "lLMT9vJAck0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "clock_gettime"
+      ]
+    },
+    {
+      "import": "6xVpy0Fdq+I#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_sigprocmask"
+      ]
+    },
+    {
+      "import": "6XG4B33N09g#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sched_yield"
+      ]
+    },
+    {
+      "import": "8OnWXlgQlvo#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Tz4RNUCBbGI#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "How7B8Oet6k#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "crb5j7mkk1c#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "_is_signal_return"
+      ]
+    },
+    {
+      "import": "mo0bFmWppIw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sigreturn"
+      ]
+    },
+    {
+      "import": "aPcyptbOiZs#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sigprocmask"
+      ]
+    },
+    {
+      "import": "k+AXqu2-eBc#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "getpagesize"
+      ]
+    },
+    {
+      "import": "BPE9s9vQQXo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "mmap"
+      ]
+    },
+    {
+      "import": "VkTAsrZDcJ0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sigfillset"
+      ]
+    },
+    {
+      "import": "tZY4+SZNFhA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "msync"
+      ]
+    },
+    {
+      "import": "RpQJJVKTiFM#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetModuleInfoForUnwind"
+      ]
+    },
+    {
+      "import": "djxxOmW6-aw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "__progname"
+      ]
+    },
+    {
+      "import": "lbQKqsERhtE#libSceDiscMap",
+      "status": "resolved",
+      "candidates": [
+        "sceDiscMapIsRequestOnHDD"
+      ]
+    },
+    {
+      "import": "fJgP+wqifno#libSceDiscMap",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "QBi7HCK03hw#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelClockGettime"
+      ]
+    },
+    {
+      "import": "ejekcaNQNq0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGettimeofday"
+      ]
+    },
+    {
+      "import": "fTx66l5iWIA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelFsync"
+      ]
+    },
+    {
+      "import": "VW3TVZiM4-E#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelFtruncate"
+      ]
+    },
+    {
+      "import": "taRWhTJFTgE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetdirentries"
+      ]
+    },
+    {
+      "import": "nKWi-N2HBV4#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelPwrite"
+      ]
+    },
+    {
+      "import": "52NcYU9+lEo#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelRename"
+      ]
+    },
+    {
+      "import": "naInUjYt3so#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelRmdir"
+      ]
+    },
+    {
+      "import": "WlyEA-sLDf0#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelTruncate"
+      ]
+    },
+    {
+      "import": "AUXVxWeJU-A#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelUnlink"
+      ]
+    },
+    {
+      "import": "hHrGoGoNf+s#libSceSysmodule",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "1FGvU0i9saQ#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadMutexattrSetprotocol"
+      ]
+    },
+    {
+      "import": "XD3mDeybCnk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockTryrdlock"
+      ]
+    },
+    {
+      "import": "bIHoZCTomsI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadRwlockTrywrlock"
+      ]
+    },
+    {
+      "import": "rcrVFJsQWRY#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadGetaffinity"
+      ]
+    },
+    {
+      "import": "ZT4ODD2Ts9o#libSceLibcInternal",
+      "status": "resolved",
+      "candidates": [
+        "Need_sceLibcInternal"
+      ]
+    },
+    {
+      "import": "7H0iTOciTLo#libScePosix",
+      "status": "unresolved",
+      "candidates": [
+        "pthread_mutex_lock"
+      ]
+    },
+    {
+      "import": "2Z+PpY6CaJg#libScePosix",
+      "status": "unresolved",
+      "candidates": [
+        "pthread_mutex_unlock"
+      ]
+    },
+    {
+      "import": "4R6-OvI2cEA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelAddUserEvent"
+      ]
+    },
+    {
+      "import": "LJDwdSNTnDg#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDeleteUserEvent"
+      ]
+    },
+    {
+      "import": "23CPPI1tyBY#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetEventFilter"
+      ]
+    },
+    {
+      "import": "mJ7aghmgvfc#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetEventId"
+      ]
+    },
+    {
+      "import": "vz+pg2zdopI#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelGetEventUserData"
+      ]
+    },
+    {
+      "import": "F6e0kwo4cnk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelTriggerUserEvent"
+      ]
+    },
+    {
+      "import": "jpFjmgAC5AE#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelDeleteEqueue"
+      ]
+    },
+    {
+      "import": "WDszmSbWuDk#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "sceKernelAddUserEventEdge"
+      ]
+    },
+    {
+      "import": "BG26hBGiNlw#ulobjmgr",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Smf+fUNblPc#ulobjmgr",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "dnEdyY4+klQ#libSceRazorCpu",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "KP+TBWGHlgs#libSceRazorCpu",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "PZku4ZrXJqg#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "7uhBFWRAS60#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "9lvj5DjHZiA#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "9FowWFMEIM8#libSceRazorCpu",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "waPcxYiR3WA#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondattrDestroy"
+      ]
+    },
+    {
+      "import": "m5-2bsNfv7s#libkernel",
+      "status": "resolved",
+      "candidates": [
+        "scePthreadCondattrInit"
+      ]
+    },
+    {
+      "import": "6bwFkosYRQg#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthCreateRequest"
+      ]
+    },
+    {
+      "import": "KxGkOrQJTqY#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthGetAuthorizationCode"
+      ]
+    },
+    {
+      "import": "99bMGglFW3I#libSceRtc",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "JzhYTP2fG18#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiAbortRequest"
+      ]
+    },
+    {
+      "import": "JELHf4xPufo#libSceNpManagerForToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckCallbackForLib"
+      ]
+    },
+    {
+      "import": "2rsFmlGWleQ#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCheckNpAvailability"
+      ]
+    },
+    {
+      "import": "uBPlr0lbuiI#libSceNetCtl",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlGetState"
+      ]
+    },
+    {
+      "import": "lLMT9vJAck0#libScePosix",
+      "status": "unresolved",
+      "candidates": [
+        "clock_gettime"
+      ]
+    },
+    {
+      "import": "i8UmXTSq7N4#libSceNpCommon",
+      "status": "resolved",
+      "candidates": [
+        "sceNpCmpNpId"
+      ]
+    },
+    {
+      "import": "YfmpW719rMo#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2CreateContext"
+      ]
+    },
+    {
+      "import": "zCWZmXXN600#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2CreateJoinRoom"
+      ]
+    },
+    {
+      "import": "Jraxifmoet4#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetRoomDataInternal"
+      ]
+    },
+    {
+      "import": "5lhvOqheFBA#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetRoomMemberDataInternal"
+      ]
+    },
+    {
+      "import": "qeF-q5KDtAc#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetUserInfoList"
+      ]
+    },
+    {
+      "import": "CSIMDsVjs-g#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2JoinRoom"
+      ]
+    },
+    {
+      "import": "AUVfU6byg3c#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2KickoutRoomMember"
+      ]
+    },
+    {
+      "import": "HoqTrkS9c5Q#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetRoomMemberDataInternal"
+      ]
+    },
+    {
+      "import": "meEjIdbjAA0#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetUserInfo"
+      ]
+    },
+    {
+      "import": "twVupeaYYrk#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingGetConnectionInfo"
+      ]
+    },
+    {
+      "import": "wUmwXZHaX1w#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingGetPingInfo"
+      ]
+    },
+    {
+      "import": "Vh1bhUG6mSs#libSceNpManager",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "ON7Sf5XEMmI#libSceNpManager",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "iQr9UxPHUFs#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "8533Q+LU7EQ#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "T6tnM1Uti4g#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "sJptZwvs1is#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "xtbb-2f703A#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "5TvttyRuU84#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "HwEtHFCpU5U#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "PkdLsRA4ON0#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "8XKR6wa64iQ#libSceInvitationDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "XvA5KS56wcs#libSceInvitationDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceInvitationDialogInitialize"
+      ]
+    },
+    {
+      "import": "0zU0G+wiVLA#libSceInvitationDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "B6HVJtDYxEE#libSceInvitationDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceInvitationDialogTerminate"
+      ]
+    },
+    {
+      "import": "9+g9iOq+7kg#libSceInvitationDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceInvitationDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "BYIZGKm6bO4#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "jktww3yJXnc#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "pLr1fEQS1z8#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "0c7HbXRKUt4#libSceNpManagerForToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNpRegisterStateCallbackForToolkit"
+      ]
+    },
+    {
+      "import": "YIvqqvJyjEc#libSceNpManagerForToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNpUnregisterStateCallbackForToolkit"
+      ]
+    },
+    {
+      "import": "M3OkENHcyiU#libSceSigninDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "LoVMVrijVOk#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetBoardInfo"
+      ]
+    },
+    {
+      "import": "ANJssPz3mY0#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreRecordScoreAsync"
+      ]
+    },
+    {
+      "import": "1i7kmKbX6hk#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreAbortRequest"
+      ]
+    },
+    {
+      "import": "gW8qyjYrUbk#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreCreateRequest"
+      ]
+    },
+    {
+      "import": "dK8-SgYf6r4#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreDeleteRequest"
+      ]
+    },
+    {
+      "import": "m1DfNRstkSQ#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScorePollAsync"
+      ]
+    },
+    {
+      "import": "KnNA1TEgtBI#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreCreateNpTitleCtx"
+      ]
+    },
+    {
+      "import": "G0pE+RNCwfk#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreDeleteNpTitleCtx"
+      ]
+    },
+    {
+      "import": "8kuIzUw6utQ#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetFriendsRanking"
+      ]
+    },
+    {
+      "import": "7SuMUlN7Q6I#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetFriendsRankingAsync"
+      ]
+    },
+    {
+      "import": "zKoVok6FFEI#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetGameData"
+      ]
+    },
+    {
+      "import": "JjOFRVPdQWc#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetGameDataAsync"
+      ]
+    },
+    {
+      "import": "9mZEgoiEq6Y#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByNpId"
+      ]
+    },
+    {
+      "import": "Rd27dqUFZV8#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByNpIdAsync"
+      ]
+    },
+    {
+      "import": "KBHxDjyk-jA#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByRange"
+      ]
+    },
+    {
+      "import": "rShmqXHwoQE#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByRangeAsync"
+      ]
+    },
+    {
+      "import": "bcoVwcBjQ9E#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreRecordGameData"
+      ]
+    },
+    {
+      "import": "1gL5PwYzrrw#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreRecordGameDataAsync"
+      ]
+    },
+    {
+      "import": "zT0XBtgtOSI#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreRecordScore"
+      ]
+    },
+    {
+      "import": "YuOW3dDAKYc#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpUriEscape"
+      ]
+    },
+    {
+      "import": "OoTjfxl8-wI#libSceNpSns",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "pTvAKV1iQkE#libSceNpSns",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "AifdcI1aKas#libSceNpSnsFacebookDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "tdQArULbNQk#libSceNpSnsFacebookDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Hi3onqHSN6M#libSceNpSnsFacebookDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "cdqOFyupRS4#libSceNpSnsFacebookDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "fjV7C8H0Y8k#libSceNpSnsFacebookDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceNpSnsFacebookDialogUpdateStatus"
+      ]
+    },
+    {
+      "import": "VtyS8XLBqNE#libSceNpSns",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "HLwz1fRIycA#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetGameIcon"
+      ]
+    },
+    {
+      "import": "w4uMPmErD4I#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetGroupIcon"
+      ]
+    },
+    {
+      "import": "eBL+l6HG9xk#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetTrophyIcon"
+      ]
+    },
+    {
+      "import": "YYP3f2W09og#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetGameInfo"
+      ]
+    },
+    {
+      "import": "wTUwGfspKic#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetGroupInfo"
+      ]
+    },
+    {
+      "import": "qqUVGDgQBm0#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetTrophyInfo"
+      ]
+    },
+    {
+      "import": "cqGkYAN-gRw#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyCaptureScreenshot"
+      ]
+    },
+    {
+      "import": "-SUR+UoLS6c#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTssGetData"
+      ]
+    },
+    {
+      "import": "BIkMmUfNKWM#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusCreateNpTitleCtx"
+      ]
+    },
+    {
+      "import": "cRVmNrJDbG8#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariable"
+      ]
+    },
+    {
+      "import": "ukr6FBSrkJw#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariableVUser"
+      ]
+    },
+    {
+      "import": "0DT5bP6YzBo#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusDeleteMultiSlotData"
+      ]
+    },
+    {
+      "import": "xutwCvsydkk#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusDeleteMultiSlotDataVUser"
+      ]
+    },
+    {
+      "import": "XOzszO4ONWU#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetData"
+      ]
+    },
+    {
+      "import": "GQHCksS7aLs#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataVUser"
+      ]
+    },
+    {
+      "import": "F+eQlfcka98#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariable"
+      ]
+    },
+    {
+      "import": "uFxVYJEkcmc#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariableVUser"
+      ]
+    },
+    {
+      "import": "4NrufkNCkiE#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetData"
+      ]
+    },
+    {
+      "import": "+RhzSuuXwxo#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetDataVUser"
+      ]
+    },
+    {
+      "import": "c6aYoa47YgI#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetMultiSlotVariable"
+      ]
+    },
+    {
+      "import": "1Cz0hTJFyh4#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetMultiSlotVariableVUser"
+      ]
+    },
+    {
+      "import": "y5Ta5JCzQHY#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreatePushEventFilter"
+      ]
+    },
+    {
+      "import": "sIFx734+xys#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateServicePushEventFilter"
+      ]
+    },
+    {
+      "import": "zE+R6Rcx3W0#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeletePushEventFilter"
+      ]
+    },
+    {
+      "import": "PfQ+f6ws764#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeleteServicePushEventFilter"
+      ]
+    },
+    {
+      "import": "x1Y7yiYSk7c#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiCreateContext"
+      ]
+    },
+    {
+      "import": "VwJ5L0Higg0#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiGetHttpResponseHeaderValue"
+      ]
+    },
+    {
+      "import": "743ZzEBzlV8#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiGetHttpResponseHeaderValueLength"
+      ]
+    },
+    {
+      "import": "PfSTDCgNMgc#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiRegisterPushEventCallback"
+      ]
+    },
+    {
+      "import": "kJQJE0uKm5w#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiRegisterServicePushEventCallback"
+      ]
+    },
+    {
+      "import": "qK4o2656W4w#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiUnregisterPushEventCallback"
+      ]
+    },
+    {
+      "import": "2edrkr0c-wg#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiUnregisterServicePushEventCallback"
+      ]
+    },
+    {
+      "import": "rAOOqDAxBIk#libSceNpUtility",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWordFilterAbortRequest"
+      ]
+    },
+    {
+      "import": "iCq5xW5KQW4#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "r9BgI0PfJZg#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "Jj4mkpFO2gE#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "cE7wIsqXdZ8#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthAbortRequest"
+      ]
+    },
+    {
+      "import": "CocbHVIKPE8#libSceNpAuth",
+      "status": "resolved",
+      "candidates": [
+        "sceNpAuthGetIdTokenA"
+      ]
+    },
+    {
+      "import": "KC+GnHzrK2o#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetRoomMemberIdListLocal"
+      ]
+    },
+    {
+      "import": "vbtWT3lZBOM#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetRoomPasswordLocal"
+      ]
+    },
+    {
+      "import": "cgQhq3E0eGo#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetSignalingOptParamLocal"
+      ]
+    },
+    {
+      "import": "GyI2f9yDUXM#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetUserInfoListA"
+      ]
+    },
+    {
+      "import": "ES3UMUWWj9U#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SetSignalingOptParam"
+      ]
+    },
+    {
+      "import": "nNeC3F8-g+4#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2SignalingGetConnectionInfoA"
+      ]
+    },
+    {
+      "import": "16sMmVuOvgU#libSceHttp",
+      "status": "resolved",
+      "candidates": [
+        "sceHttpGetMemoryPoolStats"
+      ]
+    },
+    {
+      "import": "rMyh97BU5pY#libSceNet",
+      "status": "resolved",
+      "candidates": [
+        "sceNetGetMemoryPoolStats"
+      ]
+    },
+    {
+      "import": "Ubv+fP58W1U#libSceNpManager",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "gpSAvdheZ0Q#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetMemoryInfo"
+      ]
+    },
+    {
+      "import": "8btynvj0KNA#libSceNpMatching2",
+      "status": "resolved",
+      "candidates": [
+        "sceNpMatching2GetSslMemoryInfo"
+      ]
+    },
+    {
+      "import": "3OnubUs02UM#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiGetMemoryPoolStats"
+      ]
+    },
+    {
+      "import": "-PoIzr3PEk0#libSceSsl",
+      "status": "resolved",
+      "candidates": [
+        "sceSslGetMemoryPoolStats"
+      ]
+    },
+    {
+      "import": "TWi-wZVp5Pc#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "QHFJB2F0p3k#libSceGameCustomDataDialog",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "kvdMF48mB3Y#libSceNpUtility",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "u5oqtlIP+Fw#libSceNetCtlForNpToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlCheckCallbackForNpToolkit"
+      ]
+    },
+    {
+      "import": "wIsKy+TfeLs#libSceNetCtlForNpToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlRegisterCallbackForNpToolkit"
+      ]
+    },
+    {
+      "import": "2oUqKR5odGc#libSceNetCtlForNpToolkit",
+      "status": "resolved",
+      "candidates": [
+        "sceNetCtlUnregisterCallbackForNpToolkit"
+      ]
+    },
+    {
+      "import": "VgYczPGB5ss#libSceNpManager",
+      "status": "resolved",
+      "candidates": [
+        "sceNpGetUserIdByAccountId"
+      ]
+    },
+    {
+      "import": "wuI7c7UNk0A#libSceUserServiceForNpToolkit",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "spW--yoLQ9o#libSceUserServiceForNpToolkit",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "GWnWQNXZH5M#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreCreateNpTitleCtxA"
+      ]
+    },
+    {
+      "import": "gMbOn+-6eXA#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetFriendsRankingA"
+      ]
+    },
+    {
+      "import": "AgcxgceaH8k#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetFriendsRankingForCrossSave"
+      ]
+    },
+    {
+      "import": "Lmtc9GljeUA#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetGameDataByAccountId"
+      ]
+    },
+    {
+      "import": "K9tlODTQx3c#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByAccountId"
+      ]
+    },
+    {
+      "import": "3Ybj4E1qNtY#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByAccountIdForCrossSave"
+      ]
+    },
+    {
+      "import": "wJPWycVGzrs#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByAccountIdPcId"
+      ]
+    },
+    {
+      "import": "oXjVieH6ZGQ#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByAccountIdPcIdForCrossSave"
+      ]
+    },
+    {
+      "import": "MA9vSt7JImY#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByRangeA"
+      ]
+    },
+    {
+      "import": "nRoYV2yeUuw#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreGetRankingByRangeForCrossSave"
+      ]
+    },
+    {
+      "import": "bygbKdHmjn4#libSceNpScore",
+      "status": "resolved",
+      "candidates": [
+        "sceNpScoreSetPlayerCharacterId"
+      ]
+    },
+    {
+      "import": "-quPa4SEJUw#libkernel",
+      "status": "unresolved",
+      "candidates": []
+    },
+    {
+      "import": "WuuUhuKOxwQ#libSceInvitationDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceInvitationDialogGetResultA"
+      ]
+    },
+    {
+      "import": "sAxbHhAWMXM#libSceInvitationDialog",
+      "status": "resolved",
+      "candidates": [
+        "sceInvitationDialogOpenA"
+      ]
+    },
+    {
+      "import": "LHuSmO3SLd8#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyGetTrophyUnlockState"
+      ]
+    },
+    {
+      "import": "d9jpdPz5f-8#libSceNpTrophy",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTrophyShowTrophyList"
+      ]
+    },
+    {
+      "import": "rPo6tV8D9bM#libSceSystemService",
+      "status": "resolved",
+      "candidates": [
+        "sceSystemServiceGetStatus"
+      ]
+    },
+    {
+      "import": "lBtrk+7lk14#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTssCreateNpTitleCtxA"
+      ]
+    },
+    {
+      "import": "wPFah4-5Xec#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariableA"
+      ]
+    },
+    {
+      "import": "Nt1runsPVJc#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariableAVUser"
+      ]
+    },
+    {
+      "import": "EPeq43CQKxY#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariableForCrossSave"
+      ]
+    },
+    {
+      "import": "4VLlu7EIjzk#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusAddAndGetVariableForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "iXzUOM9sXU0#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusDeleteMultiSlotDataA"
+      ]
+    },
+    {
+      "import": "yWEHUFkY1qI#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataA"
+      ]
+    },
+    {
+      "import": "iaH+Sxlw32k#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataAVUser"
+      ]
+    },
+    {
+      "import": "1TE3OvH61qo#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataForCrossSave"
+      ]
+    },
+    {
+      "import": "-LxFGYCJwww#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetDataForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "yixh7HDKWfk#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetFriendsDataStatusA"
+      ]
+    },
+    {
+      "import": "TDoqRD+CE+M#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetFriendsDataStatusForCrossSave"
+      ]
+    },
+    {
+      "import": "C8TY-UnQoXg#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetFriendsVariableA"
+      ]
+    },
+    {
+      "import": "mD6s8HtMdpk#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetFriendsVariableForCrossSave"
+      ]
+    },
+    {
+      "import": "GDXlRTxgd+M#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariableA"
+      ]
+    },
+    {
+      "import": "AsziNQ9X2uk#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariableAVUser"
+      ]
+    },
+    {
+      "import": "m9XZnxw9AmE#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariableForCrossSave"
+      ]
+    },
+    {
+      "import": "wTuuw4-6HI8#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiSlotVariableForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "lxNDPDnWfMc#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserDataStatusA"
+      ]
+    },
+    {
+      "import": "fJU2TZId210#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserDataStatusAVUser"
+      ]
+    },
+    {
+      "import": "cVeBif6zdZ4#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserDataStatusForCrossSave"
+      ]
+    },
+    {
+      "import": "w-c7U0MW2KY#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserDataStatusForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "Gjixv5hqRVY#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserVariableA"
+      ]
+    },
+    {
+      "import": "fVvocpq4mG4#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserVariableAVUser"
+      ]
+    },
+    {
+      "import": "Q5uQeScvTPE#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserVariableForCrossSave"
+      ]
+    },
+    {
+      "import": "Djuj2+1VNL0#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusGetMultiUserVariableForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "VzxN3tOouj8#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetDataA"
+      ]
+    },
+    {
+      "import": "kbWqOt3QjKU#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetDataAVUser"
+      ]
+    },
+    {
+      "import": "cf-WMA0jYCc#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusSetMultiSlotVariableA"
+      ]
+    },
+    {
+      "import": "0up4MP1wNtc#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusTryAndSetVariableA"
+      ]
+    },
+    {
+      "import": "oGIcxlUabSA#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusTryAndSetVariableAVUser"
+      ]
+    },
+    {
+      "import": "MGvSJEHwyL8#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusTryAndSetVariableForCrossSave"
+      ]
+    },
+    {
+      "import": "fcCwKpi4CbU#libSceNpTus",
+      "status": "resolved",
+      "candidates": [
+        "sceNpTusTryAndSetVariableForCrossSaveVUser"
+      ]
+    },
+    {
+      "import": "joRjtRXTFoc#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiAddHttpRequestHeader"
+      ]
+    },
+    {
+      "import": "pfaJtb7SQ80#libSceNpWebApi",
+      "status": "resolved",
+      "candidates": [
+        "sceNpWebApiDeleteExtdPushEventFilter"
+      ]
+    },
+    {
+      "import": "j6mSQs3UgaY#libSceGnmDriverResourceRegistration",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRegisterOwnerForSystem"
+      ]
+    },
+    {
+      "import": "q-qhDxP67Hg#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetResourceRegistrationUserMemory"
+      ]
+    },
+    {
+      "import": "K3BKBBYKUSE#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmSetResourceUserData"
+      ]
+    },
+    {
+      "import": "yhFCnaz5daw#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUnregisterAllResourcesForOwner"
+      ]
+    },
+    {
+      "import": "fhKwCVVj9nk#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUnregisterOwnerAndResources"
+      ]
+    },
+    {
+      "import": "k8EXkhIP+lM#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmUnregisterResource"
+      ]
+    },
+    {
+      "import": "4Mv9OXypBG8#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmFindResourcesPublic"
+      ]
+    },
+    {
+      "import": "QJjPjlmPAL0#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetOwnerName"
+      ]
+    },
+    {
+      "import": "4PKnYXOhcx4#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetResourceBaseAddressAndSizeInBytes"
+      ]
+    },
+    {
+      "import": "O0S96YnD04U#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetResourceName"
+      ]
+    },
+    {
+      "import": "UBv7FkVfzcQ#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetResourceShaderGuid"
+      ]
+    },
+    {
+      "import": "bdqdvIkLPIU#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetResourceType"
+      ]
+    },
+    {
+      "import": "UoBuWAhKk7U#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmGetResourceUserData"
+      ]
+    },
+    {
+      "import": "6IMbpR7nTzA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmQueryResourceRegistrationUserMemoryRequirements"
+      ]
+    },
+    {
+      "import": "9Mv61HaMhfA#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRegisterGdsResource"
+      ]
+    },
+    {
+      "import": "ZFqKFl23aMc#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRegisterOwner"
+      ]
+    },
+    {
+      "import": "nvEwfYAImTs#libSceGnmDriver",
+      "status": "resolved",
+      "candidates": [
+        "sceGnmRegisterResource"
+      ]
+    }
+  ]
+}

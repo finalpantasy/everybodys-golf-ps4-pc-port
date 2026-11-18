@@ -1,0 +1,131 @@
+{
+  "project": "Everybody's Golf PS4 native recompilation",
+  "recorded_at": "2026-11-17",
+  "scope": "Project-local research and analysis tools; no global installation or REA configuration change",
+  "items": [
+    {
+      "name": "LibOrbisPkg / PkgTool.Core",
+      "source": "https://github.com/maxton/LibOrbisPkg",
+      "version": "commit 643477263b2644e0803e0f58b8726ea4e3f3b7d4",
+      "license": "LGPL-3.0",
+      "path": "external/LibOrbisPkg",
+      "purpose": "PS4 PKG/PFS/SFO inventory, validation and extraction",
+      "permissions": "Reads selected inputs and writes selected output directories; dotnet build restored standard framework references",
+      "verification": "Release build succeeded with two NETSDK1138 end-of-support warnings; version command and pkg_listentries on the real base PKG succeeded using DOTNET_ROLL_FORWARD=LatestMajor",
+      "rollback": "Delete external/LibOrbisPkg"
+    },
+    {
+      "name": "Ghidra",
+      "source": "https://github.com/NationalSecurityAgency/ghidra",
+      "version": "Ghidra_12.2_build / ghidra_12.2_PUBLIC_20261016.zip",
+      "sha256": "2c2cd776db3c1f6a097ba418922378ac3649cadd5e844a6f5f088ae628a7be67",
+      "license": "Apache-2.0",
+      "path": "tools/ghidra/ghidra_12.2_PUBLIC",
+      "staged_archive": "tools/staging/ghidra_12.2_PUBLIC_20261016.zip",
+      "purpose": "Native PS4 ELF/PRX analysis and decompilation",
+      "permissions": "Local Java application; analysis may write a selected Ghidra project and user settings",
+      "verification": "Published digest and archive paths verified; headless usage printed successfully with project-local JDK 25",
+      "rollback": "Delete tools/ghidra and its staged archive; remove any REA provider configuration separately if later added"
+    },
+    {
+      "name": "Eclipse Temurin JDK",
+      "source": "https://github.com/adoptium/temurin25-binaries",
+      "version": "jdk-25.0.5+8 / OpenJDK25U-jdk_x64_windows_hotspot_25.0.5_8.zip",
+      "sha256": "636bdc13dc649ddc7d5921c5c7d23cca6e44fd19d662b45cc9c02135a6c96c42",
+      "license": "GPL-2.0 with Classpath Exception; see bundled license",
+      "path": "tools/jdk25/jdk-25.0.5+8",
+      "staged_archive": "tools/staging/OpenJDK25U-jdk_x64_windows_hotspot_25.0.5_8.zip",
+      "purpose": "Required runtime for Ghidra 12.2",
+      "permissions": "Local Java runtime used only when selected explicitly",
+      "verification": "Published digest verified; java -version reported 25.0.5 and Ghidra accepted it",
+      "rollback": "Delete tools/jdk25 and its staged archive; system Java was not modified"
+    },
+    {
+      "name": "shadPS4",
+      "source": "https://github.com/shadps4-emu/shadPS4",
+      "version": "v.0.21.0 / shadps4-win64-sdl-0.21.0.zip",
+      "sha256": "95295b8f109663f70c2dac685e6232aa97be1353f6ed0a5d5e0c5dd24a797d88",
+      "license": "GPL-2.0",
+      "path": "tools/shadps4-0.21.0",
+      "staged_archive": "tools/staging/shadps4-win64-sdl-0.21.0.zip",
+      "purpose": "Reference PS4 runtime and HLE/GPU behavior",
+      "permissions": "Not executed in this pass; future game runs may write logs/caches/saves and access controllers/GPU/network as configured",
+      "verification": "Published digest and archive contents verified; not run with game data",
+      "rollback": "Delete tools/shadps4-0.21.0 and its staged archive; remove any separately created reference-runtime data"
+    },
+    {
+      "name": "shadPS4 QtLauncher",
+      "source": "https://github.com/shadps4-emu/shadPS4-QtLauncher",
+      "version": "shadPS4QtLauncher-2026-11-06-ecc85072dae45c05628934fdb6b3aa036e9f1d4b",
+      "sha256": "eeb6498aa29d62c5f9ee2469884f6538a0a4d299cdfb6b1f48b03e17534debd9",
+      "license": "See upstream repository and bundled third-party notices",
+      "path": "tools/shadps4-qtlauncher-2026-11-06",
+      "staged_archive": "tools/staging/shadPS4QtLauncher-win64-qt-2026-11-06-ecc8507.zip",
+      "purpose": "Reference-runtime management UI",
+      "permissions": "Not executed in this pass; future use may create user settings and game data",
+      "verification": "Published digest and archive paths verified; executable and bundled libraries are present",
+      "rollback": "Delete tools/shadps4-qtlauncher-2026-11-06 and its staged archive; remove separately created launcher settings if desired"
+    },
+    {
+      "name": "Everybody's Golf shadPS4 fix",
+      "source": "https://github.com/danilenko22/shadPS4-EverybodysGolf-fix",
+      "version": "golf_fix_pro-v41 / repository commit f353e3b1a7d0fa16b57696ee0e05f46646dbdfcf",
+      "sha256": "9bfd5b169887c72af77d2a410f9a9e0c7e358d1cd6e6949a00279c3716d0450b",
+      "license": "GPL-2.0-or-later",
+      "path": "tools/golf-fix-pro-v41",
+      "staged_archive": "tools/staging/golf_fix_pro_v41.zip",
+      "purpose": "Title-specific reference fixes, configuration and 1.17 patch",
+      "permissions": "Not executed or installed globally; future reference runs have the same game/GPU/log/save effects as shadPS4",
+      "verification": "Published digest and archive paths verified; source patch and configuration inspected",
+      "rollback": "Delete tools/golf-fix-pro-v41 and its staged archive; nothing was copied into APPDATA"
+    },
+    {
+      "name": "Orbis CLI",
+      "source": "https://github.com/Antti/orbis",
+      "version": "v0.5.0 / orbis-cli-0.5.0-x86_64-pc-windows-msvc.zip",
+      "sha256": "451c6dd81bb2b9270f8bd8867553d13d1f5aa48741dbc91c0d65a8556fa5f400",
+      "license": "MIT or Apache-2.0",
+      "path": "tools/orbis-0.5.0/orbis-cli-0.5.0-x86_64-pc-windows-msvc/orbis.exe",
+      "staged_archive": "tools/staging/orbis-cli-0.5.0-x86_64-pc-windows-msvc.zip",
+      "purpose": "PS4 PKG/PFS extraction and update staging",
+      "permissions": "Reads selected packages and writes selected output directories; used for package metadata and update extraction",
+      "verification": "Published digest verified; update 1.17 metadata read and 1196 files extracted after LibOrbisPkg's parser failed",
+      "rollback": "Delete tools/orbis-0.5.0 and its staged archive; extracted work trees can be removed separately"
+    },
+    {
+      "name": "MSYS2 CLANG64",
+      "source": "https://github.com/msys2/msys2-installer",
+      "version": "nightly-x86_64 rolling base downloaded 2026-11-17; exact package list in tools/msys2-package-versions.txt",
+      "sha256": "bd46ea73d9b1e5fa6006abf6b83d8f85af219861b39493c7b1fa9c12c447139b",
+      "license": "MSYS2 and installed packages retain their individual licenses",
+      "path": "tools/msys2/msys64",
+      "staged_archive": "tools/staging/msys2-base-x86_64-latest.tar.xz",
+      "purpose": "Project-local Clang/CMake/Ninja runtime build toolchain",
+      "permissions": "Local compiler and package manager; packages were fetched from configured MSYS2 repositories and installed only in this directory",
+      "verification": "GitHub-published digest verified; fresh pacman keyring initialized; setup-msys2.sh completed and recorded installed package versions",
+      "rollback": "Delete tools/msys2, tools/msys2-package-versions.txt and the staged archive"
+    },
+    {
+      "name": "Resogun recompilation runtime candidate",
+      "source": "https://github.com/rcostanza/resogun-recomp",
+      "version": "commit e0fc29454f42f2948080e30f9b095b1297b99d00",
+      "license": "GPL-2.0-or-later; third-party terms apply",
+      "path": "external/resogun-recomp",
+      "purpose": "Direct x86-64 Windows runtime and preparation architecture reference",
+      "permissions": "Built and run locally with the user's staged game; bounded boots may write logs/settings and use the GPU; project source changes are recorded in docs/STATE.md",
+      "verification": "Pinned commit and submodules checked out; MSYS2 CLANG64 build succeeds; original guest entry and subsequent bounded boot milestones observed", 
+      "rollback": "Delete external/resogun-recomp"
+    },
+    {
+      "name": "DriveClub recompilation runtime candidate",
+      "source": "https://github.com/OverkillLabs3/driveclub-recomp",
+      "version": "commit ca23464e2d9d2cc8bd887a243d5805d5d492baa3",
+      "license": "GPL-2.0-or-later; third-party terms apply",
+      "path": "external/driveclub-recomp",
+      "purpose": "Direct x86-64 Windows runtime, diagnostics and update/DLC reference",
+      "permissions": "Source inspected only; not built or run",
+      "verification": "Pinned commit checked out; build requires MSYS2 CLANG64 and declared dependencies",
+      "rollback": "Delete external/driveclub-recomp"
+    }
+  ]
+}

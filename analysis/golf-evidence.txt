@@ -1,0 +1,121 @@
+Program: eboot.elf
+
+TERM: Month Item List
+  string 011db807 in segment_0
+    direct references: 1
+    012fd748 function=<none>
+  occurrences: 1
+
+TERM: VsEventRegulation
+  string 011db0ee in segment_0
+    direct references: 1
+    000a67c0 function=<none>
+  string 01224c52 in segment_0
+    direct references: 0
+  string 01224c72 in segment_0
+    direct references: 0
+  string 01224c92 in segment_0
+    direct references: 0
+  occurrences: 4
+
+TERM: NoticeBox
+  string 011f6f0d in segment_0
+    direct references: 1
+    006b9140 function=<none>
+  string 0122e3a8 in segment_0
+    direct references: 0
+  string 0122e3c8 in segment_0
+    direct references: 0
+  string 0122e3e8 in segment_0
+    direct references: 0
+  string 0122e448 in segment_0
+    direct references: 0
+  string 0122e468 in segment_0
+    direct references: 0
+  string 0122e4f8 in segment_0
+    direct references: 0
+  string 0122e518 in segment_0
+    direct references: 0
+  string 0122e538 in segment_0
+    direct references: 0
+  string 0122e557 in segment_0
+    direct references: 0
+  string 0122e597 in segment_0
+    direct references: 0
+  occurrences: 11
+
+TERM: Notice Box
+  string 011db700 in segment_0
+    direct references: 1
+    012fd6b0 function=<none>
+  string 011f6ce7 in segment_0
+    direct references: 1
+    013603e0 function=<none>
+  string 011f6e30 in segment_0
+    direct references: 1
+    01360670 function=<none>
+  string 011f6efe in segment_0
+    direct references: 1
+    01360770 function=<none>
+  string 011f7077 in segment_0
+    direct references: 0
+  occurrences: 5
+
+TERM: National Tournament
+  occurrences: 0
+
+TERM: sceNpMatching2GetServerId
+  string 01204e45 in segment_0
+    direct references: 1
+    00a81847 function=FUN_00a80ab0 @ 00a80ab0
+  occurrences: 1
+
+TERM: sceNpCommerceShowPsStoreIcon
+  string 01212faf in segment_0
+    direct references: 1
+    00ce7172 function=FUN_00ce6780 @ 00ce6780
+  occurrences: 1
+
+TERM: libSceAppContent
+  string segment_8::00000192 in segment_8
+    direct references: 0
+  string segment_8::00000482 in segment_8
+    direct references: 0
+  string segment_8::00000608 in segment_8
+    direct references: 0
+  occurrences: 3
+
+TERM: libSceNpTus
+  string segment_8::00000294 in segment_8
+    direct references: 0
+  string segment_8::00000554 in segment_8
+    direct references: 0
+  occurrences: 2
+
+TERM: libSceNpMatching2
+  string segment_8::000001f7 in segment_8
+    direct references: 0
+  string segment_8::000004d7 in segment_8
+    direct references: 0
+  occurrences: 2
+
+TERM: libSceNpSignaling
+  string segment_8::0000020d in segment_8
+    direct references: 0
+  string segment_8::000004e9 in segment_8
+    direct references: 0
+  occurrences: 2
+
+TERM: libSceRudp
+  string segment_8::00000223 in segment_8
+    direct references: 0
+  string segment_8::000004fb in segment_8
+    direct references: 0
+  occurrences: 2
+
+TERM: libSceNpWebApi
+  string segment_8::000002d5 in segment_8
+    direct references: 0
+  string segment_8::00000589 in segment_8
+    direct references: 0
+  occurrences: 2

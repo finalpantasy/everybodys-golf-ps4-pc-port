@@ -1,0 +1,271 @@
+{
+  "schema_version": 1,
+  "dlc_count": 24,
+  "packages_with_filesystem_files": 0,
+  "packages": [
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Akigase Keikoku Country Club.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000008",
+      "title": "Everybody's Golf - Akigase Keikoku Country Club",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Balata Country Club Course.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000005",
+      "title": "Everybody's Golf - Balata Country Club Course",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Off-Road).pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000003",
+      "title": "Everybody's Golf - Cart (Off-Road)",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Premium).pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000001",
+      "title": "Everybody's Golf - Cart (Premium)",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Standard).pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000002",
+      "title": "Everybody's Golf - Cart (Standard)",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 1.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000011",
+      "title": "Everybody's Golf - Character Box Expansion 1",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 2.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000012",
+      "title": "Everybody's Golf - Character Box Expansion 2",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 3.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000013",
+      "title": "Everybody's Golf - Character Box Expansion 3",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 4.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000014",
+      "title": "Everybody's Golf - Character Box Expansion 4",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 5.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000015",
+      "title": "Everybody's Golf - Character Box Expansion 5",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 1.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000009",
+      "title": "Everybody's Golf - Custom Club Booster 1",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 2.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000010",
+      "title": "Everybody's Golf - Custom Club Booster 2",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Green Country Club Course.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000004",
+      "title": "Everybody's Golf - Green Country Club Course",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - LEVEL-5 20th Anniversary Buggies.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000029",
+      "title": "Everybody's Golf - LEVEL-5 20th Anniversary Buggies",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Nam Rong Bay Country Club.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000006",
+      "title": "Everybody's Golf - Nam Rong Bay Country Club",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Pine Hills Golf Club.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000007",
+      "title": "Everybody's Golf: Pine Hills Golf Club",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 1.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00010000000000",
+      "title": "Everybody's Golf - Special Ticket x 1",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 10.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00020000000000",
+      "title": "Everybody's Golf - Special Ticket x 10",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "[CUSA04687] [Addon] Final Fantasy 30th Anniversary Chocobo Cart.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000028",
+      "title": "Final Fantasy 30th Anniversary Chocobo Cart",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 1,
+      "filesystem_files": [],
+      "exit_code": 0,
+      "diagnostics": []
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Everybody's Golf Commemorative Item Set.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000027",
+      "title": "Everybody's Golf Commemorative Item Set",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 0,
+      "filesystem_files": [],
+      "exit_code": 3,
+      "diagnostics": []
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Kigurumi (Bear)-01.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000019",
+      "title": "Kigurumi (Bear)-01",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 0,
+      "filesystem_files": [],
+      "exit_code": 3,
+      "diagnostics": []
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Kigurumi (Rabbit)-01.pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000018",
+      "title": "Kigurumi (Rabbit)-01",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 0,
+      "filesystem_files": [],
+      "exit_code": 3,
+      "diagnostics": []
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Polo Shirt (Special 1).pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000021",
+      "title": "Polo Shirt (Special ①)",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 0,
+      "filesystem_files": [],
+      "exit_code": 3,
+      "diagnostics": []
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Polo Shirt (Special 2).pkg",
+      "content_id": "UP9000-CUSA04687_00-EN00000000000023",
+      "title": "Polo Shirt (Special ②)",
+      "filesystem_available": true,
+      "filesystem_file_count": 0,
+      "filesystem_directory_count": 0,
+      "filesystem_files": [],
+      "exit_code": 3,
+      "diagnostics": []
+    }
+  ]
+}

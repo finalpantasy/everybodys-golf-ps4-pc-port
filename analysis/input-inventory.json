@@ -1,0 +1,2478 @@
+{
+  "schema_version": 1,
+  "title_id": "CUSA04687",
+  "package_count": 26,
+  "dlc_count": 24,
+  "packages": [
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Akigase Keikoku Country Club.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "e20215101e133f05211701385b6020a7c540124ef33d121e7e4f7bf35ab4a1c8",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000008",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Akigase Keikoku Country Club",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000008",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000008",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Akigase Keikoku Country Club.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000008"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Akigase Keikoku Country Club"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Balata Country Club Course.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "5e771164ae14a8d95f2fee35a78615807d348f35586f8cf26bbfac9f670358db",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000005",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Balata Country Club Course",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000005",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000005",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Balata Country Club Course.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000005"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Balata Country Club Course"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Off-Road).pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "1a35aaad5056c7a976bfe14553057a71c59422c06a88be10426043596699cddf",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000003",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Cart (Off-Road)",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000003",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000003",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Cart (Off-Road).pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000003"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Cart (Off-Road)"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Premium).pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "6a65d445b6dc33c9499f9fac4c5b56dc139518209fc1018ded0816f20f8a53cc",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000001",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Cart (Premium)",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000001",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000001",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Cart (Premium).pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000001"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Cart (Premium)"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Cart (Standard).pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "57c40acf663a275fd05e55ce8712a846ae621918b7ad41c35d6c7b178782d008",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000002",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Cart (Standard)",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000002",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000002",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Cart (Standard).pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000002"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Cart (Standard)"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 1.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "2ba86cdbb35cd16fadfd0457e4cfbe1780a28c1931d9dc771132b9cf637ee22b",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000011",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Character Box Expansion 1",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000011",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000011",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 1.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000011"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Character Box Expansion 1"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 2.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "f7b4ab560c59651947bd273445e974bb4dbe4258ec9897f62e9542901d1cc4d6",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000012",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Character Box Expansion 2",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000012",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000012",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 2.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000012"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Character Box Expansion 2"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 3.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "6df575ffa5c0625bf073cc4f395252abfb07fcb8b6d7ed3066adafbc444c80c9",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000013",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Character Box Expansion 3",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000013",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000013",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 3.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000013"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Character Box Expansion 3"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 4.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "fd782fb7f1c4f817fe463cc208f824617fbe50b9ab2f1bf3f3889e741206f61e",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000014",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Character Box Expansion 4",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000014",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000014",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 4.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000014"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Character Box Expansion 4"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 5.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "2d64e4e76ad92f5cce909353a2c688b74d57358665dbea34c801792a9bbd88f9",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000015",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Character Box Expansion 5",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000015",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000015",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Character Box Expansion 5.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000015"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Character Box Expansion 5"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 1.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "2b741b6c226967c2d27ba34660608d51026b0bfe4fb1b998cfe38a076e7713f2",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000009",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Custom Club Booster 1",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000009",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000009",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 1.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000009"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Custom Club Booster 1"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 2.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "77ed15c0332605e56cb62ee9c8370266dd852d758d82fbc606547ec38c499264",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000010",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Custom Club Booster 2",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000010",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000010",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Custom Club Booster 2.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000010"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Custom Club Booster 2"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Green Country Club Course.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "575b7308e45352a69c69591699966a8b9c46de89cccc05ce699968f4f9b1189e",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000004",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Green Country Club Course",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000004",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000004",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Green Country Club Course.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000004"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Green Country Club Course"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - LEVEL-5 20th Anniversary Buggies.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "fdc58893d202e5e72a4c87d44f87453dc57c5ef654d3b7b33366af78cde6ea42",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000029",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - LEVEL-5 20th Anniversary Buggies",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000029",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000029",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - LEVEL-5 20th Anniversary Buggies.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000029"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - LEVEL-5 20th Anniversary Buggies"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Nam Rong Bay Country Club.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "b6d8c556212227e1b383267bc68609df242443cd8a0ad651c7285eea45033c42",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000006",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Nam Rong Bay Country Club",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000006",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000006",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Nam Rong Bay Country Club.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000006"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Nam Rong Bay Country Club"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Pine Hills Golf Club.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "ffb49237b3b7a4171479ff8e6dd2384db9549254af6744c8c0d983a474f64b81",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000007",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf: Pine Hills Golf Club",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000007",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000007",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Pine Hills Golf Club.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000007"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf: Pine Hills Golf Club"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 1.pkg",
+      "role": "dlc",
+      "size": 1441792,
+      "sha256": "8a5882ca4cdd59538121fce1f364237c3cf6216e9294458325e98ce5fc3ca372",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00010000000000",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Special Ticket x 1",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00010000000000",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00010000000000",
+          "pfs_offset": 524288,
+          "pfs_size": 917504,
+          "pkg_size": 1441792,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 1.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00010000000000"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Special Ticket x 1"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 10.pkg",
+      "role": "dlc",
+      "size": 1441792,
+      "sha256": "9c37f4b1059f176d1dbb2a120a25438d9f0a51623e00115ad05a5178c85e5f47",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00020000000000",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf - Special Ticket x 10",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00020000000000",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00020000000000",
+          "pfs_offset": 524288,
+          "pfs_size": 917504,
+          "pkg_size": 1441792,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Everybody's Golf - Special Ticket x 10.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00020000000000"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf - Special Ticket x 10"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "[CUSA04687] [Addon] Final Fantasy 30th Anniversary Chocobo Cart.pkg",
+      "role": "dlc",
+      "size": 1966080,
+      "sha256": "b683d17106730a6cb97227f1176a69304de62f5142c6e9afa374363b36acc5ef",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "2",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "832",
+            "img0_sc_ksize": "512"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000028",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Final Fantasy 30th Anniversary Chocobo Cart",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000028",
+          "content_type": 27,
+          "content_type_name": "AC (Additional Content)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 15,
+          "label": "EN00000000000028",
+          "pfs_offset": 1048576,
+          "pfs_size": 917504,
+          "pkg_size": 1966080,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\[CUSA04687] [Addon] Final Fantasy 30th Anniversary Chocobo Cart.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000028"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,img0_l0_size=2,img0_l1_size=0,img0_sc_ksize=512,img0_pc_ksize=832"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 42532864
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Final Fantasy 30th Anniversary Chocobo Cart"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "Everybodys.Golf.Update.v1.17-CUSA04687.pkg",
+      "role": "update",
+      "size": 9521528832,
+      "sha256": "2180f1e2d5b2a500cc735c24c62c17701121d2730bca875819d7c50797a7408f",
+      "orbis_info": {
+        "application": {
+          "app_version": "01.17",
+          "build": {
+            "c_date": "20220520",
+            "img0_l0_size": "9081",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "6784",
+            "img0_sc_ksize": "4096",
+            "sdk_ver": "05008000",
+            "st_type": "digital25"
+          },
+          "category": "gp",
+          "content_id": "UP9000-CUSA04687_00-0011223344556677",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": "5.00",
+          "title": "Everybody's Golf",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 1647312896,
+          "content_flags_name": "Cumulative Patch",
+          "content_id": "UP9000-CUSA04687_00-0011223344556677",
+          "content_type": 26,
+          "content_type_name": "GD (Game Data)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 21,
+          "file_count": 15,
+          "label": "0011223344556677",
+          "pfs_offset": 4194304,
+          "pfs_size": 9517334528,
+          "pkg_size": 9521528832,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10944,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\Everybodys.Golf.Update.v1.17-CUSA04687.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "APP_TYPE": {
+            "type": "integer",
+            "value": 1
+          },
+          "APP_VER": {
+            "type": "string",
+            "value": "01.17"
+          },
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 545259522
+          },
+          "ATTRIBUTE2": {
+            "type": "integer",
+            "value": 8388608
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "gp"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-0011223344556677"
+          },
+          "DEV_FLAG": {
+            "type": "integer",
+            "value": 0
+          },
+          "DOWNLOAD_DATA_SIZE": {
+            "type": "integer",
+            "value": 1024
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PARENTAL_LEVEL": {
+            "type": "integer",
+            "value": 3
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220520,sdk_ver=05008000,st_type=digital25,img0_l0_size=9081,img0_l1_size=0,img0_sc_ksize=4096,img0_pc_ksize=6784"
+          },
+          "PUBTOOLMINVER": {
+            "type": "integer",
+            "value": 43581440
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 54001664
+          },
+          "REMOTE_PLAY_KEY_ASSIGN": {
+            "type": "integer",
+            "value": 1
+          },
+          "SERVICE_ID_ADDCONT_ADD_1": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_2": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_3": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_4": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_5": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_6": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_7": {
+            "type": "string",
+            "value": ""
+          },
+          "SYSTEM_VER": {
+            "type": "integer",
+            "value": 83918848
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "Everybodys.Golf.v1.00-CUSA04687.pkg",
+      "role": "base",
+      "size": 8070365184,
+      "sha256": "c80ff03211640d35586c9f6945b6d1dc34973135ebe0810a3f50cbcaa3528a71",
+      "orbis_info": {
+        "application": {
+          "app_version": "01.00",
+          "build": {
+            "c_date": "20201013",
+            "img0_l0_size": "7697",
+            "img0_l1_size": "0",
+            "img0_pc_ksize": "34048",
+            "img0_sc_ksize": "40448",
+            "sdk_ver": "04008000",
+            "st_type": "digital50"
+          },
+          "category": "gd",
+          "content_id": "UP9000-CUSA04687_00-0011223344556677",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": "4.50",
+          "title": "Everybody's Golf",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 167772160,
+          "content_flags_name": "GD/AC, Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-0011223344556677",
+          "content_type": 26,
+          "content_type_name": "GD (Game Data)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 24,
+          "file_count": 15,
+          "label": "0011223344556677",
+          "pfs_offset": 41418752,
+          "pfs_size": 8028946432,
+          "pkg_size": 8070365184,
+          "pkg_type": 1073741825,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\Everybodys.Golf.v1.00-CUSA04687.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "APP_TYPE": {
+            "type": "integer",
+            "value": 1
+          },
+          "APP_VER": {
+            "type": "string",
+            "value": "01.00"
+          },
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 8388610
+          },
+          "ATTRIBUTE2": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "gd"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-0011223344556677"
+          },
+          "DEV_FLAG": {
+            "type": "integer",
+            "value": 4
+          },
+          "DOWNLOAD_DATA_SIZE": {
+            "type": "integer",
+            "value": 1024
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PARENTAL_LEVEL": {
+            "type": "integer",
+            "value": 3
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20201013,sdk_ver=04008000,st_type=digital50,img0_l0_size=7697,img0_l1_size=0,img0_sc_ksize=40448,img0_pc_ksize=34048"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 54001664
+          },
+          "REMOTE_PLAY_KEY_ASSIGN": {
+            "type": "integer",
+            "value": 1
+          },
+          "SERVICE_ID_ADDCONT_ADD_1": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_2": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_3": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_4": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_5": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_6": {
+            "type": "string",
+            "value": ""
+          },
+          "SERVICE_ID_ADDCONT_ADD_7": {
+            "type": "string",
+            "value": ""
+          },
+          "SYSTEM_VER": {
+            "type": "integer",
+            "value": 72351744
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Everybody's Golf Commemorative Item Set.pkg",
+      "role": "dlc",
+      "size": 327680,
+      "sha256": "4e57db35816deb6bd6799411cf6f6cf4d5e917145a4016af537d2d706744e4e6",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20220410"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000027",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Everybody's Golf Commemorative Item Set",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 134217728,
+          "content_flags_name": "Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000027",
+          "content_type": 28,
+          "content_type_name": "AL (App License)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 12,
+          "label": "EN00000000000027",
+          "pfs_offset": 0,
+          "pfs_size": 0,
+          "pkg_size": 0,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\UP9000-CUSA04687_00-Everybody's Golf Commemorative Item Set.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000027"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220410"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 59179008
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_01": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_02": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_17": {
+            "type": "string",
+            "value": "Conjunto de itens comemorativos de Everybody's Golf"
+          },
+          "TITLE_20": {
+            "type": "string",
+            "value": "Conjunto conmemorativo de objetos de Everybody's Golf"
+          },
+          "TITLE_22": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Kigurumi (Bear)-01.pkg",
+      "role": "dlc",
+      "size": 327680,
+      "sha256": "90942c5366fef0f0a93f69fcb7239b54df1520d5b48a237196fde069059d1d80",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20220410"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000019",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Kigurumi (Bear)-01",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 134217728,
+          "content_flags_name": "Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000019",
+          "content_type": 28,
+          "content_type_name": "AL (App License)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 12,
+          "label": "EN00000000000019",
+          "pfs_offset": 0,
+          "pfs_size": 0,
+          "pkg_size": 0,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\UP9000-CUSA04687_00-Kigurumi (Bear)-01.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000019"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220410"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 59179008
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Kigurumi (Bear)-01"
+          },
+          "TITLE_01": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_02": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_17": {
+            "type": "string",
+            "value": "Conjunto de itens comemorativos de Everybody's Golf"
+          },
+          "TITLE_20": {
+            "type": "string",
+            "value": "Conjunto conmemorativo de objetos de Everybody's Golf"
+          },
+          "TITLE_22": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Kigurumi (Rabbit)-01.pkg",
+      "role": "dlc",
+      "size": 327680,
+      "sha256": "2f2ca13b1a99dbaa0939dfb5994a21f2c6bbe77b98dcf3de3a4699d68d0309fb",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20220410"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000018",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Kigurumi (Rabbit)-01",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 134217728,
+          "content_flags_name": "Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000018",
+          "content_type": 28,
+          "content_type_name": "AL (App License)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 12,
+          "label": "EN00000000000018",
+          "pfs_offset": 0,
+          "pfs_size": 0,
+          "pkg_size": 0,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\UP9000-CUSA04687_00-Kigurumi (Rabbit)-01.pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000018"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220410"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 59179008
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Kigurumi (Rabbit)-01"
+          },
+          "TITLE_01": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_02": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_17": {
+            "type": "string",
+            "value": "Conjunto de itens comemorativos de Everybody's Golf"
+          },
+          "TITLE_20": {
+            "type": "string",
+            "value": "Conjunto conmemorativo de objetos de Everybody's Golf"
+          },
+          "TITLE_22": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Polo Shirt (Special 1).pkg",
+      "role": "dlc",
+      "size": 327680,
+      "sha256": "cbd3e41f44bf2e6fecf7332be4bc25436e49f0914b64fbfecd1f4b6acc0085f9",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20220410"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000021",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Polo Shirt (Special ①)",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 134217728,
+          "content_flags_name": "Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000021",
+          "content_type": 28,
+          "content_type_name": "AL (App License)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 12,
+          "label": "EN00000000000021",
+          "pfs_offset": 0,
+          "pfs_size": 0,
+          "pkg_size": 0,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\UP9000-CUSA04687_00-Polo Shirt (Special 1).pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000021"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220410"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 59179008
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Polo Shirt (Special ①)"
+          },
+          "TITLE_01": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_02": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_17": {
+            "type": "string",
+            "value": "Conjunto de itens comemorativos de Everybody's Golf"
+          },
+          "TITLE_20": {
+            "type": "string",
+            "value": "Conjunto conmemorativo de objetos de Everybody's Golf"
+          },
+          "TITLE_22": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    },
+    {
+      "path": "UP9000-CUSA04687_00-Polo Shirt (Special 2).pkg",
+      "role": "dlc",
+      "size": 327680,
+      "sha256": "9d7eac86951ea404547fd7874f29599f9332631eba320881862bf89532c83001",
+      "orbis_info": {
+        "application": {
+          "app_version": null,
+          "build": {
+            "c_date": "20220410"
+          },
+          "category": "ac",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000023",
+          "package_version": "01.00",
+          "region_from_content_id": "North America",
+          "required_system_version": null,
+          "title": "Polo Shirt (Special ②)",
+          "title_id": "CUSA04687"
+        },
+        "metadata": {
+          "content_flags": 134217728,
+          "content_flags_name": "Unknown (0x08000000)",
+          "content_id": "UP9000-CUSA04687_00-EN00000000000023",
+          "content_type": 28,
+          "content_type_name": "AL (App License)",
+          "content_version": "00",
+          "drm_type": 15,
+          "drm_type_name": "PS4",
+          "entry_count": 11,
+          "file_count": 12,
+          "label": "EN00000000000023",
+          "pfs_offset": 0,
+          "pfs_size": 0,
+          "pkg_size": 0,
+          "pkg_type": 1,
+          "publisher_code": "9000",
+          "service_id": "UP",
+          "table_offset": 10880,
+          "title_id": "CUSA04687"
+        },
+        "package": "F:\\Everybodys Golf PS4\\UP9000-CUSA04687_00-Polo Shirt (Special 2).pkg",
+        "schema_version": 1,
+        "sfo": {
+          "ATTRIBUTE": {
+            "type": "integer",
+            "value": 0
+          },
+          "CATEGORY": {
+            "type": "string",
+            "value": "ac"
+          },
+          "CONTENT_ID": {
+            "type": "string",
+            "value": "UP9000-CUSA04687_00-EN00000000000023"
+          },
+          "FORMAT": {
+            "type": "string",
+            "value": "obs"
+          },
+          "PUBTOOLINFO": {
+            "type": "string",
+            "value": "c_date=20220410"
+          },
+          "PUBTOOLVER": {
+            "type": "integer",
+            "value": 59179008
+          },
+          "TITLE": {
+            "type": "string",
+            "value": "Polo Shirt (Special ②)"
+          },
+          "TITLE_01": {
+            "type": "string",
+            "value": "Everybody's Golf Commemorative Item Set"
+          },
+          "TITLE_02": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_17": {
+            "type": "string",
+            "value": "Conjunto de itens comemorativos de Everybody's Golf"
+          },
+          "TITLE_20": {
+            "type": "string",
+            "value": "Conjunto conmemorativo de objetos de Everybody's Golf"
+          },
+          "TITLE_22": {
+            "type": "string",
+            "value": "Ensemble d'objets commémoratifs Everybody's Golf"
+          },
+          "TITLE_ID": {
+            "type": "string",
+            "value": "CUSA04687"
+          },
+          "VERSION": {
+            "type": "string",
+            "value": "01.00"
+          }
+        },
+        "warnings": []
+      }
+    }
+  ]
+}
