@@ -76,7 +76,7 @@ Result: the entitlement request `GET /v1/users/me/entitlements?entitlement_type=
 
 Telemetry: the poster declares the full JSON length and sends 2 KiB per `sceHttpSendRequest`. The runtime refused partial sends, and the game reopened the request every frame (6,268 opens in 250 s). Bodies are now assembled from chunks and each replay route has its own slot (Codex diffs): 37 opened, 37 answered.
 
-Open Course (2026-11-18, runtime `da28e84`): the "Select Open Course" screen shows "Connecting..." and then "Server connection failed". The entry controller (`0xa5ada0`) needs byte `0x2c8245c`, which only the full boot-time title run sets (`analysis/online/title-queue-login-flag.md`). `GOLF_LOCAL_AUTH=1` had never taken effect (the resolver compared name prefixes against NID keys); with that fixed the run gets a local authorization code and sends `gameapi_login`. With the server's `--login-completion` reply the game accepts the login and then sends `gameapi_getboardlistnational` over plain http with an empty payload (66-byte multipart frame), so the run aborts there. The runtime now has a local NpMatching2 service (contexts, event `0x6f02`, world, lobby, join and member answers from `analysis/online/matching2-entry-contract.md`), not yet reached in a guest run. The Shop's `sdk:commerce` container batch is answered with one display-only, unpurchasable SKU per label; the Shop still loads.
+Open Course (2026-11-18, runtime `e94c93d`): the full boot-time login run now passes (ss.info, server time, property, NpAuth with `GOLF_LOCAL_AUTH=1`, `gameapi_login`, national boards over https, then the info lists), so byte `0x2c8245c` is set and "Server connection failed" is gone. The screen reaches the local NpMatching2 service: the context starts (event `0x6f02`, state 5) and GetWorldInfoList is answered with worlds 1..50 (the game's own world table has 50 entries), so the Matching2 object sits in state 7. The screen still shows "Connecting..." and no lobby list request follows; the gate that ends "Connecting..." is being traced (`analysis/online/matching2-after-world-list.md`). Earlier stall: the runtime registered the context callback with an extra context argument and called the user-data pointer as code; fixed in `f7f092b`.
 
 Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnmDebugHardwareStatus` is stubbed, `data_EU_18_ENG/sound/bgm/generic_menu.sxd1` and `NMG_OP_71.sxd1` are asked for and absent from the dump.
 
@@ -160,8 +160,8 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Online entry: find which login reply records the national board request builder (slot `0x2f`) needs, answer the rest of the login run (`0x26, 0x28, 0x25, 0x27, 0x10`, three info lists), then reach the Matching2 lobby from Open Course.
-2. S Tickets: the grant path works with `GOLF_TICKET_GRANTS=1` (101 tickets). Answer the `sdk:commerce` container request, then spend tickets in the Shop and check the limited-event gear in the game (NOT_RUN).
+1. Online entry: find what ends "Connecting..." on Select Open Course after the world list (Matching2 state 7), then answer GetLobbyInfoList, JoinLobby and the member list until the lobby loads.
+2. S Tickets: spending works. Shop, R1 five times to the ticket tab, Turf War Warp Medal x10: YES took Tickets 101 to 100 and Warp Medals 0 to 10 (guest run, 2026-11-18). Not yet checked: whether the purchase persists across a reboot (the save mounts read-only in that run), Blacksmith ticket costs, and limited-event gear by server time (NOT_RUN).
 3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
 4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
 5. Sound: a listening check, then volumes, patches and submixers in the Ngs2 mixer.
