@@ -15,10 +15,12 @@ This is not playable yet.
 - The runner registers two display buffers.
 - Network, HTTP and mouse startup calls are handled.
 - Audio startup runs against a silent `libSceNgs2` (no mixing yet) and fonts are served from a host font.
-- The game now issues GPU work. The boot stops on a renderer assertion in the texture cache before any frame is shown.
-- There is no rendering, no menu and no gameplay.
+- The game draws its first frames: the "NOW LOADING" screen below, captured from a 90-second run.
+- It stays on that screen for the rest of the run. There is no menu and no gameplay yet.
 
-Registered display buffers and a host window are not evidence of rendering. Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. Only the first two are reached.
+![The game's own NOW LOADING screen, drawn by the port](docs/media/2026-11-17-first-frame-now-loading.png)
+
+Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first three are reached; guest rendering so far means the loading screen only.
 
 ## Goals
 

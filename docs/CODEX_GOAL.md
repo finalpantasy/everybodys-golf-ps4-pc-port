@@ -27,7 +27,7 @@ Follow the 8-step order in `docs/research/release-standards-gap.md`. Target stat
 4. Linux packaging: a plain tarball next to any AppImage, and the AppImage takes one directory argument that holds everything.
 5. Rename user-facing names from Resogun to Everybody's Golf only in files you own; leave `runtime*.c` identifiers alone.
 
-Touch only launcher, loader argument parsing, setup, prepare, packaging and build files. If a change needs a `src/runtime*.c` or `gpu/` edit, write the exact patch to `analysis/online/for-orchestrator.md` and move on.
+Touch only launcher, loader argument parsing, setup, prepare, packaging and build files. If a change needs a `src/runtime*.c` or `gpu/` edit, write the exact patch to `docs/MAILBOX.md` and move on.
 
 ## Track 2: online and DLC groundwork (analysis and a server skeleton)
 
@@ -43,6 +43,10 @@ Touch only launcher, loader argument parsing, setup, prepare, packaging and buil
 - One heavy process at a time (a build counts), at BelowNormal priority, nothing over 10 minutes. Kill only processes you started, by PID.
 - American English.
 
+## Mailbox
+
+`docs/MAILBOX.md` is shared with the orchestrator. Read it at the start of each work block and before you stop. Append only, newest at the bottom, one entry per message: `### <date time> <from> -> <to>: <subject>`, then the message. Use it for patches you need in the boot path, questions, and findings the orchestrator should act on. It is the one shared file you may edit outside your own folders; never rewrite or delete another entry.
+
 ## Stop and report
 
-Stop when both tracks are done, or when blocked on something only the owner can decide. Report once: branches and commits, what was built and which tests ran with their real output, what is unverified, and the patches waiting in `analysis/online/for-orchestrator.md`. Mark anything not executed as NOT_RUN.
+Stop when both tracks are done, or when blocked on something only the owner can decide. Report once: branches and commits, what was built and which tests ran with their real output, what is unverified, and the patches waiting in `docs/MAILBOX.md`. Mark anything not executed as NOT_RUN.
