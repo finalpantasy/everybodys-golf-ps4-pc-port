@@ -14,7 +14,8 @@ This is not playable yet.
 - The runner creates 56 game threads.
 - The runner registers two display buffers.
 - Network, HTTP and mouse startup calls are handled.
-- Audio startup runs against a silent `libSceNgs2` (no mixing yet). The boot now stops at the first call into the font library, `libSceFont`, which is not implemented.
+- Audio startup runs against a silent `libSceNgs2` (no mixing yet) and fonts are served from a host font.
+- The game now issues GPU work. The boot stops on a renderer assertion in the texture cache before any frame is shown.
 - There is no rendering, no menu and no gameplay.
 
 Registered display buffers and a host window are not evidence of rendering. Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. Only the first two are reached.

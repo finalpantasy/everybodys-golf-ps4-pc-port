@@ -28,14 +28,17 @@ Preparation is not a byte-exact ELF reconstruction; the parser reports unavailab
 
 ## Current blocker
 
-Latest bounded boot (90 s bound, 2026-11-17, build `F3D384D7`, hidden desktop, windowed 1920x1080) stopped at:
+Latest bounded boot (90 s bound, 2026-11-17, build `3B66C40F`, hidden desktop, windowed 1920x1080) stopped in the renderer, not at an import:
 
 ```text
-STOP: first unsupported PS4 import: whrS4oksXc4#libSceFont (index 480)
-Caller return offset: 0xc1ab5; first argument: 0x802ccba50
+GPU [Debug] <Critical> texture_cache.cpp:1024 ResolveOverlap: Unreachable code!
+Encountered unresolvable image overlap with equal memory address.
+STOP: GPU library assertion failed (see GPU log above)
 ```
 
-`whrS4oksXc4` = `sceFontMemoryInit`. The game imports 22 `libSceFont`/`libSceFontFt` functions the runtime lacks. DriveClub's `src/runtime_font.c` covers 17 of them by name; five NIDs are unnamed. A worker is drafting the port and call-site evidence into `analysis/font-port/`; integrate from there. That boot reached 61 guest threads, 10 files opened and 8 file writes.
+The game is now issuing GPU work. Two images at guest address 0x106bf40000, both 3200x1800 R8G8B8A8Srgb, tile mode 0xa, differ only in the alt-tile flag and guest size (cached 0x16a8000, requested 0x1770000); the cached one is the registered display buffer. Full dump: `analysis/evidence/2026-11-17-texture-overlap.txt`. Not yet investigated: check how upstream shadPS4 `texture_cache.cpp` resolves equal-address overlaps that differ only in alt tile before changing anything. No guest frame has been presented; rendering stays NOT_VERIFIED.
+
+Fonts, same day: `libSceFont`/`libSceFontFt` (22 imports, hashes verified) are implemented in new `src/runtime_font.c`, drafted by a worker from DriveClub's file plus call-site evidence (`analysis/font-port/NOTES.md`). The PS4 system fonts are firmware files and absent from the dump, so every font set is served from one host face: `GOLF_FONT_FILE`, else Segoe UI or Arial (log line: `libSceFont serves system font sets from C:/Windows/Fonts/segoeui.ttf`). Glyph shapes differ from the PS4 font; weight and slant are stored, not applied; Japanese needs `GOLF_FONT_FILE` set to a CJK font. Boot verified past font startup; rendered text NOT_VERIFIED. That boot also opened seven audio ports.
 
 Audio, same day:
 
@@ -65,6 +68,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 - Orchestrator (sole integration owner since 2026-11-17 19:09 EST): Claude desktop Code-tab session `local_379ec4f6-3acc-450c-b6c7-f5aa8052c4c9`, title "Everybody's Golf PS4 runtime orchestration", model `claude-fable-5-2` (effort medium), local (not cloud). Pinned in the sidebar with the app's `set_pinned` control; `get_session` read back `pinned: true`. It owns `external/resogun-recomp`, builds, game execution, generated runtime state and shared docs. No workers started. The orchestrator is this lead session itself, not a separate background process: it runs only while the chat is active.
 - Public repos (2026-11-17): main `https://github.com/finalpantasy/everybodys-golf-ps4-pc-port` (branch `main`), runtime fork `https://github.com/finalpantasy/resogun-recomp` (branch `everybodys-golf`, submodule at `external/resogun-recomp`). Commit only as `finalpantasy` with the GitHub noreply email; scan every push for personal names and user paths. The README has no screenshot by owner decision until the first rendered frame exists.
+- Second agent: `docs/CODEX_GOAL.md` is the brief for a Codex session on the launcher/packaging and online side. It works in its own worktree (`external/resogun-recomp-launcher`, branch `golf-launcher`) and in `server/` and `analysis/online/`; it must not touch the boot path or run the game. Whether it has been started is not known to this file.
 - Integration owner before handoff: local Kimi lead (released). No runner process was intentionally left alive.
 - Candidate: Resogun commit `e0fc29454f42f2948080e30f9b095b1297b99d00`, branch `everybodys-golf`, project changes committed on top (ten files). `out/resogun.exe` SHA-256 `94C990B6AA7C0D064F2675D3726ED7D345C38F02846751F7DCB384FBB7AB5CA0`. `git diff` SHA-256 `deb01deab7a12ebe15022719e01a39ea04b03820a1e76662b83a09287532ec7e`. Building through `usr/bin/bash.exe -lc` created the MSYS2 home `tools/msys2/msys64/home/<user>` (first-login skeleton files only).
 - Changed files: `gpu/CMakeLists.txt`, `src/import_names.inc`, `src/runtime_devices.c`, `src/runtime_kernel.c`, `src/runtime_memory.c`, `src/runtime_net.c`, `src/runtime_rtc.c`, `src/runtime_sema.c`, `src/runtime_thread.c`.
@@ -74,7 +78,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 ## Next actions
 
 1. Done: orchestrator pinned (see ownership).
-2. Integrate the font port from `analysis/font-port/` (read its NOTES.md first), rebuild, rerun the bounded boot on the hidden desktop.
+2. Resolve the texture-cache overlap (evidence file above): compare with current upstream shadPS4, make the smallest renderer change, rebuild, rerun the bounded boot on the hidden desktop.
 3. Continue one intentional runtime failure at a time until stable initialization; do not call a host window or registered display buffers gameplay.
 4. Locate AppContent entitlement/list and redemption paths and implement the built-in-DLC unlock provider with an original-entitlement test mode.
 5. Capture Golf's network request contracts before implementing local identity, rooms, peer transport, events, and rewards.

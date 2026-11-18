@@ -1,0 +1,61 @@
+GPU [Render.Vulkan] <Error> texture_cache.cpp:1022 ResolveOverlap: Unresolvable image overlap with equal memory address:
+=== OLD IMAGE (cached) ===
+  Address:        0x106bf40000
+  Size:           0x16a8000 bytes
+  Format:         R8G8B8A8Srgb
+  Type:           9
+  Width:          3200
+  Height:         1800
+  Depth:          1
+  Pitch:          3200
+  Mip levels:     1
+  Array layers:   1
+  Samples:        1
+  Tile mode:      0xa
+  Block size:     32 bits
+  Is block-comp:  0
+  Guest size:     0x16a8000
+  Last accessed:  tick 1
+  Safe to delete: false
+  isPow2:         false
+  Alt tile:       false
+=== NEW IMAGE (requested) ===
+  Address:        0x106bf40000
+  Size:           0x1770000 bytes
+  Format:         R8G8B8A8Srgb
+  Type:           9
+  Width:          3200
+  Height:         1800
+  Depth:          1
+  Pitch:          3200
+  Mip levels:     1
+  Array layers:   1
+  Samples:        1
+  Tile mode:      0xa
+  Block size:     32 bits
+  Is block-comp:  0
+  Guest size:     0x1770000
+  isPow2:         false
+  Alt tile:       true
+=== COMPARISON ===
+  Same format:           true
+  Same type:             true
+  Same tile mode:        true
+  Same block size:       true
+  Same BlockDim:         true
+  Same pitch:            true
+  Same pow2:             true
+  Same alt tile:         false
+  Old resources <= new:  true (old: 1, new: 1)
+  Old size <= new size:  true
+  Expected size (calc):  23040000 bytes
+  Size ratio (new/expected): 1.07x
+  Size ratio (new/old):  1.03x
+  Old vs expected diff:  716800 bytes (+3.11%)
+  New vs expected diff:  1536000 bytes (+6.67%)
+  Merged image ID:       4294967295
+  Binding type:          0
+  Current tick:          1
+  Age (ticks since last access): 0
+GPU [Debug] <Critical> texture_cache.cpp:1024 ResolveOverlap: Unreachable code!
+Encountered unresolvable image overlap with equal memory address.
