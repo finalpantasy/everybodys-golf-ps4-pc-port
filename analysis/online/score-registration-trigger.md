@@ -242,3 +242,13 @@ then `gameapi_registscore?account=..&n=21&s=1` (200, 40 bytes). The listener sto
 course-world reply kept the hole-end chain from reaching the schedule load. The GOLF_BREAK sites in the 0xd8xxxx machine
 were still not the path taken; which caller enqueues this registration is not traced. Log: `work/evidence/open-course-registscore-1118.log`.
 The International Tournament item stays greyed; sections 11-12 cover that separate gate.
+
+## 14. Readback and repeat submissions (2026-11-18, runtime `e6fb120`)
+
+- After a fresh boot with `OneHole_20180914_1_1` stored, the hole-1 queries got non-empty replies (120 and 76 bytes), and hole 1
+  played to the same 6 strokes sent no `registscore`.
+- With the database cleared (backup `work/online/scores-local-1118-hole1.db`), hole 1 (5 strokes) and hole 2 (9 strokes) both
+  registered: rows `OneHole_20180914_1_1` = 1, 20 and `OneHole_20180914_1_2` = 5, 60. The first value is strokes over par;
+  the second is not identified.
+- So the game submits a hole only when no score is stored or the new one beats it (inferred from one skip and two submissions).
+  Log: `work/evidence/open-course-registscore-holes1-2-1118.log`.
