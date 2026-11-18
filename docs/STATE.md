@@ -98,7 +98,7 @@ Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnm
 - `RESOGUN_FAULT_PEEK=<reg><+|->0x<offset>`: print the string at that address in a fault report.
 - `RESOGUN_VERIFY_PREPARED=1`: compare what the draw-preparation workers read with a fresh read and log differences.
 - `RESOGUN_NGS2_TRACE=1`: print the Ngs2 voice parameters the game sends. `RESOGUN_NGS2_MIX=0`: silent output. `RESOGUN_AUDIO_DUMP=<prefix>`: raw samples of every audio port.
-- `GOLF_NP_TRACE=1`: log each distinct guest call site of the shared NP answers. `GOLF_PEEK="offset:bytes,*offset+delta:bytes"` (hex, `*` follows the pointer stored there) prints guest memory ranges when they change, every `GOLF_PEEK_MS` ms (default 2000).
+- `GOLF_NP_TRACE=1`: log each distinct guest call site of the shared NP answers. `GOLF_PEEK="offset:bytes,*offset+delta:bytes"` (hex, `*` follows the pointer stored there) prints guest memory ranges when they change, every `GOLF_PEEK_MS` ms (default 2000). `GOLF_BREAK="d91790,a62080"` (hex guest offsets, up to 8, Windows) puts an int3 on each site and prints the thread, rdi, rsi, rdx, the u32 at rsi+0x18 and the caller for the first 40 hits, then re-arms after one step (runtime `8136a31`).
 - `RESOGUN_TOGGLE_FILE=<file>`: a number in the file switches renderer optimizations off while the game runs (bits in `gpu/shim/resogun_toggles.h`).
 
 ### Network contract seen so far
