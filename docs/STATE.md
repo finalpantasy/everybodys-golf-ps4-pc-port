@@ -28,7 +28,7 @@ Preparation is not a byte-exact ELF reconstruction; the parser reports unavailab
 
 ## Current state and blocker
 
-State on 2026-11-18 (runtime branch `everybodys-golf`, commit `5c1b26b`, local only). Every boot below ran hidden with `RESOGUN_DISPLAY_MODE=windowed`, pad input from `RESOGUN_PAD_FILE` and frames from `RESOGUN_FRAME_DUMP_TRIGGER`.
+State on 2026-11-18 (runtime branch `everybodys-golf`, commit `ae6b409`, local only). Every boot below ran hidden with `RESOGUN_DISPLAY_MODE=windowed`, pad input from `RESOGUN_PAD_FILE` and frames from `RESOGUN_FRAME_DUMP_TRIGGER`.
 
 Reached, with frames in `docs/media`:
 
@@ -39,7 +39,18 @@ Reached, with frames in `docs/media`:
 - Customize Character, the character creator (`2026-11-17-character-creator.png`).
 - 2026-11-18: "Finish editing" in the creator, the home island with Hikari's dialogue, the Walking Controls panel and the free-roam view with its HUD (`2026-11-18-home-island-after-creator.png`). The left stick walks the character across the island (`2026-11-18-home-island-walking.png`).
 
-No hole and no shot has been reached, so there is no gameplay claim.
+- 2026-11-18: the Specs dialogue ("Introduction to your EG life") plays to its end and the game auto-saves. The save holds seven files, about 38 MB, and the next boot reads them.
+- 2026-11-18: the save resumes where it stopped. A boot from it reaches free roam in about 66 s (one Cross dismisses the S Ticket dialog). Hikari's "Offline Play Introduction" plays to its end and the island then shows the Tournament Desk, Solo Stroke Play, Shop and Menu markers.
+- 2026-11-18: Tournament Select with Beginners' Cup No. 1 and its 16-player list (`2026-11-18-tournament-select.png`), the pre-round screen (`2026-11-18-pre-round.png`), and the Solo Stroke Play course list with six courses (`2026-11-18-solo-stroke-course-list.png`).
+- 2026-11-18, first hole reached: Eagle City G.C., 9 holes OUT, Solo Stroke Play. Course Preview (`2026-11-18-course-preview-eagle-city.png`), hole 1 at the tee with "Set Up Tee Shot" (`2026-11-18-hole-1-tee.png`) and the shot view with power bar, club, wind and hole map (`2026-11-18-hole-1-shot-view.png`). The course load shows no new frame for about 40 s while pipelines compile; it is not a hang.
+
+No shot has been taken yet: the Cross presses sent in that run did not start the swing before the run's time limit, so "first playable hole" is reached on screen and NOT_VERIFIED for play. Grass and trees draw teal and the hole map draws black in these frames, which looks like the same color fault as the skin.
+
+Stepwise driver: `work/test-scripts/step.py TOKEN[:ms] ...` plays pad tokens against a running hidden boot (`boot-seq.ps1 -Warm 66 -Seq '-wait'` in the background), dumps one frame and writes `last.png`. Talking to a character needs the player turned toward them before Cross. A copy of the post-tutorial save is in `work/saves/after-tutorial` (untracked).
+
+Fixed 2026-11-18, auto-save wrote nothing: the game opens `/app0//savedata0/DATAn.BIN` before `/savedata0/DATAn.BIN` and goes on only after ENOENT. The runtime answered EROFS for every write under `/app0`. A write to a directory that is missing from the game image now fails with ENOENT (runtime `aa82402`).
+
+Test driver: copies of the boot scripts are in `work/test-scripts` (untracked). `boot-seq.ps1 -Until 'ImeDialog text' -Pulse 4000` taps Cross until the nickname dialog returns (about 120 s), then plays a comma list of pad tokens. A token takes `:ms` to hold and `@ms` for its gap. The creator needs 3000 ms gaps, because inputs get dropped during its transitions.
 
 Fixed 2026-11-18, the hang after "Finish editing" (and an intermittent stall during boot): the game rebuilds its compute command buffers in place as soon as `sceGnmDingDong` returns. When the GPU thread was still running the previous buffer, the label releases in it were overwritten and the graphics queue waited forever on a label holding 0. `sceGnmDingDong` now waits up to 2 s for the compute queue to drain (`Liverpool::WaitAsc`). `RESOGUN_TRACE_DINGDONG=1` prints the compute submits and label traffic that showed this.
 
