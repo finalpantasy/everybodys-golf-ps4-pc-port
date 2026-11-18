@@ -87,7 +87,11 @@ Other open items: no sound (the Ngs2 port renders silence), `IT_SET_PREDICATION`
 
 ### Network contract seen so far
 
-The game opens `https://ssps4.scej-network.jp:443/nmg-us/ss.info` (GET, five times in a boot). Nothing is sent. No NpWebApi entitlement request has been observed yet, so the S Ticket grant is not built.
+The game opens `https://ssps4.scej-network.jp:443/nmg-us/ss.info` (GET, five times in a boot). By default nothing is sent.
+
+Local title server, first guest run 2026-11-18 (runtime `e549b2c`): with `GOLF_DISCOVERY_PORT=<port>` and `server/golf_server.py` running on that port, the game accepted the local discovery file (200, 7,656 bytes) and the server-time reply (28 bytes). It then asked for `gameapi_getgamepropertyinfo` (POST, 66 bytes) and posted a 1,161-byte JSON telemetry body; the server has no route for either yet. The home island stays normal with the server on. Notice, score, board and login requests did not appear. No NpWebApi entitlement request has been observed yet, so the S Ticket grant is not built.
+
+`GOLF_LOCAL_AUTH=1` gives the local account a synthetic authorization code and a granted Plus check. `GOLF_TICKET_GRANTS=1` adds two test ticket grants to the local NpWebApi answers. Port 8765 had other listeners on this PC; use a free port such as 47123.
 
 ## Earlier findings (2026-11-17, first half)
 
@@ -140,11 +144,12 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Next actions
 
-1. Find why character skin draws blue or white.
-2. Walk through the home island tutorial and reach the first hole.
-3. Sound: an Ngs2 mixer.
-4. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
-5. Capture the game server's request contracts for the community server.
+1. Add server routes for `gameapi_getgamepropertyinfo` and telemetry (Codex side), then rerun the guest to reach login, notices and boards.
+2. Watch for the NpWebApi entitlement request (S Tickets), then build the grant list and check the items in the game.
+3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
+4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
+5. Sound: an Ngs2 mixer.
+6. Check the creator avatar's skin color with a correctly read screenshot (NOT_VERIFIED).
 
 ## Verification commands
 
