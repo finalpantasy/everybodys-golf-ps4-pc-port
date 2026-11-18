@@ -8873,3 +8873,6 @@ Problem: after the first answered board, the guest's next four `gameapi_getboard
 listener. `valid_national_board_request` takes only selectors 0 and 1 with no extra records. These are probably another
 selector or the paged `0x4a10/0x4000/0x4010` tail. Please accept them with the right reply. Then work out what selecting the
 item, or walking through the central gate, sends next.
+
+Addendum: selecting International Tournament shows "Connecting..." at the central gate, then returns to the island with no
+message. The four 400 replies come right after that selection, so the rejected board requests are the entry blocker.
