@@ -9049,3 +9049,269 @@ Runtime `5f6c932` and later, with your selector-3 listener, `ss-info-local-natio
 The guest then POSTs `gameapi_getmyscorenational` over plain http (`http://127.0.0.1:8765/...`, not https), four times. Every body is 66 bytes: the multipart wrapper with an empty `p` field (`--xYzZY`, the Content-Disposition line, a blank line, then the closing boundary). The listener returns 400 because its minimum is 570. The island then shows "Connection failed". Captures: `work/online/http-dump-3/059..063-gameapi_getmyscorenational.bin`. The runtime route for it is in the commit after `9927afb` (66..1570 bytes, reply 16..0x8000).
 
 Two questions. Does an empty payload mean the guest skipped building the record because the 136-byte board has no row that passes the mode 0x1a gate (a62d5b never hit)? If so, what row should selector 3's board carry? If the empty request is normal, what reply does the guest expect?
+
+
+### 2026-11-18 19:14 codex -> orchestrator: the own-score POST needs the HTTPS discovery URL
+
+Keep the selector-3 board. The slot `0x37` builder finds the row by ID at `b557c3–b557fa` and returns before sending if the lookup misses. The four POSTs show the builder reached the send path.
+
+I checked all four dumps. Each contains only the 66-byte multipart framing because the plain-HTTP branch at `ec9865–ec99d9` encrypts a stack copy and discards it before composing the part.
+
+Restart the listener with `work/online/ss-info-local-national-v2.bin` and replace your capture row with the HTTPS row below. The scheme change preserves the title records, and the listener should answer the 570–1,570-byte request with the 16-byte empty-score reply until a score is stored.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -97,6 +97,5 @@
+      * it (eboot 0xec97d0), so the discovery fixture must list this key as https. */
+     {"https://127.0.0.1:8765" NATIONAL_BOARD_PATH, NATIONAL_BOARD_PATH, 378, 1378, 28, 0x8000, 4, NULL},
+-    /* Entering the International Tournament: the player's national score, over plain http (66-byte body seen). */
+-    {"http://127.0.0.1:8765" NATIONAL_OWN_SCORE_PATH, NATIONAL_OWN_SCORE_PATH, 66, 1570, 16, 0x8000, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_OWN_SCORE_PATH, NATIONAL_OWN_SCORE_PATH, 570, 1570, 16, 84, 4, NULL},
+     {"http://127.0.0.1:8765" NATIONAL_BOARD_DOWNLOAD_PATH, NATIONAL_BOARD_DOWNLOAD_PATH, 0, 0, 136, 136, 4, NULL},
+     {"https://127.0.0.1:8765" NATIONAL_GAME_DATA_PATH, NATIONAL_GAME_DATA_PATH, 406, 1406, 72, 72, 4, NULL},
+```
+
+
+
+### 2026-11-18 19:15 codex -> orchestrator: move scripted input polling off guest pad reads
+
+In the 19:05 run, 16 of 19 logged slow pad reads immediately followed a scripted input edit, peaking at 14.3 ms. The guest read held the pad lock while it polled and parsed the file.
+
+The patch in `work/online/pad-file-poll-on-9927afb.diff` moves the 20 ms poll to the existing host input thread and uses SDL's subsecond timestamps. The guest reads the published input for its player.
+
+The native probe reproduced a missed Cross-to-Right edit on the baseline. The patch passed same-size edits, snapshot-only reads, player-two sticks, reconnect, replay gating, and release. Guest frame timing is NOT_RUN.
+
+```diff
+--- a/src/runtime_pad.c
++++ b/src/runtime_pad.c
+@@ -26,5 +26,4 @@
+ #include <time.h>
+ #include <SDL3/SDL.h>
+-#include <sys/stat.h>
+ 
+ #define ERR_INVALID_ARG ((int32_t)0x80920001)
+@@ -83,4 +82,8 @@
+ static pthread_mutex_t host_lock=PTHREAD_MUTEX_INITIALIZER;
+ static PadData host_sample[PADS];     /* under host_lock */
++typedef struct { uint32_t buttons; int stick[4]; } PadInjection;
++static PadInjection injected[PADS]={{0,{-1,-1,-1,-1}},{0,{-1,-1,-1,-1}}}; /* under host_lock */
++static uint32_t replay_revision;      /* under host_lock */
++static void read_inject(void);
+ static char gamepad_name[PADS][64]={"none","none"}; /* under host_lock */
+ static struct { uint8_t large, small; uint32_t serial; } rumble[PADS]; /* under host_lock */
+@@ -399,4 +402,5 @@
+     for (;;) {
+         const uint64_t start=now_us();
++        read_inject();
+         if (!sdl_ready) sdl_ready = SDL_WasInit(SDL_INIT_GAMEPAD) ? 1 : SDL_InitSubSystem(SDL_INIT_GAMEPAD) ? 1 : -1;
+         if (sdl_ready>0) host_gamepads(g,start,&next_scan,connected_count);
+@@ -435,9 +439,9 @@
+  * gamepads once per edit and the host thread opens them again, as after a real reconnect. An empty
+  * file releases everything. */
+-static struct { uint32_t buttons; int stick[4]; } injected[PADS]={{0,{-1,-1,-1,-1}},{0,{-1,-1,-1,-1}}};
+ static int replay_armed;      /* 1 while a RESOGUN_PAD_REPLAY recording plays, 2 once it ended */
+ static uint64_t replay_start; /* 0: (re)start at the next sample */
+ static void read_inject(void) {
+-    static const char *path; static int checked; static uint64_t last_check; static struct timespec mtime;
++    static const char *path; static int checked; static uint64_t last_check;
++    static bool have_stamp; static SDL_PathInfo stamp;
+     if (!checked) { path=getenv("RESOGUN_PAD_FILE"); checked=1; }
+     if (!path || !*path) return;
+@@ -445,37 +449,35 @@
+     if (now-last_check<20000) return;
+     last_check=now;
+-    struct stat st;
+-    if (stat(path,&st)!=0) return;
+-#ifdef _WIN32
+-    /* Whole-second mtimes: the size tells two edits within a second apart. */
+-    if (st.st_mtime==mtime.tv_sec && st.st_size==mtime.tv_nsec) return;
+-    mtime=(struct timespec){st.st_mtime,(long)st.st_size};
+-#else
+-    if (st.st_mtim.tv_sec==mtime.tv_sec && st.st_mtim.tv_nsec==mtime.tv_nsec) return;
+-    mtime=st.st_mtim;
+-#endif
++    SDL_PathInfo info;
++    if (!SDL_GetPathInfo(path,&info) || info.type!=SDL_PATHTYPE_FILE) return;
++    if (have_stamp && info.modify_time==stamp.modify_time &&
++        info.create_time==stamp.create_time && info.size==stamp.size) return;
+     FILE *f=fopen(path,"r");
+     if (!f) return;
+     static const char *sticks[]={"lx=","ly=","rx=","ry="};
+-    for (int u=0;u<PADS;++u) {
+-        injected[u].buttons=0;
+-        for (int i=0;i<4;++i) injected[u].stick[i]=-1;
+-    }
++    PadInjection next[PADS]={{0,{-1,-1,-1,-1}},{0,{-1,-1,-1,-1}}};
+     char token[64];
+-    int reconnect=0;
++    bool reconnect=false, replay=false;
+     while (fscanf(f,"%63s",token)==1) {
+-        if (!strcmp(token,"replay") && replay_armed!=1) { replay_armed=1; replay_start=0; } /* RESOGUN_PAD_REPLAY */
+-        if (!strcmp(token,"reconnect")) reconnect=1;
++        if (!strcmp(token,"replay")) replay=true;
++        if (!strcmp(token,"reconnect")) reconnect=true;
+         const int u=!strncmp(token,"p2:",3);
+         const char *t=token+(u ? 3 : 0);
+-        for (size_t i=0;i<sizeof(ps_names)/sizeof(*ps_names);++i) if (!strcmp(t,ps_names[i].name)) injected[u].buttons|=ps_names[i].ps;
+-        for (int i=0;i<4;++i) if (!strncmp(t,sticks[i],3)) { int v=atoi(t+3); injected[u].stick[i]=v<0 ? 0 : v>255 ? 255 : v; }
+-    }
+-    fclose(f);
++        for (size_t i=0;i<sizeof(ps_names)/sizeof(*ps_names);++i) if (!strcmp(t,ps_names[i].name)) next[u].buttons|=ps_names[i].ps;
++        for (int i=0;i<4;++i) if (!strncmp(t,sticks[i],3)) { int v=atoi(t+3); next[u].stick[i]=v<0 ? 0 : v>255 ? 255 : v; }
++    }
++    const int failed=ferror(f);
++    if (fclose(f)!=0 || failed) return; /* retry this edit on the next poll */
++    stamp=info;
++    have_stamp=true;
++    pthread_mutex_lock(&host_lock);
++    memcpy(injected,next,sizeof(next));
++    if (replay) ++replay_revision;
++    pthread_mutex_unlock(&host_lock);
+     if (reconnect) __atomic_store_n(&reconnect_wanted,1,__ATOMIC_RELEASE); /* host_gamepads closes them */
+     for (int u=0;u<PADS;++u) {
+-        const int *k=injected[u].stick;
+-        if (!u || injected[u].buttons || k[0]>=0 || k[1]>=0 || k[2]>=0 || k[3]>=0)
+-            printf("Runtime: pad file: user %d buttons 0x%x sticks %d %d %d %d\n",u+1,injected[u].buttons,k[0],k[1],k[2],k[3]);
++        const int *k=next[u].stick;
++        if (!u || next[u].buttons || k[0]>=0 || k[1]>=0 || k[2]>=0 || k[3]>=0)
++            printf("Runtime: pad file: user %d buttons 0x%x sticks %d %d %d %d\n",u+1,next[u].buttons,k[0],k[1],k[2],k[3]);
+     }
+ }
+@@ -597,4 +599,6 @@
+     pthread_mutex_lock(&host_lock);
+     *d=host_sample[slot];
++    const PadInjection injection=injected[slot];
++    const uint32_t revision=replay_revision;
+     pthread_mutex_unlock(&host_lock);
+     if (!d->connected_count) { /* before the host thread's first sample */
+@@ -611,7 +615,11 @@
+     }
+     if (!slot) record_sample(d); /* the click sources as they are: a replay plays them again */
+-    read_inject();
++    static uint32_t consumed_revision;
++    if (consumed_revision!=revision) {
++        consumed_revision=revision;
++        if (replay_armed!=1) { replay_armed=1; replay_start=0; }
++    }
+     if (!slot) replay_sample(d);
+-    const uint32_t inj=injected[slot].buttons;
++    const uint32_t inj=injection.buttons;
+     d->buttons|=inj & ~STICK_DIRECTIONS;
+     if (inj & (LSTICK_LEFT|LSTICK_RIGHT)) key_axis(&d->left_x,inj & LSTICK_LEFT,inj & LSTICK_RIGHT);
+@@ -619,8 +627,8 @@
+     if (inj & (RSTICK_LEFT|RSTICK_RIGHT)) key_axis(&d->right_x,inj & RSTICK_LEFT,inj & RSTICK_RIGHT);
+     if (inj & (RSTICK_UP|RSTICK_DOWN)) key_axis(&d->right_y,inj & RSTICK_UP,inj & RSTICK_DOWN);
+-    if (injected[slot].buttons & BTN_L2) d->l2=255;
+-    if (injected[slot].buttons & BTN_R2) d->r2=255;
++    if (inj & BTN_L2) d->l2=255;
++    if (inj & BTN_R2) d->r2=255;
+     uint8_t *axes[4]={&d->left_x,&d->left_y,&d->right_x,&d->right_y};
+-    for (int i=0;i<4;++i) if (injected[slot].stick[i]>=0) *axes[i]=(uint8_t)injected[slot].stick[i];
++    for (int i=0;i<4;++i) if (injection.stick[i]>=0) *axes[i]=(uint8_t)injection.stick[i];
+     cheat_chord(d,slot,false);
+     if (!slot) title_back(d);
+```
+
+
+
+### 2026-11-18 19:24 codex -> orchestrator: retry a lost room create or join reply
+
+A room create or join can commit on the listener before its reply is lost. The current Matching2 worker sends either request once, so a dropped reply reaches the server-unavailable callback.
+
+The patch retries either operation once after a transport failure with the original request bytes and create nonce. Apply it after the Matching2 bundle. A loopback socket probe dropped both accepted replies and recovered one two-seat room by replaying the same requests. The patch passes the strict apply check. The native dropped-reply probe is NOT_RUN.
+
+```diff
+--- a/src/runtime_golf.c
++++ b/src/runtime_golf.c
+@@ -1519,4 +1519,9 @@
+         }
+         status=runtime_golf_room_exchange(job->request,job->size,response,&length);
++        /* The listener can have committed an idempotent create or join before its reply was lost. */
++        if (!status && (operation==M2_ROOM_CREATE || operation==M2_ROOM_JOIN)) {
++            length=0;
++            status=runtime_golf_room_exchange(job->request,job->size,response,&length);
++        }
+     }
+     free(job);
+```
+
+
+
+### 2026-11-18 19:26 codex -> orchestrator: online patch applies to 1699c4e
+
+`work/online/online-on-1699c4e.diff` applies to the current runtime commit. It carries the Matching2 and RUDP stack, the room retry, and the tournament routes including the HTTPS own-score row.
+
+The strict apply check passed against the current checkout. Applying the rebased bundle to clean `1699c4e` sources produced the same three source files as applying the earlier bundle and retry patch to `9927afb`. Use discovery fixture `work/online/ss-info-local-national-v6.bin` for the complete tournament route set.
+
+
+
+
+### 2026-11-18 19:34 codex -> orchestrator: Windows room retry fault test passed
+
+On the baseline, the listener accepted a create in one run and a join in another, dropped each reply, and both native clients reported server unavailable through their callbacks.
+
+With `online-on-1699c4e.diff`, the Windows AddressSanitizer probe verified byte-for-byte retries. Two clients joined one room, exchanged RUDP in both directions, and cleared their leases on leave. Guest multiplayer is NOT_RUN.
+
+
+
+### 2026-11-18 19:34 codex -> orchestrator: replay the saved daily score distribution
+
+In the 19:22 guest run, daily score distribution and top players received empty HTTP 200 replies. The listener now returns the saved score for the requested date, course, and side, and retains the empty reply for groups without a score.
+
+All 100 listener tests passed. The patch widens the bridge limit to 68 bytes and passed a strict apply check on its own and after the online bundle. Guest display of a populated distribution is NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -86,3 +86,3 @@
+     {"https://127.0.0.1:8765" TOP_PLAYER_PATH, TOP_PLAYER_PATH, 410, 1410, 36, 36, 4, NULL},
+-    {"https://127.0.0.1:8765" SCORE_DISTRIBUTION_PATH, SCORE_DISTRIBUTION_PATH, 402, 1414, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" SCORE_DISTRIBUTION_PATH, SCORE_DISTRIBUTION_PATH, 402, 1414, 36, 68, 4, NULL},
+     {"https://127.0.0.1:8765" USER_STATUS_PATH, USER_STATUS_PATH, 526, 1526, 16, 0x1000, 4, NULL},
+```
+
+
+
+### 2026-11-18 19:39 codex -> orchestrator: guard long HTTP capture paths
+
+A 520-character `GOLF_HTTP_DUMP` value without a slash truncates the capture filename before its slash. The Windows AddressSanitizer probe caught the resulting null-pointer access.
+
+The bounds check skips that capture and continues the replay. The probe then wrote the exact body under a valid path, and `git apply --check --whitespace=error` passed on `72e8850`.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -172,14 +172,17 @@
+         "%sConnection: close\r\n\r\n";
+     const ReplayRoute *route=req->route;
+     /* GOLF_HTTP_DUMP=<folder> (diagnostics): save each replayed request body as <counter>-<last path part>.bin. */
+-    if (getenv("GOLF_HTTP_DUMP") && data && size>0) {
++    const char *dump_dir=getenv("GOLF_HTTP_DUMP");
++    if (dump_dir && *dump_dir && data && size>0) {
+         static atomic_int dumped;
+         const char *path=route->path ? route->path : req->login_path, *name=strrchr(path,'/');
+         char file[512];
+-        snprintf(file,sizeof file,"%s/%03d-%.64s.bin",getenv("GOLF_HTTP_DUMP"),atomic_fetch_add(&dumped,1),name ? name+1 : path);
+-        for (char *c=strrchr(file,'/')+1;*c;++c) if (*c=='?' || *c=='&' || *c=='=') *c='_';
+-        FILE *f=fopen(file,"wb");
+-        if (f) { fwrite(data,1,(size_t)size,f); fclose(f); }
++        const int n=snprintf(file,sizeof file,"%s/%03d-%.64s.bin",dump_dir,atomic_fetch_add(&dumped,1),name ? name+1 : path);
++        if (n>=0 && (size_t)n<sizeof file) {
++            for (char *c=strrchr(file,'/')+1;*c;++c) if (*c=='?' || *c=='&' || *c=='=') *c='_';
++            FILE *f=fopen(file,"wb");
++            if (f) { fwrite(data,1,(size_t)size,f); fclose(f); }
++        }
+     }
+ #ifdef _WIN32
+     WSADATA wsa;
+```
+
+
+### 2026-11-18 orchestrator -> codex: own score now sends; entry still ends in "Connection failed"
+
+Runtime `dece52c` carries `online-on-1699c4e.diff`, the 68-byte distribution limit and the pad-file poll patch. Suite 38 ok. Listener restarted with `ss-info-local-national-v6.bin`, `--national-tournament`, `--score-db work/online/scores-local.db` (empty table) and the v10 options.
+
+Selecting International Tournament now sends selector 3 (200, then the 136-byte download), then one `gameapi_getmyscorenational` over HTTPS with a 582-byte body (`work/online/http-dump-4/058-gameapi_getmyscorenational.bin`). The listener answers 200 with 16 bytes. No other request follows and the runtime logs no other call. The gate then shows "Connection failed" and the player is back on the island (frames in the 19:44 run).
+
+So the guest rejects the 16-byte empty-score reply. What does the slot 0x37 / action 0x2b reply parser need for a player with no national score yet? If it needs an entry record, the listener could return one built from the 136-byte board row (id 0x4147).
