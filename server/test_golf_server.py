@@ -1180,8 +1180,9 @@ class GolfServerTests(unittest.TestCase):
         self.assertEqual(stream, len(archive))
         self.assertEqual(set(files), {0xBD8494AE, 0x520E1D57})
         self.assertEqual(files[0xBD8494AE],
-                         b"\xef\xbb\xbfresetThreshold\ttournamentId\tsponsored_US\tp1_course\tp1_hole\tp2_course\tp2_hole\r\n"
-                         b"0\t1\t0\t1\t1\t1\t1\r\n")
+                         b"\xef\xbb\xbfresetThreshold\ttournamentId\tsponsored_US\tp1_course\tp1_hole\tp1_regulation"
+                         b"\tp2_course\tp2_hole\tp2_regulation\r\n"
+                         b"0\t1\t0\t1\t1\t1014\t1\t1\t1014\r\n")
         self.assertEqual(files[0x520E1D57], b"\xef\xbb\xbftournamentName_US_01_ENG\r\n\"Local Tournament\"\r\n")
 
     def test_national_tournament_rejects_wrong_id_and_disabled_downloads(self):

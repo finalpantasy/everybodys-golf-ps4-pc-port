@@ -6,6 +6,11 @@ import zlib
 
 PARAMETER_PATH = "data/sponsor/param/International_Tournament_"
 SETTINGS_PATH = PARAMETER_PATH + "settings.txt"
+# A row of data/param/course_condition/Regulation_generator_PatternCategory.txt (columns Cup_Use,
+# Tee_Use, Wind_Use, Mirror_Use). 1014 is 0, 0, 0, 0: normal cup, regular tee, standard wind, mirror
+# off. Without it (0) the entry screen and the round each drew their own random conditions and the
+# tournament showed as unofficial.
+REGULATION_PATTERN = 1014
 MESSAGES_PATH = PARAMETER_PATH + "messages.txt"
 
 
@@ -26,7 +31,8 @@ def tournament_archive(tournament_id: int) -> bytes:
     settings = {"resetThreshold": 0, "tournamentId": tournament_id, "sponsored_US": 0}
     for stage in (1, 2):
         # The entry screen requires a nonzero course byte for the selected stage (0xc4e0ad).
-        settings.update({f"p{stage}_course": 1, f"p{stage}_hole": 1})
+        settings.update({f"p{stage}_course": 1, f"p{stage}_hole": 1,
+                         f"p{stage}_regulation": REGULATION_PATTERN})
     sources = {
         SETTINGS_PATH: tabular_row(settings),
         # The loader drops the first and last character of the name (0xa4f88f-0xa4f8b8), so it is quoted.
