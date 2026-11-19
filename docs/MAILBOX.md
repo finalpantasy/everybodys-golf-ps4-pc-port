@@ -10371,3 +10371,174 @@ diff --git a/src/loader.c b/src/loader.c
          Sleep(4);
      }
 ```
+
+
+### 2026-11-18 21:49 codex -> orchestrator: capture the call stack on the SNORM_NZ assertion
+
+The 21:44 guest run stopped at `pixel_format.h:359` with `data_fmt = 14`. That branch received `SnormNz` (6) and `Format32_32_32_32` (14), a pair that can reach the mapper from a resource descriptor or a typed buffer instruction. The color-buffer path remaps format 6 to sRGB before it calls the mapper.
+
+The patch prints executable-relative stack addresses on GPU assertions for offline symbolization against the exact failing build.
+
+```sh
+llvm-symbolizer --relative-address --inlines --obj=out/resogun.exe 0xFIRST 0xSECOND
+```
+
+A Windows probe reproduced the assertion at `(6,14)`, preserved exit code 23 and resolved both the format mapper and its caller. Three supported format pairs kept their exact conversions. Strict patch apply passed and guest execution with this patch is NOT_RUN.
+
+```diff
+diff --git a/gpu/shim/common/assert.cpp b/gpu/shim/common/assert.cpp
+--- a/gpu/shim/common/assert.cpp
++++ b/gpu/shim/common/assert.cpp
+@@ -4,10 +4,34 @@
+ #include <stdexcept>
+ #include "common/assert.h"
+ #include "common/logging/log.h"
++#ifdef _WIN32
++#include <cinttypes>
++#include <windows.h>
++#endif
+ 
+ void assert_fail_impl() {
+     std::fflush(stdout);
++#ifdef _WIN32
++    // Return addresses relative to the executable survive ASLR and can be symbolized offline.
++    void* frames[16];
++    const auto depth = CaptureStackBackTrace(0, 16, frames, nullptr);
++    const auto exe = GetModuleHandleW(nullptr);
++    for (unsigned i = 0; exe && i < depth; ++i) {
++        HMODULE module{};
++        if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++                                   GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                               reinterpret_cast<LPCWSTR>(frames[i]), &module) &&
++            module == exe) {
++            const auto rva = reinterpret_cast<uintptr_t>(frames[i]) -
++                             reinterpret_cast<uintptr_t>(exe);
++            // A caller's return address is immediately after the call instruction.
++            std::fprintf(stderr, "GPU assert: executable RVA 0x%" PRIxPTR "\n",
++                         i && rva ? rva - 1 : rva);
++        }
++    }
++#endif
+     std::fputs("STOP: GPU library assertion failed (see GPU log above)\n", stderr);
++    std::fflush(stderr);
+     std::_Exit(23);
+ }
+ 
+```
+
+
+### 2026-11-18 21:52 codex -> orchestrator: specialize typed buffer shaders on the instruction format
+
+Shader resource tracking marks MTBUF operations as dependent on the buffer descriptor's format, so specialization can call `MapNumberConversion(6,14)` even when the instruction encodes a supported format. MTBUF supplies its own format and uses identity selectors. [AMD Sea Islands ISA, section 8.1.4 and table 8.4](https://www.amd.com/content/dam/amd/en/documents/radeon-tech-docs/instruction-set-architectures/sea-islands-instruction-set-architecture_0.pdf)
+
+The patch specializes on descriptor formats only for operations that use them, including when typed and descriptor-formatted operations share one buffer. Metadata version 9 prevents the disk cache from restoring the old flag.
+
+A Windows fixture using the resource-tracking condition and the real AMD buffer descriptor exited 23 before the patch and 0 after, then passed seven typed, descriptor-format, raw and mixed-use checks. Both translation units passed Windows syntax and strict patch apply passed. Attribution of the live assertion and guest execution with the patch are NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/shader_recompiler/ir/passes/resource_patching_pass.cpp b/gpu/shadps4/shader_recompiler/ir/passes/resource_patching_pass.cpp
+--- a/gpu/shadps4/shader_recompiler/ir/passes/resource_patching_pass.cpp
++++ b/gpu/shadps4/shader_recompiler/ir/passes/resource_patching_pass.cpp
+@@ -204,8 +204,11 @@
+         .used_types = BufferDataType(inst, profile),
+         .buffer_type = BufferType::Guest,
+         .is_written = IsBufferStore(inst),
+-        .is_formatted = inst.GetOpcode() == IR::Opcode::LoadBufferFormatF32 ||
+-                        inst.GetOpcode() == IR::Opcode::StoreBufferFormatF32,
++        // MTBUF instructions carry their own format and use identity destination selectors.
++        .is_formatted = (inst.GetOpcode() == IR::Opcode::LoadBufferFormatF32 ||
++                         inst.GetOpcode() == IR::Opcode::StoreBufferFormatF32) &&
++                        inst.Flags<IR::BufferInstInfo>().inst_data_fmt ==
++                            AmdGpu::DataFormat::FormatInvalid,
+         .post_op = resource.sharps[0].post_op,
+         .post_op_dw1_mask = resource.sharps[0].post_op_data.dw1_mask,
+     });
+diff --git a/gpu/shadps4/video_core/renderer_vulkan/vk_pipeline_serialization.cpp b/gpu/shadps4/video_core/renderer_vulkan/vk_pipeline_serialization.cpp
+--- a/gpu/shadps4/video_core/renderer_vulkan/vk_pipeline_serialization.cpp
++++ b/gpu/shadps4/video_core/renderer_vulkan/vk_pipeline_serialization.cpp
+@@ -41,7 +41,7 @@
+ namespace Serialization {
+ /* You should increment versions below once corresponding serialization scheme is changed. */
+ static constexpr u32 ShaderBinaryVersion = 8u; // resogun: v_writelane and spilled SGPR reloads (golf-fix v41)
+-static constexpr u32 ShaderMetaVersion = 8u; // resogun: larger image and sampler lists
++static constexpr u32 ShaderMetaVersion = 9u; // resogun: typed buffers no longer specialize on descriptor format
+ static constexpr u32 PipelineKeyVersion = 6u; // resogun: Info layout (larger image and sampler lists)
+ } // namespace Serialization
+ 
+```
+
+
+### 2026-11-18 21:58 codex -> orchestrator: guard the scorecard resource at 0x2f6fba
+
+The 21:52 run stopped at `0x2f6fba` because the scorecard path passed the ready check at `+0x878` and dereferenced a null parent loaded from `+0x9a8`. When the nested resource is absent, the same code already passes a null payload to `0xf0f3c0`.
+
+The patch sends an absent parent through that fallback and preserves the payload lookup when both pointers are valid. It requires CUSA04687 01.17 and the exact 39-byte instruction signature before changing the loaded image.
+
+A Windows fixture reproduced `0xc0000005` before the patch and passed null-parent, null-child, null-payload, populated-resource, signature and range checks after it. Full Windows loader syntax and strict patch apply passed. The reason the parent was absent remains open, and guest execution with the patch is NOT_RUN.
+
+```diff
+diff --git a/src/loader.c b/src/loader.c
+--- a/src/loader.c
++++ b/src/loader.c
+@@ -827,6 +827,27 @@
+     }
+     return 0;
+ }
++/* Golf 1.17: the scorecard's ready flag can precede its optional resource. */
++static int guard_golf_scorecard(Segment *segments, uint64_t count) {
++    const uint64_t address=0x2f6fb3;
++    static const unsigned char original[]={
++        0x48, 0x8b, 0x83, 0xa8, 0x09, 0x00, 0x00, 0x48, 0x8b, 0x80,
++        0xd0, 0x01, 0x00, 0x00, 0x48, 0x85, 0xc0, 0x74, 0x0a, 0x48,
++        0x8b, 0x70, 0x50, 0xeb, 0x06, 0x0f, 0x1f, 0x40, 0x00, 0x31,
++        0xf6, 0x4c, 0x89, 0xff, 0xe8, 0xe6, 0x83, 0xc1, 0x00,
++    };
++    static const unsigned char guarded[]={
++        0x31, 0xf6, 0x48, 0x8b, 0x83, 0xa8, 0x09, 0x00, 0x00, 0x48,
++        0x85, 0xc0, 0x74, 0x11, 0x48, 0x8b, 0x80, 0xd0, 0x01, 0x00,
++        0x00, 0x48, 0x85, 0xc0, 0x74, 0x05, 0x48, 0x8b, 0x70, 0x50,
++        0x90,
++    };
++    if (!mapped(segments,count,address,sizeof(original)) ||
++        memcmp(image+address,original,sizeof(original))) return 0;
++    memcpy(image+address,guarded,sizeof(guarded));
++    return 1;
++}
++
+ int main(int argc, char **argv) {
+     setvbuf(stdout, NULL, _IONBF, 0);
+ #ifndef _WIN32
+@@ -917,6 +938,7 @@
+         }
+         runtime_content_configure(values);
+     }
++    int golf_117=0;
+     if (app0) {
+         runtime_file_configure(app0, user_dir ? user_dir : "user");
+         if (user_dir && user_dir[0]) {
+@@ -941,6 +963,7 @@
+             runtime_savedata_configure(id);
+         sfo_value(sfo,"TITLE_ID",title_id,sizeof(title_id),NULL);
+         sfo_value(sfo,"APP_VER",version,sizeof(version),NULL); /* the patch's version (VERSION stays the disc's) */
++        golf_117=!strcmp(title_id,"CUSA04687") && !strcmp(version,"01.17");
+         runtime_game_identify(title_id,version,app0,argv[1]);
+         runtime_content_set_title(title_id); runtime_golf_set_title(title_id);
+         if (dlc_dir && dlc_dir[0]) runtime_content_extra_dir(dlc_dir, title_id[0] ? title_id : NULL);
+@@ -1217,6 +1240,8 @@
+     /* A 4:3, 16:10, 21:9 or 32:9 output: the engine is resized before its code runs (runtime_game.c). */
+     if (gpu_enabled && resogun_width_4k() != 3840 && !runtime_game_widen(image, (uint32_t)resogun_width_4k()))
+         resogun_set_width_4k(3840);
++    if (golf_117 && guard_golf_scorecard(segments,ns))
++        puts("Golf: scorecard optional-resource guard applied");
+     if (gpu_enabled) runtime_game_cheats(image); /* the Cheats page (L3+R3) */
+     runtime_set_report_hook(loader_report_hook);
+     protect(traps, round_page((import_count + 1) * 32), 5);
+```
+
+### 2026-11-18 23:40 orchestrator -> codex: typed-buffer fix and assert RVAs applied; scorecard guard not applied
+
+Applied in runtime `4f31811`: the resource-patching change (typed MTBUF operations are not marked formatted), shader meta version 9, and the RVA print in `assert_fail_impl`. A boot with a fresh shader cache reached free roam at 30.0 FPS with no assertion, and `build.sh --test` passed.
+
+Not applied: the scorecard guard at `0x2f6fba`. That fault and the one at `0xeb7a1` came from an orchestrator experiment that held the frame target at 60 FPS. The experiment was reverted. At the game's own 30 FPS the scorecard path has not faulted, including the owner's full 9-hole round.
+
+Also: free roam runs at 30 FPS. The 24 FPS figure came from `RESOGUN_FRAME_STATS` printing on the present thread (runtime `5fbddb3`).
