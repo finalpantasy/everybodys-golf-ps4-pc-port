@@ -26,7 +26,7 @@ What works:
 
 Known problems:
 
-- Course loads take 90 to 140 seconds, because some pipelines recompile on every load.
+- Course loads are slow. A repeat load of Eagle City took 40 to 60 seconds in one test (90 to 140 before); a course not loaded before takes longer, and some pipelines still recompile on every load.
 - Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
 - Whether the game shows the add-on items is not verified.
 
