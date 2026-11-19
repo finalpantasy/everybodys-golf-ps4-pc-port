@@ -113,7 +113,7 @@
       "path": "external/resogun-recomp",
       "purpose": "Direct x86-64 Windows runtime and preparation architecture reference",
       "permissions": "Built and run locally with the user's staged game; bounded boots may write logs/settings and use the GPU; project source changes are recorded in docs/STATE.md",
-      "verification": "Pinned commit and submodules checked out; MSYS2 CLANG64 build succeeds; original guest entry and subsequent bounded boot milestones observed", 
+      "verification": "Pinned commit and submodules checked out; MSYS2 CLANG64 build succeeds; original guest entry and subsequent bounded boot milestones observed",
       "rollback": "Delete external/resogun-recomp"
     },
     {
@@ -126,6 +126,17 @@
       "permissions": "Source inspected only; not built or run",
       "verification": "Pinned commit checked out; build requires MSYS2 CLANG64 and declared dependencies",
       "rollback": "Delete external/driveclub-recomp"
+    },
+    {
+      "name": "Real-ESRGAN ncnn-vulkan",
+      "source": "https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-windows.zip",
+      "version": "v0.2.5.0 (20220424); zip sha256 abc02804e17982a3be33675e4d471e91ea374e65b70167abc09e31acb412802d; exe sha256 07e49f7cbb4ede01ae4dd4c399d3a7e5846e3d2085c3128eff881e55cb7b1a0c",
+      "license": "BSD-3-Clause (Real-ESRGAN); model weights under the same project terms",
+      "path": "tools/realesrgan",
+      "purpose": "Offline texture upscaling for the optional local texture pack (tools/texture_pack.py); output stays in work/",
+      "permissions": "Downloaded with the owner's approval on 2026-11-19; runs locally on the GPU, no network",
+      "verification": "Zip hash checked after download; demo media removed after extraction",
+      "rollback": "Delete tools/realesrgan and tools/realesrgan-dl"
     }
   ]
 }

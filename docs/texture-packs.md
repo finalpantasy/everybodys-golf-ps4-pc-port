@@ -14,8 +14,19 @@ shared.
    `python external/resogun-recomp/tools/texture_pack.py convert DUMP_DIR PNG_DIR`
 3. Upscale them:
    `python external/resogun-recomp/tools/texture_pack.py upscale PNG_DIR PACK_DIR --scale 2`
-   - With `--esrgan path/to/realesrgan-ncnn-vulkan.exe`, Real-ESRGAN does the upscale. Without
-     it, the tool uses Lanczos with light sharpening, which adds little detail.
+   - With `--esrgan path/to/realesrgan-ncnn-vulkan.exe`, Real-ESRGAN upscales the color
+     textures. Without it, the tool uses Lanczos with light sharpening, which adds little detail.
+   - Normal maps and channel masks always get plain Lanczos. About half of this game's textures
+     hold data, not pictures: 297 normal maps and 286 masks with an empty blue channel, against
+     632 color textures. Real-ESRGAN shifted their values by up to 10 levels out of 255, which
+     would change shading.
+   - Real-ESRGAN (`realesrgan-x4plus`) sharpens woven and printed detail well, but it smooths
+     noise-like detail such as grass blades into flat color and darkens some textures. So each
+     result keeps the texture's own tone (per-channel mean and spread), and a result that keeps
+     less than 75% of the edge detail (`--min-detail`) falls back to Lanczos.
+   - Real-ESRGAN results are cached in `PACK_DIR-esrgan`, so a rerun with other settings skips
+     the GPU work.
+   - `--limit N` stops after N textures; the next run skips the ones already in the pack.
    - Outputs are capped at 4096 px per side (`--max-side`). Textures under 128 px (`--min`)
      and screen-sized frame captures are skipped.
 4. Turn the pack on: `texture_pack=F:/path/to/pack` (or `RESOGUN_TEXTURE_PACK`).
