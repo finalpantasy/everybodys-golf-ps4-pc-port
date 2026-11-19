@@ -20,6 +20,7 @@ What works:
 - Courses load and draw with correct colors. Hole scores register and read back after a restart.
 - Stereo music and sound effects.
 - 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
+- Texture packs: dump the game's textures, upscale them, and the port draws the PNGs instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
 - A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
 - With the bundled local server, the daily ranking opens and a Game Room can be created up to its participant list.
 
