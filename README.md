@@ -8,29 +8,37 @@ The port runs the game's original x86-64 code directly on Windows. The PS4 syste
 
 ## Current status
 
-This is not playable yet. No hole has been played.
+**Playable.** On 2026-11-18 a full 9-hole round was played by hand, start to finish, with keyboard controls. Shots, putts, scoring and the scorecard work.
 
-- The original game code boots to the title screen and the main menu.
-- The opening event plays with correct 3D geometry and dialogue text.
-- Nickname entry works and the character creator opens.
-- Course 00 loads and draws behind the loading text.
-- A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed. Whether the game shows those items is not verified.
-- Character skin draws blue or white instead of skin tones. Scenery and menus have the right colors.
-- There is no sound yet.
+![Hole 1 at Eagle City G.C.: a putt drops for par, then the scorecard. Drawn by the port.](docs/media/2026-11-18-default-build-hole-1-par-scorecard.png)
 
-![The character creator, drawn by the port. The avatar skin draws white; whether that is a fault is not verified.](docs/media/2026-11-17-character-creator.png)
+![An approach shot on hole 1, from swing to "Nice Approach!". Drawn by the port.](docs/media/2026-11-18-eagle-city-nice-approach.png)
 
-![The opening event, drawn by the port.](docs/media/2026-11-17-faces-fixed.png)
+What works:
 
-Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first four are reached.
+- Boot, title screen, menus, the home island and character creation.
+- Courses load and draw with correct colors. Hole scores register and read back after a restart.
+- Stereo music and sound effects.
+- A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
+- With the bundled local server, the daily ranking opens and a Game Room can be created up to its participant list.
+
+Known problems:
+
+- NPC and character faces show light graphical faults.
+- The frame rate averages about 24 FPS in the home area, against the game's 30 FPS target, with occasional long frames. Work on this is in progress.
+- International Tournament entry stops with "Connection failed".
+- Whether the game shows the add-on items is not verified.
+
+Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
 
 ## Goals
 
 - Built-in DLC unlocked by default, with an original-entitlement test mode.
 - Online multiplayer through a community server and a compatible peer transport.
 - Restored limited-event gear, based on evidence of the original event, redemption and shop behavior.
+- Higher frame rates and resolutions on PC.
 
-The entitlement unlock is implemented and not yet verified in the game. Online and event gear are not implemented.
+The entitlement unlock is implemented and not yet verified in the game. Online play works in part against a local server only. Event gear is not implemented.
 
 ## What you need
 
@@ -56,7 +64,7 @@ bash build.sh
 
 ## Run
 
-Set `MSYS2_ROOT` to your MSYS2 install first. Without it, the runner exits with 0xC0000135 (DLL not found). Run from the repository root.
+Run from the repository root. The runner looks for MSYS2 in `MSYS2_ROOT`, then `tools/msys2/msys64`, then `C:\msys64`.
 
 Check the prepared game files:
 
@@ -64,13 +72,15 @@ Check the prepared game files:
 python external/resogun-recomp/run.py check --game work/game-1.17 --out work/game-1.17-prepared --any-build
 ```
 
-Stage your dump into `work/game-1.17` first with `tools/stage_game.py`. Then start a bounded boot (20 second limit):
+Stage your dump into `work/game-1.17` first with `tools/stage_game.py`. Then play:
 
 ```bash
-python external/resogun-recomp/run.py play --game work/game-1.17 --out work/game-1.17-prepared --any-build --timeout 20
+python external/resogun-recomp/run.py play --game work/game-1.17 --out work/game-1.17-prepared --any-build
 ```
 
-The runner opens a borderless window that covers the screen. Set `RESOGUN_DISPLAY_MODE=windowed` for a normal window. The boot is sensitive to CPU load, so a timeout on a busy machine does not mean the game hung.
+The runner opens a borderless window that covers the screen. Set `RESOGUN_DISPLAY_MODE=windowed` for a normal window. Add `--timeout 20` for a bounded test boot.
+
+Keyboard: Space or Enter is Cross, Esc is Circle, the arrow keys are the d-pad, WASD is the left stick and Tab is Options. A controller works too.
 
 Current state, evidence and the next step are in [docs/STATE.md](docs/STATE.md).
 
