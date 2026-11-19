@@ -10,7 +10,7 @@ from golf_server import (
     ANALYTICS_PREFIX, BOARD_LIST_PATH, BONUS_LIST_PATH, CHARACTER_ASSIGNMENT_PATH, CHARACTER_BOARD_PATH,
     CHARACTER_COUNT_PREFIX,
     COURSE_ASSIGNMENT_PREFIX, DAILY_SCORE_PATH, EULA_PATH, FINISH_BOARD_PATH, GAME_DOWNLOAD_BASE, LOGIN_PREFIX,
-    LOOPBACK, NATIONAL_BOARD_PATH, NATIONAL_DISTRIBUTION_PATH, NATIONAL_GAME_DATA_PATH, NATIONAL_JOIN_PATH,
+    LOOPBACK, NATIONAL_BOARD_PATH, NATIONAL_DISTRIBUTION_PATH, NATIONAL_GAME_DATA_PATH, NATIONAL_JOIN_PREFIX,
     NATIONAL_OWN_SCORE_PATH, NATIONAL_REGISTRATION_PREFIX, NATIONAL_SCORE_LIST_PATH,
     NOTICE_PATH, OWN_SCORE_PATH,
     PROPERTY_INFO_PATH,
@@ -79,7 +79,7 @@ def discovery_document(*, eula: bool = False, empty_notices: bool = False,
     if national_tournament:
         urls["gameapi_getnationalgamedata"] = f"https://{LOOPBACK}:8765{NATIONAL_GAME_DATA_PATH}"
         urls["gameapi_getmyscorenational"] = f"https://{LOOPBACK}:8765{NATIONAL_OWN_SCORE_PATH}"
-        urls["gameapi_noticejoinnational"] = f"https://{LOOPBACK}:8765{NATIONAL_JOIN_PATH}"
+        urls["gameapi_noticejoinnational"] = f"https://{LOOPBACK}:8765{NATIONAL_JOIN_PREFIX}"
         urls["gameapi_getscoredistributionnational"] = f"https://{LOOPBACK}:8765{NATIONAL_DISTRIBUTION_PATH}"
         urls["gameapi_getscorelistnational"] = f"https://{LOOPBACK}:8765{NATIONAL_SCORE_LIST_PATH}"
         if score_registration:

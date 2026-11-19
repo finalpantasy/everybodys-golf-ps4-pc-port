@@ -1134,7 +1134,7 @@ class GolfServerTests(unittest.TestCase):
         success = bytes.fromhex("00800100 0000020001000000 830003006c6f63616c000000")
         end = bytes.fromhex("10800100")
 
-        for selector in (0, 3):
+        for selector in (0, 1, 3):
             with self.subTest(selector=selector):
                 request = NATIONAL_BOARD_REQUEST.replace(bytes.fromhex("404a020000000000"),
                                                          pack("<2HI", 0x4A40, 2, selector))
@@ -1150,11 +1150,11 @@ class GolfServerTests(unittest.TestCase):
             " 4341020000000000 4441020000000000 50410600") + b"Local Tournament\0\x03\x03\x03"
             + bytes.fromhex("774103002018091400000000 784103002018091423595900 30410100") + end))
 
-        selector_one = NATIONAL_BOARD_REQUEST.replace(bytes.fromhex("404a020000000000"),
-                                                      bytes.fromhex("404a020001000000"))
-        client.request("POST", NATIONAL_BOARD_PATH, body=selector_one, headers=SERVER_TIME_HEADERS)
+        selector_two = NATIONAL_BOARD_REQUEST.replace(bytes.fromhex("404a020000000000"),
+                                                      bytes.fromhex("404a020002000000"))
+        client.request("POST", NATIONAL_BOARD_PATH, body=selector_two, headers=SERVER_TIME_HEADERS)
         response = client.getresponse()
-        self.assertEqual((response.status, response.read()), (200, success + end))
+        self.assertEqual((response.status, response.read()), (400, b""))
         for token in (b"\x83\x00\x02\x00abc\0", b"\x83\x00\xfc\x00" + b"x" * 1000 + b"\0\x03\x03\x03"):
             with self.subTest(token_bytes=len(token)):
                 body = NATIONAL_GAME_DATA_REQUEST.replace(b"\x83\x00\x02\x00abc\0", token)
@@ -1259,7 +1259,8 @@ class GolfServerTests(unittest.TestCase):
         self.assertEqual((response.status, response.read()), (404, b""))
 
     def test_national_join_replays_the_synthetic_first_entry(self):
-        path = "/nmg-us/replay-probe/gameapi_noticejoinnational"
+        prefix = "/nmg-us/replay-probe/gameapi_noticejoinnational?account="
+        path = prefix + "5932163534510096385&n=14&s=1"
         event = bytes.fromhex("40410500") + b"LocalTournament\0" + bytes.fromhex(
             "4741020001000000 4241020000030303 4341020000000000 4441020000000000")
         request = SERVER_TIME_REQUEST.replace(b"\x10\x80\x01\x00",
@@ -1289,11 +1290,16 @@ class GolfServerTests(unittest.TestCase):
         disabled.request("POST", path, body=request, headers=SERVER_TIME_HEADERS)
         response = disabled.getresponse()
         self.assertEqual((response.status, response.read()), (404, b""))
-        for enabled, scheme in ((True, "https"), (False, "http")):
+        for enabled, url in ((True, "https://127.0.0.1:8765" + prefix),
+                             (False, "http://127.0.0.1:8765" + prefix.removesuffix("?account="))):
             document = discovery_document(national_tournament=enabled).rstrip(b"\0")
             urls = ElementTree.fromstring(b"<fixture>" + document + b"</fixture>")
-            self.assertEqual(urls.findtext("./gameurl1/gameapi_noticejoinnational"),
-                             f"{scheme}://127.0.0.1:8765{path}")
+            self.assertEqual(urls.findtext("./gameurl1/gameapi_noticejoinnational"), url)
+        for target in (prefix, prefix + "5932163534510096385&n=14", prefix + "1&n=14&s=1"):
+            with self.subTest(target=target):
+                client.request("POST", target, body=request, headers=SERVER_TIME_HEADERS)
+                response = client.getresponse()
+                self.assertEqual((response.status, response.read()), (400, b""))
 
     def test_national_distribution_returns_empty_download(self):
         path = "/nmg-us/replay-probe/gameapi_getscoredistributionnational"

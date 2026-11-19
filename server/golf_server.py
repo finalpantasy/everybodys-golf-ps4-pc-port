@@ -56,6 +56,8 @@ NATIONAL_BOARD_PATH = "/nmg-us/replay-probe/gameapi_getboardlistnational"
 NATIONAL_GAME_DATA_PATH = "/nmg-us/replay-probe/gameapi_getnationalgamedata"
 NATIONAL_OWN_SCORE_PATH = "/nmg-us/replay-probe/gameapi_getmyscorenational"
 NATIONAL_JOIN_PATH = "/nmg-us/replay-probe/gameapi_noticejoinnational"
+# The game appends "%llu&n=%d&s=1" to the join URL (eboot 0xb5d300), so the fixture ends it in "?account=".
+NATIONAL_JOIN_PREFIX = NATIONAL_JOIN_PATH + "?account="
 NATIONAL_DISTRIBUTION_PATH = "/nmg-us/replay-probe/gameapi_getscoredistributionnational"
 NATIONAL_SCORE_LIST_PATH = "/nmg-us/replay-probe/gameapi_getscorelistnational"
 NATIONAL_REGISTRATION_PREFIX = "/nmg-us/replay-probe/gameapi_registscorenational?account="
@@ -102,7 +104,9 @@ NOTICE_REPLY = (
     + pack("<2HI", 0x3000, 2, 0) + TERMINATOR
 )
 NATIONAL_BOARD_FIELDS = ((0x0080, 65, 65), (0x0083, 2, 252), (0x4A40, 2, 2))
-NATIONAL_BOARD_DOWNLOAD_SELECTORS = (0, 3)
+# Board selectors 0, 1 and 3 fill entry lists +0x11c0, the main entry and list +8; the join
+# path reads the main entry ([0x2c81150]+0x28c), so selector 1 must carry the tournament too.
+NATIONAL_BOARD_DOWNLOAD_SELECTORS = (0, 1, 3)
 NATIONAL_BOARD_MIN_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(
     minimum for _, minimum, _ in NATIONAL_BOARD_FIELDS
 )
@@ -247,6 +251,7 @@ COURSE_ASSIGNMENT_TARGET = re.compile(re.escape(COURSE_ASSIGNMENT_PREFIX) + SESS
 CHARACTER_COUNT_TARGET = re.compile(re.escape(CHARACTER_COUNT_PREFIX) + SESSION_QUERY)
 REGISTRATION_TARGETS = tuple(re.compile(re.escape(prefix) + SESSION_QUERY) for prefix in REGISTRATION_PREFIXES)
 NATIONAL_REGISTRATION_TARGET = re.compile(re.escape(NATIONAL_REGISTRATION_PREFIX) + SESSION_QUERY)
+NATIONAL_JOIN_TARGET = re.compile(re.escape(NATIONAL_JOIN_PREFIX) + SESSION_QUERY)
 LOCAL_SCORE_NAME = re.compile(rb"[A-Za-z0-9_-]{1,16}")
 SCORE_TIMESTAMP = re.compile(rb"[0-9]{1,4}(?:-[0-9]{2}){2}T[0-9]{2}(?::[0-9]{2}){2}\+09:00")
 SCORE_SUCCESS_PREFIX = pack("<4HI2H", 0x8000, 1, 0, 2, 1, 0x0083, 3) + b"local\0\0\0"
@@ -438,7 +443,7 @@ def valid_national_board_request(body: bytes) -> bool:
         return False
     _context, token, selector_record = fields
     selector = unpack_from("<I", selector_record)[0]
-    return padded_string(token) is not None and (selector == 1 or selector in NATIONAL_BOARD_DOWNLOAD_SELECTORS)
+    return padded_string(token) is not None and selector in NATIONAL_BOARD_DOWNLOAD_SELECTORS
 
 
 def valid_national_id_request(body: bytes, *, layout: tuple) -> bool:
@@ -1060,7 +1065,10 @@ class GolfHandler(BaseHTTPRequestHandler):
             response = NATIONAL_OWN_SCORE_EMPTY_REPLY
             minimum, maximum = NATIONAL_OWN_SCORE_MIN_BYTES, NATIONAL_OWN_SCORE_MAX_BYTES
             validate = valid_national_own_score_request
-        elif self.path == NATIONAL_JOIN_PATH and self.server.national_archive is not None:
+        elif self.path.startswith(NATIONAL_JOIN_PREFIX) and self.server.national_archive is not None:
+            if not valid_session_target(self.path, NATIONAL_JOIN_TARGET):
+                self.reject_before_reading(HTTPStatus.BAD_REQUEST)
+                return
             response = NATIONAL_JOIN_REPLY
             minimum, maximum = NATIONAL_JOIN_MIN_BYTES, NATIONAL_JOIN_MAX_BYTES
             validate = valid_national_join_request
@@ -1309,7 +1317,8 @@ class GolfHandler(BaseHTTPRequestHandler):
                   and self.server.empty_boards is not None)
               or (self.path == RIVAL_LIST_PATH and self.server.rival_groups)
               or (self.path == NATIONAL_BOARD_PATH and (self.server.empty_national_boards or self.server.national_board))
-              or (self.path in (NATIONAL_GAME_DATA_PATH, NATIONAL_OWN_SCORE_PATH, NATIONAL_JOIN_PATH,
+              or (self.server.national_archive is not None and valid_session_target(self.path, NATIONAL_JOIN_TARGET))
+              or (self.path in (NATIONAL_GAME_DATA_PATH, NATIONAL_OWN_SCORE_PATH,
                                 NATIONAL_DISTRIBUTION_PATH, NATIONAL_SCORE_LIST_PATH)
                   and self.server.national_archive is not None)
               or (self.path == BOARD_LIST_PATH and (self.server.empty_boards is not None or self.server.schedule))

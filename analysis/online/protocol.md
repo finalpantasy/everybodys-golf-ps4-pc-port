@@ -1233,8 +1233,15 @@ values are quoted.
 The local listener now sends `0x4146` = 1, `p1_course` and `p2_course`
 = 1, and a quoted name. The game then opens the tournament screen
 (Eagle City, 9 holes OUT), the course settings and the golfer screen.
-"Go to Course" shows "Connecting..." and then "Connection failed"
-without another HTTP request.
+"Go to Course" then sends the join notification below. Two fixture
+changes were needed before it connected. The join path reads the
+main entry (`[0x2c81150]+0x28c`), which only board selector 1
+fills, so the listener now returns the tournament board for
+selectors 0, 1 and 3. The game builds the join URL with
+`"%s%llu&n=%d&s=1"` (format string `0x120b1fa`, used at `0xb5d351`
+in `0xb5d300`), so the discovery URL must end in `?account=`. With
+both changes the qualifier loads Eagle City and reaches the first
+tee of hole 1.
 
 With a saved score, the parser reads the token and optional `0x42d0`,
 then a nonzero count followed by `0x4230` and `0x42d1`
@@ -1262,7 +1269,8 @@ The settings loader copies `resetThreshold` from the table at
 `0xa4e4e8` and `0xa4f8c0–0xa4f8d2`. The entry screen branches
 when the reply word exceeds that byte (`0xc4b8d6–0xc4b8f9`).
 The loopback fixture accepts 422–1,422 bytes for the synthetic
-event and returns a 36-byte success reply with `0x4962/2/0`.
+event at `gameapi_noticejoinnational?account=<id>&n=<n>&s=1` and
+returns a 36-byte success reply with `0x4962/2/0`.
 With the fixture's threshold of 0, the zero word branches to
 `0xc4c837`. A positive word enters a path that can look up and
 request a ticket spend (`0xc4c794–0xc4c832`) or open a dialog
