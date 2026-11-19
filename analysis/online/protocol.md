@@ -1209,7 +1209,32 @@ The listener now returns a 36-byte success with `0x0083`, `0x4200/2/0`
 and `0x8010` for the captured request when the player has no saved score.
 The zero-count branch reaches `0xb776b0` and sets entry `+0x299` after
 finding the row by the original request ID (`0xb731d7–0xb731f7`,
-`0xb776ce–0xb776dd`, `0xb777dc–0xb7786b`). Guest acceptance is NOT_RUN.
+`0xb776ce–0xb776dd`, `0xb777dc–0xb7786b`). The guest accepts it: on
+2026-11-19 the screen took the success path and called `0xc4e050`
+(caller `0xc4bb19`).
+
+#### Tournament entry stage
+
+`0xc4e050` shows "Connection failed" unless the selected entry has
+`+0x270` set, stage byte `+0x271` equal to 1 or 2, and a nonzero course
+byte in that stage's block at `+0x78 + stage * 0x90`
+(`0xc4e078–0xc4e0b2`). The entry builder in `0xa5d3a0` copies the stage
+from board row `+0x104`, the value of board word `0x4146`, and the
+row's selector (row `+0x220`) picks the entry list. The archive loader
+`0xa4de30` fills the two stage blocks from columns `p1_*` and `p2_*`
+of `International_Tournament_settings.txt`: `course` at block byte 0,
+then `hole` (0 gives 18 holes, 1 and 2 give 9 holes) at bytes 1 and 2.
+It also reads `regulation`, `weather`, `limitation_gear`,
+`limitation_stats`, `limitation_reentry`, `slotMode`, `rule_1`,
+`rule_2` and the reward columns. It drops the first and last character
+of `tournamentName_<language>` (`0xa4f88f–0xa4f8b8`), so the shipped
+values are quoted.
+
+The local listener now sends `0x4146` = 1, `p1_course` and `p2_course`
+= 1, and a quoted name. The game then opens the tournament screen
+(Eagle City, 9 holes OUT), the course settings and the golfer screen.
+"Go to Course" shows "Connecting..." and then "Connection failed"
+without another HTTP request.
 
 With a saved score, the parser reads the token and optional `0x42d0`,
 then a nonzero count followed by `0x4230` and `0x42d1`

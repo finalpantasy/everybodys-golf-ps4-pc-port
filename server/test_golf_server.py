@@ -1145,7 +1145,7 @@ class GolfServerTests(unittest.TestCase):
         client.request("GET", DOWNLOAD_BASE + "/local-national-board.bin")
         response = client.getresponse()
         self.assertEqual((response.status, response.read()), (200, bytes.fromhex(
-            "0041020001000000 20410100 4541020001000000 4641020000000000 40410500")
+            "0041020001000000 20410100 4541020001000000 4641020001000000 40410500")
             + b"LocalTournament\0" + bytes.fromhex("4741020001000000 4241020000030303"
             " 4341020000000000 4441020000000000 50410600") + b"Local Tournament\0\x03\x03\x03"
             + bytes.fromhex("774103002018091400000000 784103002018091423595900 30410100") + end))
@@ -1181,8 +1181,8 @@ class GolfServerTests(unittest.TestCase):
         self.assertEqual(set(files), {0xBD8494AE, 0x520E1D57})
         self.assertEqual(files[0xBD8494AE],
                          b"\xef\xbb\xbfresetThreshold\ttournamentId\tsponsored_US\tp1_course\tp1_hole\tp2_course\tp2_hole\r\n"
-                         b"0\t1\t0\t0\t1\t0\t1\r\n")
-        self.assertEqual(files[0x520E1D57], b"\xef\xbb\xbftournamentName_US_01_ENG\r\nLocal Tournament\r\n")
+                         b"0\t1\t0\t1\t1\t1\t1\r\n")
+        self.assertEqual(files[0x520E1D57], b"\xef\xbb\xbftournamentName_US_01_ENG\r\n\"Local Tournament\"\r\n")
 
     def test_national_tournament_rejects_wrong_id_and_disabled_downloads(self):
         for options, expected in (({}, 404), ({"national_tournament": True,

@@ -68,6 +68,9 @@ NATIONAL_DISTRIBUTION_SUFFIX = "/local-national-distribution.json"
 NATIONAL_DISTRIBUTION_DOWNLOAD_PATH = GAME_DOWNLOAD_BASE + NATIONAL_DISTRIBUTION_SUFFIX
 LOCAL_TOURNAMENT_ID = 1
 LOCAL_TOURNAMENT_VERSION = 1
+# Board word 0x4146 becomes entry +0x271, the stage whose p<n>_ settings the entry screen uses.
+# 0 fails the check at 0xc4e095-0xc4e0a3 and shows "Connection failed"; 1 selects the p1_ settings.
+LOCAL_TOURNAMENT_STAGE = 1
 LOCAL_TOURNAMENT_GROUP = b"LocalTournament"
 LOGIN_PREFIX = "/nmg-us/replay-probe/gameapi_login?account="
 PROPERTY_INFO_PATH = "/nmg-us/replay-probe/gameapi_getgamepropertyinfo"
@@ -541,7 +544,7 @@ def national_tournament_board(at: datetime) -> bytes:
     start = bcd_timestamp(at.replace(hour=0, minute=0, second=0, microsecond=0))
     end = bcd_timestamp(at.replace(hour=23, minute=59, second=59, microsecond=0))
     return (pack("<2HI2H2HI2HI", 0x4100, 2, 1, 0x4120, 1,
-                 0x4145, 2, LOCAL_TOURNAMENT_VERSION, 0x4146, 2, 0)
+                 0x4145, 2, LOCAL_TOURNAMENT_VERSION, 0x4146, 2, LOCAL_TOURNAMENT_STAGE)
             + score_string(0x4140, LOCAL_TOURNAMENT_GROUP)
             + pack("<2HI", 0x4147, 2, LOCAL_TOURNAMENT_ID)
             + score_string(0x4142, b"") + pack("<2HI2HI", 0x4143, 2, 0, 0x4144, 2, 0)
