@@ -1399,9 +1399,16 @@ class GolfServerTests(unittest.TestCase):
         best = pack("<2Hq2Hq", 0x4500, 3, -3, 0x4501, 3, 91)
         expected_own = (prefix + bytes.fromhex("0042020001000000 30420100 d142020002000000")
                         + rank + best + bytes.fromhex("40420100") + term)
-        expected_list = (prefix + bytes.fromhex("0042020001000000 1042020001000000 50420100")
-                         + rank + best + string_record(0x0020, b"Golfer") + string_record(0x0084, LOGIN_ACCOUNT)
-                         + bytes.fromhex("60420100") + term)
+
+        def list_row(rank, name, primary, secondary):
+            stats = pack("<2Hq2Hq", 0x4500, 3, primary, 0x4501, 3, secondary)
+            return (bytes.fromhex("50420100") + pack("<2HI", 0x4270, 2, rank) + stats
+                    + string_record(0x0020, name) + string_record(0x0084, LOGIN_ACCOUNT) + bytes.fromhex("60420100"))
+
+        # Each online name keeps its own best score, so the three submitted names rank as three rows.
+        expected_list = (prefix + bytes.fromhex("0042020003000000 1042020001000000")
+                         + list_row(1, b"Golfer", -3, 91) + list_row(2, b"G", -2, 42)
+                         + list_row(3, b"ABCDEFGHIJKLMNOP", 8, 123) + term)
 
         def request(client, method, path, expected_status, expected_reply, body=None):
             client.request(method, path, body=body, headers=SERVER_TIME_HEADERS if body is not None else {})

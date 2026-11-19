@@ -19,7 +19,10 @@ from golf_server import (
 )
 
 PREPARED_EBOOT_HASH = "293156adf6462feedb574dd9cd5db45707469a6c407b1d89a2241a4bacde5dc2"
-URL_MAP = Path(__file__).resolve().parents[1] / "analysis/online/title-url-map.tsv"
+# Next to this script in a release (tools/server), else in the repository's analysis folder.
+URL_MAP = next((path for path in (Path(__file__).resolve().parent / "title-url-map.tsv",
+                                  Path(__file__).resolve().parents[1] / "analysis/online/title-url-map.tsv")
+                if path.is_file()), Path(__file__).resolve().parents[1] / "analysis/online/title-url-map.tsv")
 PROBE_ROOT = f"http://{LOOPBACK}:8765/nmg-us/replay-probe/"
 
 

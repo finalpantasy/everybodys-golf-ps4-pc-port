@@ -22,13 +22,15 @@ What works:
 - 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
 - Texture packs: dump the game's textures, upscale them, and the port draws the upscaled copies instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
 - A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
-- With the bundled local server, the daily ranking opens and a Game Room can be created up to its participant list.
+- With the bundled server, the daily ranking opens, Open Course hole scores register, and a Game Room can be created up to its participant list.
+- Render resolution changes while you play (tested on the island: 1080 to 1440 and back, with no restart).
 
 Known problems:
 
 - Course loads are slow. A repeat load of Eagle City took 40 to 60 seconds in one test (90 to 140 before); a course not loaded before takes longer, and some pipelines still recompile on every load.
 - Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
 - Whether the game shows the add-on items is not verified.
+- Online with friends shares rankings only. Each round is still played alone: the game's matchmaking runs inside each PC, so other players never appear on your course. Joining from a second PC and the router port mapping are not tested yet.
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
 
@@ -39,7 +41,7 @@ Progress is measured by these steps: prepared image, boot, guest rendering, real
 - Restored limited-event gear, based on evidence of the original event, redemption and shop behavior.
 - Higher frame rates and resolutions on PC.
 
-The entitlement unlock is implemented and not yet verified in the game. Online play works in part against a local server only. Event gear is not implemented.
+The entitlement unlock is implemented and not yet verified in the game. Online play works in part: one server, on your PC or a friend's, keeps everyone's Open Course rankings; playing a round together is not implemented. Event gear is not implemented.
 
 ## What you need
 
@@ -59,8 +61,14 @@ Settings, saves, logs and the prepared game stay in `data\` inside the install f
 
 The launcher also has:
 
-- Display: window mode, output resolution, render height, frame rate priority, SMAA, FSR 1 sharpening, vsync and HDR.
+- Display: window mode, output resolution, render resolution, 60 FPS mode, SMAA, FSR 1 sharpening, vsync and HDR.
+- Saves: several saves, each with its own golfer and progress. Make a new one, copy, rename, back up to `data\backups`, or move one to the Recycle Bin.
 - HD textures: tick "Collect textures while playing", play a while, then build an upscaled pack with Real-ESRGAN (2x or 4x, bundled) and turn it on. The pack is made from your own copy and stays on your PC.
+- Online: host the bundled server on your PC or join a friend's. Pick a name and a port, press Copy invite for friends, and send them the text: it lists your home network address and any VPN address (Tailscale, ZeroTier) with the port. Friends outside your home network need the port forwarded on your router (the launcher can ask the router with UPnP) or a shared VPN.
+
+### Settings in the game
+
+Press F10 in the game. On a controller, hold Options for 2 seconds. Display Settings opens over the game. These change at once: window mode, window size, monitor, vsync, render resolution (up to 1800 lines, or the size the game started at if higher), SMAA, sharpening and HD textures. 60 FPS mode and HDR take effect at the next start. The launcher and the game share one settings file, so a change in either shows in the other.
 
 ## Build
 

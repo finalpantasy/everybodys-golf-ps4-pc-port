@@ -7,7 +7,25 @@ python -B server/golf_server.py --port 8765
 python -B -m unittest discover -s server -v
 ```
 
-The listener binds to `127.0.0.1`.
+The listener binds to `127.0.0.1` unless `--bind ADDRESS` is given
+(`0.0.0.0` accepts other machines; open the port in the firewall).
+
+## Hosting for friends
+
+`host.py` is the launcher's one-command entry. It builds the discovery
+fixture, daily score block and EULA text into `--state` once (cached by
+the eboot's SHA-256 and `FIXTURE_VERSION`), keeps `scores.db` there, and
+serves the verified full online flag set. It prints `ready <bind>:<port>`
+when listening and one line per request.
+
+```sh
+python -I server/host.py --eboot work/game-1.17-prepared/eboot.elf     --libcrypto tools/msys2/msys64/clang64/bin/libcrypto-4-x64.dll     --state work/online/host --port 48765 --bind 0.0.0.0
+```
+
+Scores are kept per online name. The server learns a client's name from
+its `gameapi_login` and score registrations and ties it to the client's IP
+address, so two players behind one address share the last name seen.
+A client with no known name gets the best row for own-score queries.
 
 ## Combined replay
 
