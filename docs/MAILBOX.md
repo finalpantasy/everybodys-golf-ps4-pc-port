@@ -8876,3 +8876,176 @@ item, or walking through the central gate, sends next.
 
 Addendum: selecting International Tournament shows "Connecting..." at the central gate, then returns to the island with no
 message. The four 400 replies come right after that selection, so the rejected board requests are the entry blocker.
+
+
+### 2026-11-18 18:15 codex -> orchestrator: selector 3 tournament entry board
+
+Restart the listener with the same options and `ss-info-local-national-v1.bin`. Action `0x24` writes selector 3 at `a612e3` and uses slot `0x2f`, whose builder ends with `0x4a40` and `0x8010` (`b5561a-b55649`). Selectors 0 and 3 now serve the same 136-byte board. All 94 listener tests pass, including the selector 3 regression.
+
+Use `GOLF_BREAK=a612e3,b84b63,a62d5b,a615a3,a61691` to trace the entry sequence through board parsing, the mode 0x1a row gate, national own score and national score distribution. The allowlist in `8eae334` covers the board POST and download.
+
+
+### 2026-11-18 18:23 codex -> orchestrator: national own score and join request
+
+Use `work/online/ss-info-local-national-v2.bin` with the patch below to route the own-score POST queued by the tournament entry screen at `c4bed1`. The 16-byte no-score reply uses the branch at `b6b3dd`.
+
+- Discovery change from v1 â€” own-score URL scheme only
+- Host verification â€” 95 listener tests and Windows ASan at both request bounds
+- Join notification â€” action `0x2f`, slot `0x3a`, reply word `0x4962`, compared at `c4b8f3`
+
+The join value and guest acceptance of the own-score reply remain unverified.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -37,4 +37,5 @@
+ #define CHARACTER_BOARD_PATH "/nmg-us/replay-probe/gameapi_getboardlistcharactordownload"
+ #define NATIONAL_BOARD_PATH "/nmg-us/replay-probe/gameapi_getboardlistnational"
++#define NATIONAL_OWN_SCORE_PATH "/nmg-us/replay-probe/gameapi_getmyscorenational"
+ #define NATIONAL_GAME_DATA_PATH "/nmg-us/replay-probe/gameapi_getnationalgamedata"
+ #define NATIONAL_BOARD_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-national-board.bin"
+@@ -97,4 +98,5 @@
+     {"https://127.0.0.1:8765" NATIONAL_BOARD_PATH, NATIONAL_BOARD_PATH, 378, 1378, 28, 0x8000, 4, NULL},
+     {"http://127.0.0.1:8765" NATIONAL_BOARD_DOWNLOAD_PATH, NATIONAL_BOARD_DOWNLOAD_PATH, 0, 0, 136, 136, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_OWN_SCORE_PATH, NATIONAL_OWN_SCORE_PATH, 570, 1570, 16, 16, 4, NULL},
+     {"https://127.0.0.1:8765" NATIONAL_GAME_DATA_PATH, NATIONAL_GAME_DATA_PATH, 406, 1406, 72, 72, 4, NULL},
+     {"http://127.0.0.1:8765" NATIONAL_GAME_DOWNLOAD_PATH, NATIONAL_GAME_DOWNLOAD_PATH, 0, 0, 16, 8192, 1, NULL},
+```
+
+
+### 2026-11-18 18:36 codex -> orchestrator: national tournament first-entry reply
+
+Use `work/online/ss-info-local-national-v3.bin` with the current tournament options and the own-score row from 18:23. The only discovery change from v2 is the join URL scheme.
+
+The join POST accepts 422–1,422 bytes and returns a 36-byte reply. The zero in record `0x4962` branches from `c4b8f9` to `c4c837` at the fixture threshold of zero. A positive value can reach the ticket or dialog branch.
+
+All 96 listener tests passed and the patch passes `git apply --check`. Guest join and repeat entry are NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -39,2 +39,3 @@
+ #define NATIONAL_GAME_DATA_PATH "/nmg-us/replay-probe/gameapi_getnationalgamedata"
++#define NATIONAL_JOIN_PATH "/nmg-us/replay-probe/gameapi_noticejoinnational"
+ #define NATIONAL_BOARD_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-national-board.bin"
+@@ -99,2 +100,3 @@
+     {"https://127.0.0.1:8765" NATIONAL_GAME_DATA_PATH, NATIONAL_GAME_DATA_PATH, 406, 1406, 72, 72, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_JOIN_PATH, NATIONAL_JOIN_PATH, 422, 1422, 36, 36, 4, NULL},
+     {"http://127.0.0.1:8765" NATIONAL_GAME_DOWNLOAD_PATH, NATIONAL_GAME_DOWNLOAD_PATH, 0, 0, 16, 8192, 1, NULL},
+```
+
+
+
+### 2026-11-18 18:39 codex -> orchestrator: local national score distribution
+
+Use `work/online/ss-info-local-national-v4.bin` with the own-score and join rows already in the mailbox. The sole discovery change from v3 is the distribution URL scheme.
+
+Action `0x2e` sends slot `0x34`. Its 68-byte reply gives the suffix in record `0x4292`, and slot `0x35` downloads `[]` to exercise the parser's empty-row path at `b6e87a`.
+
+All 97 listener tests passed, and the patch passes `git apply --check`. Guest distribution is NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -41,2 +41,4 @@
+ #define NATIONAL_GAME_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-tournament.xb"
++#define NATIONAL_DISTRIBUTION_PATH "/nmg-us/replay-probe/gameapi_getscoredistributionnational"
++#define NATIONAL_DISTRIBUTION_DOWNLOAD_PATH "/nmg-us/replay-probe/gamedata-down/local-national-distribution.json"
+ #define CHARACTER_COUNT_PATH "/nmg-us/replay-probe/gameapi_getcountcharactordownload"
+@@ -100,2 +102,4 @@
+     {"http://127.0.0.1:8765" NATIONAL_GAME_DOWNLOAD_PATH, NATIONAL_GAME_DOWNLOAD_PATH, 0, 0, 16, 8192, 1, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_DISTRIBUTION_PATH, NATIONAL_DISTRIBUTION_PATH, 398, 1398, 68, 68, 4, NULL},
++    {"http://127.0.0.1:8765" NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, 0, 0, 2, 2, 1, NULL},
+     {"https://127.0.0.1:8765" PROPERTY_INFO_PATH, PROPERTY_INFO_PATH, 118, 118, 24, 24, 4, NULL},
+```
+
+
+
+### 2026-11-18 18:44 codex -> orchestrator: inline national score list
+
+`work/online/ss-info-local-national-v5.bin` adds the HTTPS score-list URL to v4. Keep the earlier tournament rows in place.
+
+Slot `0x36` accepts the paged request and the size-1 variant with record `0x42f3`. The 44-byte inline reply reaches the zero-row branch at `b85c8a`.
+
+All 98 listener tests passed, and the patch passes `git apply --check`. Guest score-list acceptance and populated ranking are NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -42,2 +42,3 @@
+ #define CHARACTER_COUNT_PATH "/nmg-us/replay-probe/gameapi_getcountcharactordownload"
++#define NATIONAL_SCORE_LIST_PATH "/nmg-us/replay-probe/gameapi_getscorelistnational"
+ #define PROPERTY_INFO_PATH "/nmg-us/replay-probe/gameapi_getgamepropertyinfo"
+@@ -101,2 +102,3 @@
+     {"https://127.0.0.1:8765" PROPERTY_INFO_PATH, PROPERTY_INFO_PATH, 118, 118, 24, 24, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_SCORE_LIST_PATH, NATIONAL_SCORE_LIST_PATH, 438, 1698, 44, 44, 4, NULL},
+     {"https://127.0.0.1:8765" CHARACTER_COUNT_PATH "?account=", CHARACTER_COUNT_PATH "?account=", 394, 1394, 44, 44, 4, NULL},
+```
+
+
+
+### 2026-11-18 18:50 codex -> orchestrator: tournament host replay and Vulkan query timing
+
+The four tournament patches from 18:23 through 18:44 apply in order. Windows AddressSanitizer verified all five loopback routes at both POST bounds and with the tournament disabled.
+
+Three idle RTX 4090 runs of 4,096 samples each measured 0.800 µs median and 0.900 µs p99 for the Vulkan memory-budget query. The reported budget held at 23,370 MiB with zero device-local usage in the probe.
+
+The 18:30 guest run ended with 452,451 copy-wait yields and zero frame-statistics windows. The matched FPS comparison remains NOT_RUN.
+
+
+
+### 2026-11-18 18:56 codex -> orchestrator: persist national tournament scores
+
+Use `work/online/ss-info-local-national-v6.bin` with `--national-tournament` and `--score-db` on the listener. Apply the patch below after the four earlier tournament patches.
+
+Slot `0x39` commits the score before acknowledging it. The listener keeps the lower primary score and its paired secondary score for the selected event date, then returns that row in own score, score list, and distribution.
+
+All 99 listener tests passed, including both request-size bounds, wrong-account rejection, restart readback, and date isolation. The patch passes `git apply --check` after the earlier patches. Guest acceptance is NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -99,2 +99,3 @@
+     {"https://127.0.0.1:8765" REGIST_PREFIX "longdrivecontest" SESSION_QUERY, NULL, 582, 4514, 16, 0x1000, 4, NULL},
++    {"https://127.0.0.1:8765" REGIST_PREFIX "national" SESSION_QUERY, NULL, 590, 5134, 40, 40, 4, NULL},
+     /* Action 0x26 of the login run (slot 0x2f). Over plain http the game encrypts the payload and drops
+@@ -103,3 +104,3 @@
+     {"http://127.0.0.1:8765" NATIONAL_BOARD_DOWNLOAD_PATH, NATIONAL_BOARD_DOWNLOAD_PATH, 0, 0, 136, 136, 4, NULL},
+-    {"https://127.0.0.1:8765" NATIONAL_OWN_SCORE_PATH, NATIONAL_OWN_SCORE_PATH, 570, 1570, 16, 16, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_OWN_SCORE_PATH, NATIONAL_OWN_SCORE_PATH, 570, 1570, 16, 84, 4, NULL},
+     {"https://127.0.0.1:8765" NATIONAL_GAME_DATA_PATH, NATIONAL_GAME_DATA_PATH, 406, 1406, 72, 72, 4, NULL},
+@@ -108,5 +109,5 @@
+     {"https://127.0.0.1:8765" NATIONAL_DISTRIBUTION_PATH, NATIONAL_DISTRIBUTION_PATH, 398, 1398, 68, 68, 4, NULL},
+-    {"http://127.0.0.1:8765" NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, 0, 0, 2, 2, 1, NULL},
++    {"http://127.0.0.1:8765" NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, NATIONAL_DISTRIBUTION_DOWNLOAD_PATH, 0, 0, 2, 35, 1, NULL},
+     {"https://127.0.0.1:8765" PROPERTY_INFO_PATH, PROPERTY_INFO_PATH, 118, 118, 24, 24, 4, NULL},
+-    {"https://127.0.0.1:8765" NATIONAL_SCORE_LIST_PATH, NATIONAL_SCORE_LIST_PATH, 438, 1698, 44, 44, 4, NULL},
++    {"https://127.0.0.1:8765" NATIONAL_SCORE_LIST_PATH, NATIONAL_SCORE_LIST_PATH, 438, 1698, 44, 132, 4, NULL},
+     {"https://127.0.0.1:8765" CHARACTER_COUNT_PATH "?account=", CHARACTER_COUNT_PATH "?account=", 394, 1394, 44, 44, 4, NULL},
+```
+
+
+
+### 2026-11-18 19:04 codex -> orchestrator: current multiplayer and tournament patch bundle
+
+The mailbox patches now apply as one diff on runtime `9927afb`. Use `work/online/online-on-9927afb.diff` for a clean checkout of that commit, or `work/online/matching-on-9927afb.diff` for Matching2 and RUDP only.
+
+The combined diff covers the 21 mailed patch blocks for local lobby and room traffic, lost join replies, and national tournament replay. It passed `git apply --check --whitespace=error` against byte-for-byte copies of the committed sources. Guest multiplayer and the combined Windows bridge replay remain NOT_RUN.
+
+
+
+### 2026-11-18 19:05 codex -> orchestrator: Windows bridge verification on 9927afb
+
+Windows AddressSanitizer verified `online-on-9927afb.diff` with two native clients. The listener dropped an accepted join reply, the retry reused the seat, both clients joined one room, RUDP packets traveled in both directions, and both leases cleared on leave.
+
+The tournament probe passed 590- and 5,134-byte registration requests and exact 84-byte own-score, 132-byte score-list, and 35-byte distribution readbacks. Disabled routes returned HTTP 404. Guest multiplayer and tournament registration remain NOT_RUN.
+
+
+
+### 2026-11-18 orchestrator -> codex: tournament entry now stops at an empty own-score request
+
+Runtime `5f6c932` and later, with your selector-3 listener, `ss-info-local-national-v1.bin` and `--national-tournament`. Selecting International Tournament now sends the selector-3 board (200, 60 bytes, then the 136-byte download) with no 400s. GOLF_BREAK hits: a612e3, b84b63, a615a3. a62d5b (mode 0x1a row gate) and a61691 (national score distribution) did not hit.
+
+The guest then POSTs `gameapi_getmyscorenational` over plain http (`http://127.0.0.1:8765/...`, not https), four times. Every body is 66 bytes: the multipart wrapper with an empty `p` field (`--xYzZY`, the Content-Disposition line, a blank line, then the closing boundary). The listener returns 400 because its minimum is 570. The island then shows "Connection failed". Captures: `work/online/http-dump-3/059..063-gameapi_getmyscorenational.bin`. The runtime route for it is in the commit after `9927afb` (66..1570 bytes, reply 16..0x8000).
+
+Two questions. Does an empty payload mean the guest skipped building the record because the 136-byte board has no row that passes the mode 0x1a gate (a62d5b never hit)? If so, what row should selector 3's board carry? If the empty request is normal, what reply does the guest expect?
