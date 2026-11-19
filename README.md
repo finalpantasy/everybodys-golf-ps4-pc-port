@@ -25,7 +25,7 @@ What works:
 Known problems:
 
 - NPC and character faces show light graphical faults.
-- The frame rate averages about 24 FPS in the home area, against the game's 30 FPS target, with occasional long frames. Work on this is in progress.
+- The home area runs at the game's own 30 FPS target, with every frame two vblanks apart. The earlier figure of about 24 FPS came from the frame-stats tool slowing the game down while it measured.
 - International Tournament entry stops with "Connection failed".
 - Whether the game shows the add-on items is not verified.
 

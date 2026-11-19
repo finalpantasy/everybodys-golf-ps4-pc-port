@@ -1,6 +1,6 @@
 # Project state
 
-Status: Playable. On 2026-11-18 the owner played a full 9-hole round by hand. Known faults: light graphical errors on NPC and character faces, about 24 FPS instead of 30, and "Connection failed" at the International Tournament gate.
+Status: Playable. On 2026-11-18 the owner played a full 9-hole round by hand. Known faults: light graphical errors on NPC and character faces, and "Connection failed" at the International Tournament gate.
 
 ## Goals
 
@@ -153,7 +153,8 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 - 60 FPS: the game switches between 30 (0xeadb0, with `SetFlipRate(1)`) and 60 (0xeacf0) itself and checks `==60` in about 20 places. Holding the target at 60 crashed at 0xeb7a1 and, with a guard, at 0x2f6fba, because the 60 path expects objects such as the one at 0x2c99d30. The change was reverted. Game logic above 60 FPS does not exist in this game.
 - FSR 1: with `sharpening=1` the presenter upscales the 3200x1800 PS4 Pro frame to a larger window with EASU, then RCAS sharpens it (runtime `6d095aa`). At 3779x2126 the output's mean color matched the source frame.
 - Not possible from the presenter: DLSS and FSR 2/3 (upscaling or frame generation) need per-pixel motion vectors and depth from the game's own renderer. Driver-level frame generation (NVIDIA Smooth Motion, AMD Fluid Motion Frames) works on any Vulkan window and is the available route. Native 4K would need the game's 3200x1800 render targets resized.
-- Next: measure flip-event latency in `gpu/shadps4/core/libraries/videoout/driver.cpp` (the flip event fires after the host present) while no other heavy process is loading the PC.
+- 30 FPS (runtime `5fbddb3`): the measured 24 FPS was caused by the measuring tool. `RESOGUN_FRAME_STATS` printed each stall report from the present thread and blocked on the output pipe for 40-60 ms before the flip event fired; main waited for that event, so the next frame stalled too, about 11 times in every 5 s. Printed from a logger thread, free roam holds 30.0 FPS, with 150 of 150 flips two vblanks apart and a p99 frame of 34 ms. No other change was needed. Measured with another project's game loading the PC.
+- New diagnostics: a "Flip latency" stats line (guest submit to GPU-thread queue, about 0.2 ms; queue to flip, about 16 ms; intervals in vblanks); `RESOGUN_SLOW_WAITS_THREAD=<name>`; slow sleeps and flip waits print the guest call site (image base 0x800000000); `RESOGUN_EQUEUE_WAITERS=1` lists each event queue's waiting threads. Main (0xfbd04f) and `BackgroundDraw` (0xfb768a, loading screens only) share the Flip queue.
 
 ## Active source and ownership
 
