@@ -20,14 +20,14 @@ What works:
 - Courses load and draw with correct colors. Hole scores register and read back after a restart.
 - Stereo music and sound effects.
 - 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
-- Texture packs: dump the game's textures, upscale them, and the port draws the PNGs instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
+- Texture packs: dump the game's textures, upscale them, and the port draws the upscaled copies instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
 - A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
 - With the bundled local server, the daily ranking opens and a Game Room can be created up to its participant list.
 
 Known problems:
 
-- NPC and character faces show light graphical faults.
-- International Tournament entry stops with "Connection failed".
+- Course loads take 90 to 140 seconds, because some pipelines recompile on every load.
+- Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
 - Whether the game shows the add-on items is not verified.
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
@@ -48,6 +48,19 @@ The entitlement unlock is implemented and not yet verified in the game. Online p
 - Your own DLC packages.
 
 Packages, keys, licenses and game data stay out of the repository. See `.gitignore`.
+
+## Install (Windows)
+
+1. Run `EverybodysGolfPC-Setup-<version>.exe`. It installs for your user only and needs no admin rights. The default folder is `C:\Games\Everybody's Golf PC`; any folder you can write to works.
+2. Start Everybody's Golf from the Start menu. On the Game files tab, choose your base game folder, the 1.17 update folder (leave it empty if your dump already has the update) and any DLC folders, then press Set up game files. It takes a few seconds.
+3. Press Play.
+
+Settings, saves, logs and the prepared game stay in `data\` inside the install folder, never in AppData. The installer adds only a Start menu shortcut and an uninstall entry for your user. Uninstalling keeps `data\` unless you say otherwise.
+
+The launcher also has:
+
+- Display: window mode, output resolution, render height, frame rate priority, SMAA, FSR 1 sharpening, vsync and HDR.
+- HD textures: tick "Collect textures while playing", play a while, then build an upscaled pack with Real-ESRGAN (2x or 4x, bundled) and turn it on. The pack is made from your own copy and stays on your PC.
 
 ## Build
 

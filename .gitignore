@@ -38,6 +38,10 @@ saves/
 /tools/realesrgan*/
 /tools/home/
 /tools/staging/
+/tools/python-embed/
+/tools/innosetup/
+/tools/upscale-models/
+/tools/upscale-venv/
 
 # Local agent handoff notes
 /docs/CLAUDE_TAKEOVER.md

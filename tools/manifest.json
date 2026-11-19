@@ -137,6 +137,29 @@
       "permissions": "Downloaded with the owner's approval on 2026-11-19; runs locally on the GPU, no network",
       "verification": "Zip hash checked after download; demo media removed after extraction",
       "rollback": "Delete tools/realesrgan and tools/realesrgan-dl"
+    },
+    {
+      "name": "Python embeddable package",
+      "source": "https://www.python.org/ftp/python/3.13.17/python-3.13.17-embed-amd64.zip",
+      "version": "3.13.17 (amd64); zip sha256 9e35319bffedab8b36ad44d8f377cb4f1733bcec257a0b6d04d94f01486ddb38; numpy 2.5.5, pillow 13.0.0, etcpak 0.9.15 installed with pip --only-binary into runtime/Lib/site-packages",
+      "license": "PSF-2.0 (Python); NumPy BSD-3-Clause; Pillow MIT-CMU; etcpak BSD-3-Clause",
+      "path": "tools/python-embed",
+      "purpose": "Bundled as tools/python in the release for the texture-pack scripts; built by external/resogun-recomp/tools/package.py",
+      "permissions": "Downloaded 2026-11-19; runs locally, no network",
+      "verification": "Hash computed on download (no published digest checked); import numpy, PIL, etcpak ran with -I from the dist folder",
+      "rollback": "Delete tools/python-embed"
+    },
+    {
+      "name": "Inno Setup",
+      "source": "https://github.com/jrsoftware/issrc/releases/download/is-6_7_4/innosetup-6.7.4.exe",
+      "version": "6.7.4; installer sha256 a549929319f9120716677c685535ca4671e4b937b5fdc87e2585f32d8eb30e8c",
+      "license": "Inno Setup License (free, redistribution of the compiler restricted)",
+      "path": "tools/innosetup",
+      "staged_archive": "tools/staging/innosetup-6.7.4.exe",
+      "purpose": "Builds the per-user Windows installer (packaging/windows/installer.iss) via package.py --installer",
+      "permissions": "Installed with /CURRENTUSER into the project folder; compiler only, no network",
+      "verification": "ISCC compiled the script; silent install and uninstall tested in a scratch folder",
+      "rollback": "Delete tools/innosetup and its staged installer"
     }
   ]
 }
