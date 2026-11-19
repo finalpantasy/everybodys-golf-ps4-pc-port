@@ -1,6 +1,6 @@
 # Project state
 
-Status: Building. On 2026-11-18 the game finished the character creator and reached the home island with the walking tutorial. Later that day hole 1 of Eagle City G.C. was finished twice (bogey, then par) and hole 2 was started. There is no sound.
+Status: Playable. On 2026-11-18 the owner played a full 9-hole round by hand. Known faults: light graphical errors on NPC and character faces, about 24 FPS instead of 30, and "Connection failed" at the International Tournament gate.
 
 ## Goals
 
@@ -146,6 +146,15 @@ All 20 missing `libSceNet*`/`libSceHttp`/`libSceSsl` imports in `missing-imports
 
 The import checker remains nonzero by design; `work/game-1.17-prepared/missing-imports.txt` was not regenerated in this session (NOT_RUN).
 
+## Performance and display (2026-11-18)
+
+- Profiler: `GOLF_PROFILE=<seconds>` (runtime `120994f`) samples guest and runtime threads every 4 ms and prints per-thread CPU and the top 40 guest callers. `GOLF_PROFILE_THREAD=<name>` limits it to one thread (sampling every thread slowed the game to 4-13 FPS); `GOLF_PROFILE_WAITS=1` also samples threads that are waiting.
+- Frame loop: the frame object is at image+0x2cea1c0, with the target FPS at +0x24ec (30 by default, set at 0xb9ab5) and the flip-rate flag at +0x24f0. The pacing loop at 0xfb3110 calls `sceVideoOutWaitVblank` until 60/target-1 vblanks pass. The main thread then submits the flip and blocks in `sceKernelWaitEqueue` at 0xfbd04a until the flip completes. Most of a slow frame is spent in these two waits, not in CPU work.
+- 60 FPS: the game switches between 30 (0xeadb0, with `SetFlipRate(1)`) and 60 (0xeacf0) itself and checks `==60` in about 20 places. Holding the target at 60 crashed at 0xeb7a1 and, with a guard, at 0x2f6fba, because the 60 path expects objects such as the one at 0x2c99d30. The change was reverted. Game logic above 60 FPS does not exist in this game.
+- FSR 1: with `sharpening=1` the presenter upscales the 3200x1800 PS4 Pro frame to a larger window with EASU, then RCAS sharpens it (runtime `6d095aa`). At 3779x2126 the output's mean color matched the source frame.
+- Not possible from the presenter: DLSS and FSR 2/3 (upscaling or frame generation) need per-pixel motion vectors and depth from the game's own renderer. Driver-level frame generation (NVIDIA Smooth Motion, AMD Fluid Motion Frames) works on any Vulkan window and is the available route. Native 4K would need the game's 3200x1800 render targets resized.
+- Next: measure flip-event latency in `gpu/shadps4/core/libraries/videoout/driver.cpp` (the flip event fires after the host present) while no other heavy process is loading the PC.
+
 ## Active source and ownership
 
 - Orchestrator (sole integration owner since 2026-11-17 19:09 EST): Claude desktop Code-tab session `local_379ec4f6-3acc-450c-b6c7-f5aa8052c4c9`, title "Everybody's Golf PS4 runtime orchestration", model `claude-fable-5-2` (effort medium), local (not cloud). Pinned in the sidebar with the app's `set_pinned` control; `get_session` read back `pinned: true`. It owns `external/resogun-recomp`, builds, game execution, generated runtime state and shared docs. No workers started. The orchestrator is this lead session itself, not a separate background process: it runs only while the chat is active.
@@ -162,7 +171,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 1. Scores: confirm holes 3..9 and the round's Daily group register in one full round (needs a run over 10 minutes), then enter the International Tournament (central gate) and play its round.
 2. S Tickets: spending works and persists. Shop, R1 five times to the ticket tab, Turf War Warp Medal x10, YES: Tickets 101 to 100, Warp Medals 0 to 10; the save is written on leaving the Shop and a later boot shows 100 and 10 (2026-11-18). Not yet checked: Blacksmith ticket costs and limited-event gear by server time (NOT_RUN).
-3. Play a full nine-hole round and a three-press swing to hole-out (both NOT_RUN).
+3. A three-press swing to hole-out (NOT_RUN). The full nine-hole round was played by hand on 2026-11-18.
 4. Hole map HUD: black silhouette on Eagle City hole 1, colored on hole 2.
 5. Sound: a listening check, then volumes, patches and submixers in the Ngs2 mixer.
 6. Check the creator avatar's skin color with a correctly read screenshot (NOT_VERIFIED).
