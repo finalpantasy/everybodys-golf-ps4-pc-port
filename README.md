@@ -19,13 +19,13 @@ What works:
 - Boot, title screen, menus, the home island and character creation.
 - Courses load and draw with correct colors. Hole scores register and read back after a restart.
 - Stereo music and sound effects.
+- 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
 - A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
 - With the bundled local server, the daily ranking opens and a Game Room can be created up to its participant list.
 
 Known problems:
 
 - NPC and character faces show light graphical faults.
-- The home area runs at the game's own 30 FPS target, with every frame two vblanks apart. The earlier figure of about 24 FPS came from the frame-stats tool slowing the game down while it measured.
 - International Tournament entry stops with "Connection failed".
 - Whether the game shows the add-on items is not verified.
 
