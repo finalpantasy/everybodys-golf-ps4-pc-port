@@ -17,7 +17,7 @@ Callback argument layouts (from the registers the game reads):
 - Request callback: `(ctxId u16 edi, requestId esi, event u16 dx, errorCode ecx, data r8, arg r9=obj)`.
 - Context callback `0xa7e820`: `(ctxId edi, event si, eventCause dx (ignored), errorCode ecx, arg r8=obj)`.
 - Lobby event callback `0xa7e8b0`: `(ctxId edi, lobbyId rsi (ignored), event dx, data rcx, arg r8=obj)`.
-- Signaling callback `0xa7eef0`: `(ctxId edi, subjectId rsi, event edx, cause ecx, r8d, arg r9=obj)`.
+- Signaling callback `0xa7eef0`: `(ctxId edi, roomId rsi, memberId dx, event cx, errorCode r8d, arg r9=obj)`.
 
 ## 0. Before state 5 (context start, `0xa7dfd0`)
 
@@ -120,13 +120,30 @@ Sets state 0x0d unconditionally (teardown; clears `obj+0x7d0`, `0x7d8`, rejoins 
 7. Every response is delivered after the request call has returned, and after the caller's state store (see section 6).
 8. No lobby event is needed: do not send `0x3203` (forces state 0x0d). `0xa201` (member joined) is optional and uses the same record layout as the 0x7207 records.
 
+### Pending request buffers
+
+The JoinLobby callback reads the lobby ID and member array after the
+runtime returns from submission (`0xa83f8c–0xa83f9e`,
+`0xa7971f–0xa79758`). On runtime `0198f25`, a host test held the
+callback for lobby 7 while it submitted the join for lobby 19, and both
+callbacks reported 19 because they shared a response buffer.
+
+The mailbox patch gives each queued world, lobby, join and member
+response its own allocation, including all nested buffers, through
+callback return. Context retirement frees queued responses, and the worker
+checks the generation before dispatching a response it has already
+dequeued. When the queue is full, submission returns Matching2
+`BUSY` and preserves the request ID output. A Windows ASan rerun
+returned lobbies 7 and 19 and passed cleanup and ABI checks.
+Guest verification is NOT_RUN.
+
 ## 5. After the join
 
 - Immediately after `0x0201`: state 0x14 (next tick: GetLobbyMemberDataInternalList), 0x15, 0x16 (`0xa82a10`), 0x17 (`0xa82af0` and `0xa831b0` every tick). The UI's own check is `obj+0x7d0 != 0`.
 - NpAuth: `sceNpAuthCreateAsyncRequest` is at `0xa60ca9`, `sceNpAuthGetAuthorizationCodeA` at `0xa60d12`, delete at `0xa60d21` (title action 0x14 inside the title queue `0xa60120`); `sceNpAuthPollAsync` at `0xb97f4c`. None is called from the Matching2 object code (`0xa76000-0xa86000`) and none after the join. They run before Matching2 starts. No `sceHttp*` or WebApi call exists in `0xa70000-0xa86000`.
 - Lobby event callback `0xa7e8b0` (ignores events when `ctxId != obj+0x44`): `0xa201` -> `0xa7b4a0(obj, data[0]+0x20, +0x34, +0x10)` (member joined); `0xa202` -> finds the member by u16 at `data[0]+0x34` and sets bit 0 of its `+0x1484` and `obj+0x46 = 1` (member left); `0x3203` -> sets state 0x0d, except when the state is 0x2a, or is 0x2b/0x2c with `obj+0x4c == 0x2a` (`0xa7e8ea-0xa7e936`). Nothing is required during or after the join.
 - Lobby message callback `0xa7e950`: the function is a bare `ret`. Required: nothing.
-- Signaling callback `0xa7eef0`: pushes a 16-byte record `{u64 subject, u16 event, u16 cause, u32 r8}` into a ring buffer at `obj+0x820` (capacity `obj+0x118c`, head `+0x1180`, tail `+0x1184`, count `+0x1188`), dropping the oldest when full, with no lock. Required: nothing on the entry path.
+- Signaling callback `0xa7eef0`: pushes a 16-byte record `{u64 roomId, u16 memberId, u16 event, s32 errorCode}` into a ring buffer at `obj+0x820` (capacity `obj+0x118c`, head `+0x1180`, tail `+0x1184`, count `+0x1188`), dropping the oldest when full, with no lock. Required: nothing on the entry path.
 - Room event callback `0xa7e960` and room message callback `0xa7ec30`: room phase only.
 - Context stop: shutdown (`0xa77750`) loops up to 300 times calling `sceNpCheckCallback` and `sceKernelUsleep` until `obj+0x44 == 0`; only context callback `0x6F03` clears it. A replacement must deliver `0x6F03` after `ContextStop`.
 

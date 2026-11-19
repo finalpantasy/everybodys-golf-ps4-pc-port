@@ -9315,3 +9315,93 @@ Runtime `dece52c` carries `online-on-1699c4e.diff`, the 68-byte distribution lim
 Selecting International Tournament now sends selector 3 (200, then the 136-byte download), then one `gameapi_getmyscorenational` over HTTPS with a 582-byte body (`work/online/http-dump-4/058-gameapi_getmyscorenational.bin`). The listener answers 200 with 16 bytes. No other request follows and the runtime logs no other call. The gate then shows "Connection failed" and the player is back on the island (frames in the 19:44 run).
 
 So the guest rejects the 16-byte empty-score reply. What does the slot 0x37 / action 0x2b reply parser need for a player with no national score yet? If it needs an entry record, the listener could return one built from the 136-byte board row (id 0x4147).
+
+
+
+### 2026-11-18 19:49 codex -> orchestrator: national own score now returns a zero-count success
+
+The old `0x90000310` reply reaches the generic completion at `0xb7b2e5` and skips loading the selected tournament entry. A successful reply with `0x4200/2/0` takes the zero-count branch at `0xb731f3`, finds the entry by the original request ID, and sets `+0x299` at `0xb7786b`.
+
+Restart the listener with the same v6 fixture and options. I replayed the exact 582-byte capture over loopback and received HTTP 200 with the new 36-byte reply, within the existing bridge bounds in `dece52c`. All 100 listener tests passed. Guest acceptance is NOT_RUN.
+
+
+
+### 2026-11-18 19:52 codex -> orchestrator: Windows launcher build window
+
+`golf-launcher` is ready to build at `257df4d` on your `dece52c` runtime. All 33 launcher commits matched in the rebase check.
+
+Please leave a build window after the current guest run. I'll close it as soon as the Windows build and archive checks finish.
+
+
+
+### 2026-11-18 20:06 codex -> orchestrator: trim pad diagnostic overhead and fix its startup timestamp
+
+The 20:03 run printed 20 slow host samples, including 19 that followed pad-file edits within three log lines and peaked at 15.7 ms. The shared print cap hides later events, and the log has no FPS windows.
+
+The first sample's start preceded the epoch initialized by another call, so the unsigned subtraction wrapped. The patch clamps that case to zero and replaces the recurring compare-exchange with a relaxed load after initialization. Timestamp cases and the strict apply check passed on `dece52c`. Native and guest timing are NOT_RUN.
+
+```diff
+--- a/src/runtime_pad.c
++++ b/src/runtime_pad.c
+@@ -105,11 +105,12 @@
+     static const char *const names[SLOW_KINDS]={"read","vibration","info","host sample"};
+     const uint64_t us=now_us()-start;
+-    uint64_t unset=0;
+-    __atomic_compare_exchange_n(&slow_epoch,&unset,start,false,__ATOMIC_RELAXED,__ATOMIC_RELAXED);
++    uint64_t epoch=__atomic_load_n(&slow_epoch,__ATOMIC_RELAXED);
++    if (!epoch && __atomic_compare_exchange_n(&slow_epoch,&epoch,start,false,__ATOMIC_RELAXED,__ATOMIC_RELAXED))
++        epoch=start;
+     if (us<2000) return;
+     ++slow_calls[kind];
+     if (us>slow_max_us[kind]) slow_max_us[kind]=us;
+     if (__atomic_fetch_add(&slow_shown,1,__ATOMIC_RELAXED)<20)
+-        printf("Runtime: slow pad %s %.1f ms at %.3f s\n",names[kind],us/1e3,(start-__atomic_load_n(&slow_epoch,__ATOMIC_RELAXED))/1e6);
++        printf("Runtime: slow pad %s %.1f ms at %.3f s\n",names[kind],us/1e3,(start>=epoch ? start-epoch : 0)/1e6);
+ }
+ static uint8_t axis(int16_t v) { int x=(v+32768)>>8; return (uint8_t)(x<0 ? 0 : x>255 ? 255 : x); }
+```
+
+
+
+### 2026-11-18 20:10 codex -> orchestrator: loopback replay for an empty bonus list
+
+Slot `0x2d` accepts a terminator immediately after the session token at `0xb69d8a–0xb69dab`. The new `--empty-bonus-list` option on the fixture generator and listener enables that 28-byte reply for `gameapi_getbonuslist`.
+
+The 386- and 1,386-byte request bounds passed loopback replay. The CLI-generated fixture decoded to all 37 URL mappings, including the HTTPS bonus-list URL. All 101 listener tests passed. Guest acceptance and redemption are NOT_RUN.
+
+```diff
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -32,4 +32,5 @@
+ #define EULA_PATH "/nmg-us/replay-probe/gameapi_geteula"
+ #define NOTICE_PATH "/nmg-us/replay-probe/gameapi_getinfolist"
++#define BONUS_LIST_PATH "/nmg-us/replay-probe/gameapi_getbonuslist"
+ #define DAILY_SCORE_PATH "/nmg-us/replay-probe/gameapi_getscorelist"
+ #define RIVAL_LIST_PATH "/nmg-us/replay-probe/gameapi_getrivallist"
+@@ -75,4 +76,5 @@
+     {"https://127.0.0.1:8765" NOTICE_PATH, NOTICE_PATH, 394, 1394, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" RIVAL_LIST_PATH, RIVAL_LIST_PATH, 438, 1574, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" BONUS_LIST_PATH, BONUS_LIST_PATH, 386, 1386, 28, 28, 4, NULL},
+     {"https://127.0.0.1:8765" DAILY_SCORE_PATH, DAILY_SCORE_PATH, 166, 258, 52, 52, 4, NULL},
+     {"https://127.0.0.1:8765" BOARD_LIST_PATH, BOARD_LIST_PATH, 138, 230, 40, 40, 4, NULL},
+```
+
+
+
+### 2026-11-18 20:15 codex -> orchestrator: launcher build passed and archive is pending
+
+`257df4d` built in the idle window. All 28 CMake test targets passed, and the Python suite reported `Ran 81 tests` and `OK (skipped=17)`.
+
+Please leave one idle minute before the next guest launch so I can compress and check the Windows ZIP.
+
+
+
+### 2026-11-18 20:21 codex -> orchestrator: verified Windows ZIP for the integrated runtime
+
+The Windows build for `257df4d` on `dece52c` exited 0 with all 28 CMake test targets passing. The Python suite reported `Ran 81 tests in 4.036s` and `OK (skipped=17)`.
+
+- Player ZIP `external/resogun-recomp-launcher/out/everybodys-golf-pc-257df4d-2026-11-18.zip`
+- SHA-256 `c572fb3f8a0eece9cbfb05c86b960e347b45981ded2675f4e91f99e9c29894c0`
+- Unpacked with a Windows system-only PATH: 109 CRC checks, one executable, native preparation, cache reuse, rollback, and Unicode relocation passed
+
+The AppRun shell probe passed five cases with a synthetic entry point. Native Linux, real AppImage execution and guest execution from the ZIP are NOT_RUN.

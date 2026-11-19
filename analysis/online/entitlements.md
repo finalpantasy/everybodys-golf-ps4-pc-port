@@ -132,8 +132,10 @@ and `0xc77482` stores it in the queued request. The PUT sends that value
 as `use_count` (`0xefbd7–0xefc2a`, `0xece5ab–0xece5cf`). On success,
 `0xc762be–0xc762c6` adds the old `use_limit` to the cached
 `use_count` and clears the cached `use_limit`. The loopback fixture
-uses these transitions for two synthetic grants. Retail service
-responses and guest use of the fixture are unverified.
+uses these transitions for two synthetic grants. On `d91027d`, the guest
+consumed both grants through the in-process WebAPI and displayed an
+S Ticket balance of 101 after a reboot (07:05 mailbox entry). Retail
+service responses remain unverified.
 [WebAPI request table](protocol.md#webapi-requests)
 
 
@@ -157,6 +159,82 @@ windows and distribution paths. [Project background](../../docs/online-and-dlc.m
 
 The Atelier items cover Lydie's and Suelle's hair accessories, outfits,
 boots and socks. Their IDs are absent from the AppContent entitlement
-table. Guest verification is needed for the BEAMS bundle grant and to
-establish which shop table the local runtime uses and how the sale
-window is evaluated.
+table. The BEAMS bundle grant and shop availability remain unverified
+in the guest.
+
+### Shop calendar and server time
+
+| Function | Observed behavior |
+|---|---|
+| Archive loader | Replaces the extension in `xbdata/param/serverFile/info.xb` with the suffix from `0x13390c0`, using `.US_01.xb` for locale index 9 (`0xea5bdb–0xea5c00`). |
+| Shop row parser | Opens `data/param/serverFile/shop_price_sheet.txt` (`0x5e5b47–0x5e5b82`), reads `sale_close_year` at `0x5e7864`, and reads `sale_open_year` at `0x5e8084`. |
+| Archive entry lookup | Lowercases the name and hashes it as `31 * hash + byte` (`0xea55d0–0xea5611`). The match in the sorted name table supplies the stream index (`0xea5682–0xea572a`). |
+| Calendar helper | Checks each field's flags and value before copying its year, month, day, hour or minute (`0x5e4f3b–0x5e502d`). |
+
+In the bundled US archive, the shop path hashes to `0x612e3f4b`. The
+matching name-table entry at file offset `0x38` gives stream index 1,
+which resolves to the 14,007-byte zlib stream at `0x2a0`. The decoded
+sheet has 2,056 rows. All 17 BEAMS and Atelier rows omit weekday,
+hour, and minute restrictions in that sheet.
+
+The shop check starts with the cached game tick at `+0x85cbf8` in
+the object referenced at `0x2c8f2e0`. To refresh an empty cache it uses
+`sceRtcGetCurrentNetworkTick` plus `+0x10520` or falls back to
+`sceRtcGetCurrentTick` plus `+0x10518` (`0x5eb715–0x5eb7c2`). The
+weekday check comes first (`0x5eb7e0`). When the adjusted tick falls
+between the opening and closing ticks, including both endpoints
+(`0x5eb908–0x5eb91f`), the shop runs additional eligibility checks
+(`0x5eba18–0x5eba5a`).
+
+The server-time reply decoder converts its date to a tick, subtracts
+the two RTC readings, and writes the offsets used by the shop
+(`0xb86194–0xb861c5`, `0xb86598–0xb865d2`). An in-window reply can test
+the gate after the guest refreshes its cached tick. The shop still
+needs a guest check.
+
+### Lucky Chance mission rewards
+
+The same US archive contains `data/param/serverFile/event_mission_schedule.txt`.
+The name-table hash at file offset `0xec` is `0xa4e244da` and points to
+stream index 2 at `0x3958`. The game opens the tab-separated entry at
+`0x5b2781–0x5b27bc` and checks the cached title clock at
+`0x5b27c1–0x5b27e0`.
+
+The 24 bundled rows require a nine-hole round and list
+`quest_get_totalscore` with `<=99`. The quest limit key is used at
+`0x5b2ca5`. The rows specify `pay_to_step_loop` (recognized at
+`0x5b37e4–0x5b37fc`), `reward_win_rate=0.5`, and
+`month_limited=now` as the reward element and value. The reward parser
+recognizes `month_limited` at `0x5b5cf7–0x5b5d14`.
+
+Friday's rows open at even hours and close at minute 19 of the same
+hour. September 14, 2018 at noon falls in one of those windows. The
+runtime owner reached the Lucky Chance reward at the end of the full
+nine-hole Open Course round with that replay date. The reward's item ID
+and persistence remain unverified. The 17 collaboration shop rows
+above have empty `month_limited` fields. [Runtime evidence](../../docs/STATE.md)
+
+#### Identifying the item and checking the save
+
+| Step | Guest behavior and addresses |
+|---|---|
+| Parse the mission reward | Stores reward type 3 and value `-1` for `month_limited=now` (`0x5b5d0e`, `0x5b5e44–0x5b5e78`, `0x5b6081–0x5b6089`). |
+| Filter the reward pool | The type-3 consumer walks the shop manager's rows at `[0x2c77740]+0x1e8..+0x1f0` and calls the shop's calendar and eligibility helper (`0x5b78c9–0x5b78d4`, `0x5b79d2–0x5b7a70`, `0x5b7a3d`). |
+| Pick an item | Value `-1` selects the picker at `0x5ecd50` (`0x5b7a70–0x5b7a92`, `0x5b7c41`), which updates its random state at `0x5ed042–0x5ed088`. |
+| Read its ID | The shop parser stores `item_id` at row offset `0x10` (`0x5e62f4–0x5e6380`, `0x5e6641–0x5e6645`). The reward consumer loads that field at `0x5b7c5f`, with the ID in `ecx` at `0x5b7c68` before the item-index lookup (`0x5b7c68–0x5b7ce7`). |
+
+The bundled shop sheet has 40 distinct IDs where `month_limited=9`,
+all on floor 14 with `month_limited_weight=1`. Those counts describe
+the archive. The live picker reads the rows that pass its eligibility checks.
+
+To verify persistence, capture the selected ID, confirm the grant, and check the same
+inventory entry after saving and restarting from the same profile.
+The selection and restart check are NOT_RUN.
+
+Use [lookup_item.py](lookup_item.py) with the US item index to resolve
+the breakpoint's hexadecimal ID to an asset label and name. For
+example, `0x98` is item 152.
+
+```sh
+python -B analysis/online/lookup_item.py work/game-1.17/xbdata/param/ItemIndex/Item_index_list.US_01.xb 0x98
+```
