@@ -1443,6 +1443,48 @@ class GolfServerTests(unittest.TestCase):
             + bytes.fromhex("0042020000000000 1042020001000000 2042020000000000 10800100")
         )))
 
+    def test_empty_regulation_probe_accepts_only_the_two_request_shapes(self):
+        path = "/nmg-us/replay-probe/gameapi_getregulationdata"
+        date = bytes.fromhex("10600200 20261118")
+        tail = bytes.fromhex("10800100")
+        fields = string_record(0x0020, b"Golfer") + bytes.fromhex("60000300") + SCORE_INNER
+        undated = SERVER_TIME_REQUEST.replace(tail, fields + tail)
+        dated = undated.replace(tail, date + tail)
+        shortest = undated.replace(fields, string_record(0x0020, b"") + fields[-12:])
+        longest = dated.replace(fields, string_record(0x0020, b"x" * 55) + pack("<2H", 0x0060, 13) + bytes(48))
+        self.assertEqual((len(shortest), len(longest)), (122, 222))
+        reply = (bytes.fromhex("00800100 0000020001000000 60000300") + SCORE_INNER
+                 + bytes.fromhex("0060020000000000 10800100"))
+        client = self.start(daily_score_block=SCORE_INNER, empty_regulations=True)
+        for body, status, expected in (
+            (undated, 200, reply), (dated, 200, reply), (shortest, 200, reply), (longest, 200, reply),
+            (dated.replace(date, bytes.fromhex("10600200 20260230")), 400, b""),
+            (dated.replace(date, bytes.fromhex("11600200 20261118")), 400, b""),
+            (undated.replace(fields, fields[:-12] + bytes.fromhex("60000400") + bytes(12)), 400, b""),
+            (undated.replace(fields, fields[:11] + b"\xff" + fields[12:]), 400, b""),
+        ):
+            with self.subTest(body=body.hex()):
+                client.request("POST", path, body=body, headers=SERVER_TIME_HEADERS)
+                response = client.getresponse()
+                self.assertEqual((response.status, response.read()), (status, expected))
+        client.request("GET", path)
+        response = client.getresponse()
+        self.assertEqual((response.status, response.getheader("Allow"), response.read()), (405, "POST", b""))
+        inactive = self.start(daily_score_block=SCORE_INNER)
+        inactive.request("POST", path, body=undated, headers=SERVER_TIME_HEADERS)
+        response = inactive.getresponse()
+        self.assertEqual((response.status, response.read()), (404, b""))
+        with self.assertRaisesRegex(ValueError, "requires --daily-score-block"):
+            GolfServer(0, empty_regulations=True)
+
+    def test_empty_regulation_discovery_advertises_the_exact_https_path(self):
+        route = "./gameurl1/gameapi_getregulationdata"
+        for enabled, scheme in ((False, "http"), (True, "https")):
+            document = discovery_document(empty_regulations=enabled).rstrip(b"\0")
+            urls = ElementTree.fromstring(b"<fixture>" + document + b"</fixture>")
+            self.assertEqual(urls.findtext(route),
+                             f"{scheme}://127.0.0.1:8765/nmg-us/replay-probe/gameapi_getregulationdata")
+
     def test_own_score_probe_advertises_the_exact_https_path(self):
         document = discovery_document(empty_own_score=True).rstrip(b"\0")
         urls = ElementTree.fromstring(b"<fixture>" + document + b"</fixture>")

@@ -9405,3 +9405,969 @@ The Windows build for `257df4d` on `dece52c` exited 0 with all 28 CMake test tar
 - Unpacked with a Windows system-only PATH: 109 CRC checks, one executable, native preparation, cache reuse, rollback, and Unicode relocation passed
 
 The AppRun shell probe passed five cases with a synthetic entry point. Native Linux, real AppImage execution and guest execution from the ZIP are NOT_RUN.
+
+
+
+### 2026-11-18 20:39 codex -> orchestrator: Matching2 room attribute updates
+
+Golf sends `SetRoomDataExternal` for the public `0x55` listing and `SetRoomDataInternal` for private `0x57` data and flags. Room protocol version 1 now carries both attributes independently in member views.
+
+Restart the listener with the updated sources before using the patch below. It applies to `dece52c` and wires request events `0x0004` and `0x0109` and the `0x1106` room callback.
+
+Windows AddressSanitizer replay verified both setters through the loopback bridge, including the 224-byte callback, flag-only reopening, owner authorization, and late join. All 102 listener tests passed. Guest room updates are NOT_RUN.
+
+```diff
+--- a/src/runtime_golf.c
++++ b/src/runtime_golf.c
+@@ -398,5 +398,5 @@
+ }
+ 
+-enum { M2_LOCAL_JOIN=1, M2_LOCAL_POLL=2, M2_LOCAL_LEAVE=3, M2_LOCAL_CAPACITY=50 };
++enum { M2_LOCAL_JOIN=1, M2_LOCAL_POLL=2, M2_LOCAL_LEAVE=3, M2_LOCAL_CAPACITY=50, M2_ROOM_ATTRIBUTE=256 };
+ typedef struct { uint16_t id; char name[17]; } M2LocalMember;
+ typedef struct {
+@@ -418,4 +418,7 @@
+     M2LocalRoster roster;
+     M2LocalRoom room, advertised_links;
++    uint8_t room_internal[M2_ROOM_ATTRIBUTE];
++    uint16_t room_internal_size;
++    uint32_t room_flags;
+     uint64_t signal_registration, room_message_ack;
+     uint8_t room_message_relay[16];
+@@ -1037,5 +1040,5 @@
+     }
+     if (event->event==0x7101 || event->event==0x7102 || event->event==0x0103 ||
+-        event->event==0x7106 || event->event==0x7005) {
++        event->event==0x7106 || event->event==0x7005 || event->event==0x0004 || event->event==0x0109) {
+         m2_room_complete(session,event);
+         return;
+@@ -1102,12 +1105,13 @@
+     const M2Opt use=opt ? *opt : m2_default_opt;
+     const uint32_t request=m2_next_request++;
++    const int stateful=event==0x0108 || event==0x0004 || event==0x0109;
+     int32_t result=0;
+     if (!m2_ctx || ctx!=m2_ctx) result=M2_CONTEXT_NOT_FOUND;
+-    else if (use.cb || event==0x0108) {
++    else if (use.cb || stateful) {
+         result=m2_post_locked((M2Event){.cb=use.cb,.arg=use.arg,.data=data,.req=request,.event=event,.ctx=ctx,.lobby=lobby});
+     }
+     if (!result && id) *id=request;
+     pthread_mutex_unlock(&m2_lock);
+-    if (result || (!use.cb && event!=0x0108)) free(data);
++    if (result || (!use.cb && !stateful)) free(data);
+     if (result) return result;
+     printf("Runtime: NpMatching2 %s: request %u (local answer follows)\n",what,(unsigned)request);
+@@ -1117,5 +1121,8 @@
+  * room route. All guest request data is copied before queueing. */
+ enum { M2_ROOM_CREATE=1, M2_ROOM_JOIN=2, M2_ROOM_VIEW=3, M2_ROOM_LEAVE=4, M2_ROOM_SEARCH=5, M2_ROOM_EXTERNAL=6,
+-       M2_ROOM_ATTRIBUTE=256, M2_ROOM_RESULTS=20, M2_ROOM_HEADER=20 };
++       M2_ROOM_UPDATE_EXTERNAL=7, M2_ROOM_UPDATE_INTERNAL=8, M2_ROOM_RESULTS=20, M2_ROOM_HEADER=20,
++       M2_ROOM_WIRE_VERSION=1 };
++
++static const uint32_t m2_room_update_flags=0xd4000000u;
+ 
+ typedef struct { uint16_t id; uint8_t pad[6]; const uint8_t *data; uint64_t size; } M2RoomBin;
+@@ -1130,6 +1137,6 @@
+     M2LocalRoom room;
+     uint32_t flags;
+-    uint16_t capacity, size;
+-    const uint8_t *listing;
++    uint16_t capacity, internal_size;
++    const uint8_t *internal;
+ } M2RoomView;
+ typedef struct {
+@@ -1137,5 +1144,5 @@
+     uint64_t count;
+     void *self, *owner;
+-    uint8_t internal[0x58], records[M2_LOCAL_CAPACITY][0x58], listing[M2_ROOM_ATTRIBUTE];
++    uint8_t internal[0x58], records[M2_LOCAL_CAPACITY][0x58], internal_data[M2_ROOM_ATTRIBUTE];
+     M2RoomInternalBin bin;
+ } M2RoomJoinReply;
+@@ -1173,16 +1180,12 @@
+     const size_t base_size=30+(size_t)count*18+size;
+     if ((room>>56)!=session->world || !revision || !count || capacity>M2_LOCAL_CAPACITY || count>capacity ||
+-        size>M2_ROOM_ATTRIBUTE || (length!=base_size && length!=base_size+4) ||
+-        self!=session->roster.own_id) return 0;
+-    uint8_t signaling=0;
+-    uint16_t hub=0;
+-    if (length>base_size) {
+-        const uint8_t *tail=body+base_size;
+-        signaling=tail[0];
+-        hub=m2_room_u16(tail+2);
+-        if (tail[1] || (signaling!=1 && signaling!=2) || (signaling==1 ? hub!=0 : hub!=owner)) return 0;
+-    }
++        size>M2_ROOM_ATTRIBUTE || length<base_size+6 || self!=session->roster.own_id) return 0;
++    const uint8_t *tail=body+base_size;
++    const uint8_t signaling=tail[0];
++    const uint16_t hub=m2_room_u16(tail+2), internal_size=m2_room_u16(tail+4);
++    if (tail[1] || signaling>2 || hub!=(signaling==2 ? owner : 0) ||
++        internal_size>M2_ROOM_ATTRIBUTE || length!=base_size+6+internal_size) return 0;
+     *view=(M2RoomView){.room={.id=room,.revision=revision,.owner=owner,.hub=hub,.signaling=signaling},.flags=m2_room_u32(body+16),
+-                       .capacity=capacity,.size=size,.listing=body+30+(size_t)count*18};
++                       .capacity=capacity,.internal_size=internal_size,.internal=tail+6};
+     for (uint16_t i=0;i<count;++i) {
+         const uint8_t *row=body+30+(size_t)i*18;
+@@ -1209,9 +1212,26 @@
+ }
+ 
++static void m2_room_internal_record(uint8_t record[0x58],const M2LocalSession *session,
++                                    const M2RoomView *view,const M2RoomInternalBin *bin) {
++    const uint16_t capacity=view->capacity, open=capacity-view->room.count, server=1;
++    const uint32_t world=session->world;
++    memcpy(record,&capacity,2);
++    memcpy(record+4,&open,2);
++    memcpy(record+8,&capacity,2);
++    memcpy(record+0x0a,&server,2);
++    memcpy(record+0x0c,&world,4);
++    memcpy(record+0x18,&view->room.id,8);
++    memcpy(record+0x40,&view->flags,4);
++    if (bin) {
++        const uint64_t one=1;
++        memcpy(record+0x48,&bin,8);
++        memcpy(record+0x50,&one,8);
++    }
++}
++
+ static void *m2_room_join_reply(const M2LocalSession *session,const M2RoomView *view) {
+     /* Internal room at response +0, then chain/count/self/owner (0xa79d51–0xa79f40). */
+-    const uint64_t room=view->room.id;
+-    const uint16_t capacity=view->capacity, count=view->room.count;
+-    const uint16_t owner=view->room.owner, self=session->roster.own_id, size=view->size;
++    const uint16_t count=view->room.count, owner=view->room.owner, self=session->roster.own_id;
++    const uint16_t size=view->internal_size;
+     M2RoomJoinReply *reply=calloc(1,sizeof *reply);
+     if (!reply) return NULL;
+@@ -1219,21 +1239,9 @@
+     reply->members=reply->records[0];
+     reply->count=count;
+-    const uint16_t open=capacity-count, server=1;
+-    const uint32_t world=session->world;
+-    memcpy(reply->internal,&capacity,2);
+-    memcpy(reply->internal+4,&open,2);
+-    memcpy(reply->internal+8,&capacity,2);
+-    memcpy(reply->internal+0x0a,&server,2);
+-    memcpy(reply->internal+0x0c,&world,4);
+-    memcpy(reply->internal+0x18,&room,8);
+-    memcpy(reply->internal+0x40,&view->flags,4);
+     if (size) {
+-        memcpy(reply->listing,view->listing,size);
+-        reply->bin=(M2RoomInternalBin){.member=owner,.bin={.id=0x57,.data=reply->listing,.size=size}};
+-        const M2RoomInternalBin *bin=&reply->bin;
+-        const uint64_t one=1;
+-        memcpy(reply->internal+0x48,&bin,8);
+-        memcpy(reply->internal+0x50,&one,8);
+-    }
++        memcpy(reply->internal_data,view->internal,size);
++        reply->bin=(M2RoomInternalBin){.member=owner,.bin={.id=0x57,.data=reply->internal_data,.size=size}};
++    }
++    m2_room_internal_record(reply->internal,session,view,size ? &reply->bin : NULL);
+     for (uint16_t i=0;i<count;++i) {
+         const M2LocalMember *member=&view->room.members[i];
+@@ -1350,4 +1358,29 @@
+ }
+ 
++static void m2_room_notify_internal(const M2LocalSession *session,const M2RoomView *view) {
++    /* Golf reads changed attributes at +0x38 and follows the first pointer (0xa7ea11–0xa7ea53). */
++    const M2RoomInternalBin bin={.member=view->room.owner,
++        .bin={.id=0x57,.data=view->internal,.size=view->internal_size}};
++    const M2RoomInternalBin *changed_bin=&bin;
++    uint8_t record[0x58]={0};
++    const uint32_t *flags=view->flags!=session->room_flags ? &view->flags : NULL;
++    struct {
++        const void *room;
++        const uint32_t *flags, *previous_flags;
++        uint64_t optional[4];
++        const M2RoomInternalBin *const *attributes;
++        uint64_t count;
++    } data={.room=record,.flags=flags,.previous_flags=flags ? &session->room_flags : NULL,
++            .attributes=&changed_bin,.count=1};
++    m2_room_internal_record(record,session,view,&bin);
++    m2_room_notify(session,view->room.id,0x1106,&data);
++}
++
++static void m2_room_store_internal(M2LocalSession *session,const M2RoomView *view) {
++    session->room_internal_size=view->internal_size;
++    memcpy(session->room_internal,view->internal,view->internal_size);
++    session->room_flags=view->flags;
++}
++
+ static void m2_room_notify_member(const M2LocalSession *session,uint16_t event,
+                                   const M2LocalMember *member,uint16_t owner) {
+@@ -1424,4 +1457,6 @@
+     if (!id) return;
+     memset(&session->room,0,sizeof session->room);
++    session->room_internal_size=0;
++    session->room_flags=0;
+     memset(session->room_message_relay,0,sizeof session->room_message_relay);
+     session->room_message_ack=0;
+@@ -1440,5 +1475,5 @@
+     if (!session->room.id) return;
+     const M2LocalRoom previous=session->room;
+-    uint8_t request[M2_ROOM_HEADER+8]={M2_ROOM_VIEW,session->world};
++    uint8_t request[M2_ROOM_HEADER+8]={M2_ROOM_VIEW,session->world,M2_ROOM_WIRE_VERSION};
+     uint8_t response[GOLF_ROOM_RESPONSE_MAX];
+     size_t length=0;
+@@ -1471,4 +1506,9 @@
+         m2_room_notify(session,view.room.id,0x1105,data);
+     }
++    const int flags_changed=((session->room_flags^view.flags)&m2_room_update_flags)!=0;
++    if (view.internal_size && (flags_changed || session->room_internal_size!=view.internal_size ||
++                              memcmp(session->room_internal,view.internal,view.internal_size)))
++        m2_room_notify_internal(session,&view);
++    m2_room_store_internal(session,&view);
+     m2_room_signals_sync(session);
+ }
+@@ -1506,5 +1546,6 @@
+     M2RoomJob *job=event->data;
+     const uint8_t operation=job->request[0];
+-    const uint64_t leaving=operation==M2_ROOM_LEAVE ? m2_room_u64(job->request+M2_ROOM_HEADER) : 0;
++    const int update=operation==M2_ROOM_UPDATE_EXTERNAL || operation==M2_ROOM_UPDATE_INTERNAL;
++    const uint64_t room_id=operation==M2_ROOM_LEAVE || update ? m2_room_u64(job->request+M2_ROOM_HEADER) : 0;
+     uint8_t response[GOLF_ROOM_RESPONSE_MAX];
+     size_t length=0;
+@@ -1519,6 +1560,6 @@
+         }
+         status=runtime_golf_room_exchange(job->request,job->size,response,&length);
+-        /* The listener can have committed an idempotent create or join before its reply was lost. */
+-        if (!status && (operation==M2_ROOM_CREATE || operation==M2_ROOM_JOIN)) {
++        /* The listener can have committed an idempotent request before its reply was lost. */
++        if (!status && (operation==M2_ROOM_CREATE || operation==M2_ROOM_JOIN || update)) {
+             length=0;
+             status=runtime_golf_room_exchange(job->request,job->size,response,&length);
+@@ -1530,9 +1571,16 @@
+         event->error=status==404 ? (int32_t)0x80550c30u :
+                      status==409 && operation==M2_ROOM_JOIN ? (int32_t)0x80550d19u :
++                     status==403 ? (int32_t)0x80550d07u :
+                      status==409 ? M2_BUSY : status==400 ? NP_INVALID_ARGUMENT : M2_SERVER_NOT_AVAILABLE;
+         return;
+     }
++    if (update) {
++        M2RoomView view;
++        if (!m2_room_decode(session,response,length,&view) || room_id!=view.room.id)
++            event->error=M2_SERVER_NOT_AVAILABLE;
++        return;
++    }
+     if (operation==M2_ROOM_LEAVE) {
+-        if (session->room.id==leaving) m2_room_clear(session,0);
++        if (session->room.id==room_id) m2_room_clear(session,0);
+         return;
+     }
+@@ -1543,4 +1591,5 @@
+             if (event->data) {
+                 session->room=view.room;
++                m2_room_store_internal(session,&view);
+                 m2_room_publish(session);
+             }
+@@ -1555,4 +1604,5 @@
+     job->world=world;
+     job->request[0]=operation;
++    job->request[2]=M2_ROOM_WIRE_VERSION;
+     job->size=M2_ROOM_HEADER+size;
+     memcpy(job->request+M2_ROOM_HEADER,body,size);
+@@ -1652,4 +1702,34 @@
+ }
+ 
++static int32_t m2_room_set_data(uint16_t ctx,const uint8_t *req,const M2Opt *opt,uint32_t *id,int internal) {
++    if (!req || !id || !m2_room_u64(req)) return NP_INVALID_ARGUMENT;
++    /* Golf supplies one 0x55 or 0x57 attribute at these offsets (0xa8432a–0xa844df). */
++    if (internal ? (m2_room_u64(req+40) || m2_room_pointer(req+48) || m2_room_u64(req+64))
++                 : (m2_room_u64(req+16) || m2_room_u64(req+32))) return NP_INVALID_ARGUMENT;
++    const uint32_t mask=internal ? m2_room_u32(req+8) : 0, flags=internal ? m2_room_u32(req+12) : 0;
++    if (mask & ~m2_room_update_flags || flags & ~mask) return NP_INVALID_ARGUMENT;
++    M2RoomBin bin={0};
++    if (!m2_room_read_bin(req+(internal ? 16 : 40),internal ? 0x57 : 0x55,&bin) || !bin.id)
++        return NP_INVALID_ARGUMENT;
++    const uint16_t size=(uint16_t)bin.size;
++    uint8_t body[18+M2_ROOM_ATTRIBUTE];
++    memcpy(body,req,8);
++    memcpy(body+8,&mask,4);
++    memcpy(body+12,&flags,4);
++    memcpy(body+16,&size,2);
++    if (size) memcpy(body+18,bin.data,size);
++    M2RoomJob *job=m2_room_job(internal ? M2_ROOM_UPDATE_INTERNAL : M2_ROOM_UPDATE_EXTERNAL,0,body,18+size);
++    return job ? m2_answer(internal ? "SetRoomDataInternal" : "SetRoomDataExternal",ctx,opt,id,
++                           internal ? 0x0109 : 0x0004,job,0) : M2_OUT_OF_MEMORY;
++}
++
++static ABI int32_t m2_room_set_external(uint16_t ctx,const uint8_t *req,const M2Opt *opt,uint32_t *id) {
++    return m2_room_set_data(ctx,req,opt,id,0);
++}
++
++static ABI int32_t m2_room_set_internal(uint16_t ctx,const uint8_t *req,const M2Opt *opt,uint32_t *id) {
++    return m2_room_set_data(ctx,req,opt,id,1);
++}
++
+ enum { M2_MSG_SEND=1, M2_MSG_POLL=2, M2_MSG_HEADER=36, M2_MSG_BATCH=8, M2_MSG_LIMIT=1024 };
+ typedef struct { size_t size; uint8_t body[GOLF_ROOM_MESSAGE_REQUEST_MAX]; } M2RoomMessageJob;
+@@ -1791,4 +1871,5 @@
+     {"sceNpMatching2LeaveRoom",m2_room_leave}, {"sceNpMatching2SearchRoom",m2_room_search},
+     {"sceNpMatching2GetRoomDataExternalList",m2_room_external},
++    {"sceNpMatching2SetRoomDataExternal",m2_room_set_external}, {"sceNpMatching2SetRoomDataInternal",m2_room_set_internal},
+     {"sceNpMatching2SignalingGetConnectionStatus",m2_room_connection_status},
+ };
+```
+
+### 2026-11-18 20:49 codex -> orchestrator: loopback replay for empty event regulations
+
+The listener and discovery generator accept `--empty-regulations`. Give the listener the existing `--daily-score-block PATH`. The option advertises the HTTPS regulation URL and serves a 36-byte empty reply for slots `0x12` and `0x15`. The current-day reader clears its row count. The dated reader advances without updating the calendar. Both behaviors are traced in `analysis/online/protocol.md`.
+
+The listener suite reported `Ran 104 tests in 3.915s` and `OK`. The patch passes strict apply on `dece52c`. The Windows AddressSanitizer HTTP probe verified both request-length bounds and all 36 reply bytes with the generated score block. The server rejected an impossible date and the bridge refused a 121-byte request. Guest acceptance and populated regulations are NOT_RUN.
+
+```diff
+diff --git a/src/runtime_net.c b/src/runtime_net.c
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -31,6 +31,7 @@
+ #define SIGN_BOARD_PATH "/nmg-us/replay-probe/gameapi_getsignboardlist"
+ #define EULA_PATH "/nmg-us/replay-probe/gameapi_geteula"
+ #define NOTICE_PATH "/nmg-us/replay-probe/gameapi_getinfolist"
++#define REGULATION_PATH "/nmg-us/replay-probe/gameapi_getregulationdata"
+ #define DAILY_SCORE_PATH "/nmg-us/replay-probe/gameapi_getscorelist"
+ #define RIVAL_LIST_PATH "/nmg-us/replay-probe/gameapi_getrivallist"
+ #define BOARD_LIST_PATH "/nmg-us/replay-probe/gameapi_getboardlist"
+@@ -73,6 +74,7 @@
+     {"https://127.0.0.1:8765" FINISH_BOARD_PATH, FINISH_BOARD_PATH, 134, 226, 60, 60, 4, NULL},
+     {"https://127.0.0.1:8765" SIGN_BOARD_PATH, SIGN_BOARD_PATH, 370, 1370, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" NOTICE_PATH, NOTICE_PATH, 394, 1394, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" REGULATION_PATH, REGULATION_PATH, 122, 222, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" RIVAL_LIST_PATH, RIVAL_LIST_PATH, 438, 1574, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" DAILY_SCORE_PATH, DAILY_SCORE_PATH, 166, 258, 52, 52, 4, NULL},
+     {"https://127.0.0.1:8765" BOARD_LIST_PATH, BOARD_LIST_PATH, 138, 230, 40, 40, 4, NULL},
+```
+
+### 2026-11-18 20:53 codex -> orchestrator: combined HTTP replay and capture patch
+
+Use this patch on `dece52c` for the bonus list, event regulations, and capture path guard. It supersedes the individual HTTP hunks at 19:39, 20:10, and 20:49. The bonus and regulation options remain opt-in on both the discovery generator and listener.
+
+Strict apply passed. The Windows AddressSanitizer probe checked the 386- and 1,386-byte bonus requests and 122- and 222-byte regulation requests, with exact 28- and 36-byte replies. A 520-character capture path left the requests working. A valid directory recorded all five request bodies byte-for-byte. Guest acceptance is NOT_RUN.
+
+```diff
+diff --git a/src/runtime_net.c b/src/runtime_net.c
+--- a/src/runtime_net.c
++++ b/src/runtime_net.c
+@@ -31,6 +31,8 @@
+ #define SIGN_BOARD_PATH "/nmg-us/replay-probe/gameapi_getsignboardlist"
+ #define EULA_PATH "/nmg-us/replay-probe/gameapi_geteula"
+ #define NOTICE_PATH "/nmg-us/replay-probe/gameapi_getinfolist"
++#define REGULATION_PATH "/nmg-us/replay-probe/gameapi_getregulationdata"
++#define BONUS_LIST_PATH "/nmg-us/replay-probe/gameapi_getbonuslist"
+ #define DAILY_SCORE_PATH "/nmg-us/replay-probe/gameapi_getscorelist"
+ #define RIVAL_LIST_PATH "/nmg-us/replay-probe/gameapi_getrivallist"
+ #define BOARD_LIST_PATH "/nmg-us/replay-probe/gameapi_getboardlist"
+@@ -73,7 +75,9 @@
+     {"https://127.0.0.1:8765" FINISH_BOARD_PATH, FINISH_BOARD_PATH, 134, 226, 60, 60, 4, NULL},
+     {"https://127.0.0.1:8765" SIGN_BOARD_PATH, SIGN_BOARD_PATH, 370, 1370, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" NOTICE_PATH, NOTICE_PATH, 394, 1394, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" REGULATION_PATH, REGULATION_PATH, 122, 222, 36, 36, 4, NULL},
+     {"https://127.0.0.1:8765" RIVAL_LIST_PATH, RIVAL_LIST_PATH, 438, 1574, 36, 36, 4, NULL},
++    {"https://127.0.0.1:8765" BONUS_LIST_PATH, BONUS_LIST_PATH, 386, 1386, 28, 28, 4, NULL},
+     {"https://127.0.0.1:8765" DAILY_SCORE_PATH, DAILY_SCORE_PATH, 166, 258, 52, 52, 4, NULL},
+     {"https://127.0.0.1:8765" BOARD_LIST_PATH, BOARD_LIST_PATH, 138, 230, 40, 40, 4, NULL},
+     /* Event schedule board: up to 18 rows (per-hole groups plus the Daily group). */
+@@ -172,14 +176,17 @@
+         "%sConnection: close\r\n\r\n";
+     const ReplayRoute *route=req->route;
+     /* GOLF_HTTP_DUMP=<folder> (diagnostics): save each replayed request body as <counter>-<last path part>.bin. */
+-    if (getenv("GOLF_HTTP_DUMP") && data && size>0) {
++    const char *dump_dir=getenv("GOLF_HTTP_DUMP");
++    if (dump_dir && *dump_dir && data && size>0) {
+         static atomic_int dumped;
+         const char *path=route->path ? route->path : req->login_path, *name=strrchr(path,'/');
+         char file[512];
+-        snprintf(file,sizeof file,"%s/%03d-%.64s.bin",getenv("GOLF_HTTP_DUMP"),atomic_fetch_add(&dumped,1),name ? name+1 : path);
+-        for (char *c=strrchr(file,'/')+1;*c;++c) if (*c=='?' || *c=='&' || *c=='=') *c='_';
+-        FILE *f=fopen(file,"wb");
+-        if (f) { fwrite(data,1,(size_t)size,f); fclose(f); }
++        const int n=snprintf(file,sizeof file,"%s/%03d-%.64s.bin",dump_dir,atomic_fetch_add(&dumped,1),name ? name+1 : path);
++        if (n>=0 && (size_t)n<sizeof file) {
++            for (char *c=strrchr(file,'/')+1;*c;++c) if (*c=='?' || *c=='&' || *c=='=') *c='_';
++            FILE *f=fopen(file,"wb");
++            if (f) { fwrite(data,1,(size_t)size,f); fclose(f); }
++        }
+     }
+ #ifdef _WIN32
+     WSADATA wsa;
+```
+
+### 2026-11-18 20:57 codex -> orchestrator: keep the last Ngs2 sampler frame
+
+The sampler advances to the last decoded sample, then returns before mixing it when the next read reaches the end of the queue. A three-sample PCM probe expected 0.123742 on the third output frame and got zero. The patch holds the last sample for the remainder of its source-frame period. If a streamed block arrives before the next render, interpolation continues into that block.
+
+Strict apply passed on `dece52c`. Windows AddressSanitizer and UndefinedBehaviorSanitizer passed single-sample playback, native pitch, half and double pitch, grain splits, and appending PCM between renders. Guest audio is NOT_RUN.
+
+```diff
+diff --git a/src/runtime_ngs2.c b/src/runtime_ngs2.c
+--- a/src/runtime_ngs2.c
++++ b/src/runtime_ngs2.c
+@@ -98,7 +98,7 @@
+ #define MASTER_LEVEL 0.8f
+ typedef struct { const uint8_t *data; uint32_t size, repeats, skip, samples; uint64_t user; } Block;
+ typedef struct Voice {
+-    int codec, playing, paused, primed;
++    int codec, playing, paused, primed, has_next;
+     uint32_t type, channels, rate;
+     Block blocks[MAX_BLOCKS];
+     uint32_t num_blocks, block, repeat, byte_pos, skip, left; int limited, entered;
+@@ -198,13 +198,20 @@
+     double step=(double)(v->pitch>0 ? v->pitch : 1.0f)*v->rate/system_rate;
+     if (!v->primed) {
+         if (!voice_frame(v,v->frame[0])) { v->playing=0; return; }
+-        if (!voice_frame(v,v->frame[1])) memcpy(v->frame[1],v->frame[0],sizeof v->frame[0]);
+-        v->primed=1; v->phase=0;
++        v->primed=1; v->has_next=0; v->phase=0;
++    }
++    /* Streamed blocks can be appended between renders while the current sample is the tail. */
++    if (!v->has_next) {
++        v->has_next=voice_frame(v,v->frame[1]);
++        if (!v->has_next) memcpy(v->frame[1],v->frame[0],sizeof v->frame[0]);
+     }
+     for (uint32_t i=0;i<frames;++i) {
+         while (v->phase>=1.0) {
++            if (!v->has_next) { v->playing=0; return; }
+             memcpy(v->frame[0],v->frame[1],sizeof v->frame[0]);
+-            if (!voice_frame(v,v->frame[1])) { v->playing=0; return; }
++            v->has_next=voice_frame(v,v->frame[1]);
++            /* The last sample still occupies a source frame, with no next value to interpolate. */
++            if (!v->has_next) memcpy(v->frame[1],v->frame[0],sizeof v->frame[0]);
+             v->phase-=1.0;
+         }
+         float t=(float)v->phase, *out=mix+(size_t)i*MAX_CHANNELS;
+```
+
+### 2026-11-18 21:01 codex -> orchestrator: Windows GPU-thread CPU time per draw
+
+The Windows flip report calculates CPU time per draw from Linux-only counters. The patch uses the existing `GetThreadTimes` sample for that calculation and the stall's user and kernel times. If the query fails, the report preserves the last sample.
+
+A synthetic 40-draw window with 60 ms user and 20 ms kernel went from 0 to 2,000 µs/draw. Windows AddressSanitizer and UndefinedBehaviorSanitizer passed query failure, recovery, and 64-bit FILETIME conversion. Strict apply passed on `dece52c`, and the full VideoOut source passed `clang++ -fsyntax-only` with the Windows launcher build flags. Guest FPS is NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.cpp b/gpu/shadps4/core/libraries/videoout/driver.cpp
+--- a/gpu/shadps4/core/libraries/videoout/driver.cpp
++++ b/gpu/shadps4/core/libraries/videoout/driver.cpp
+@@ -409,12 +409,12 @@
+                               ResogunStats::t_staging.load(), ResogunStats::t_host_wait.load()};
+         static u64 last_draws, last_dispatches, last_subs, last_sys, last_user, last_invol, last_vol;
+         const u64 draws = ResogunStats::draws.load(), dispatches = ResogunStats::dispatches.load(),
+-                  subs = ResogunStats::submissions.load(), sys_us = ResogunStats::gpu_sys_us.load(),
+-                  user_us = ResogunStats::gpu_user_us.load(), invol = ResogunStats::gpu_invol_switches.load(),
++                  subs = ResogunStats::submissions.load(),
++                  invol = ResogunStats::gpu_invol_switches.load(),
+                   vol = ResogunStats::gpu_vol_switches.load();
+-        u64 gpu_ns = 0;
+ #ifdef _WIN32
+-        // resogun: Windows has no per-thread clock id; the thread's user + kernel time instead.
++        // resogun: Keep the previous CPU time if sampling fails, so deltas cannot wrap.
++        u64 gpu_ns = last_gpu_ns, sys_us = last_sys, user_us = last_user;
+         static HANDLE gpu_thread = nullptr;
+         if (!gpu_thread) {
+             if (const unsigned long id = ResogunStats::gpu_thread_id.load()) {
+@@ -426,9 +426,14 @@
+             const auto ns = [](const FILETIME& t) {
+                 return ((u64(t.dwHighDateTime) << 32) | t.dwLowDateTime) * 100;
+             };
+-            gpu_ns = ns(kernel) + ns(user);
++            const u64 kernel_ns = ns(kernel), user_ns = ns(user);
++            gpu_ns = kernel_ns + user_ns;
++            sys_us = kernel_ns / 1000;
++            user_us = user_ns / 1000;
+         }
+ #else
++        const u64 sys_us = ResogunStats::gpu_sys_us.load(), user_us = ResogunStats::gpu_user_us.load();
++        u64 gpu_ns = 0;
+         if (const int clock = ResogunStats::gpu_thread_clock.load(); clock != -1) {
+             timespec ts{};
+             clock_gettime(static_cast<clockid_t>(clock), &ts);
+@@ -520,7 +525,7 @@
+             // (and so the frame rate) differs a little.
+             static u64 window_draws = 0, window_gpu_us = 0;
+             const u64 all_draws = ResogunStats::draws.load();
+-            const u64 gpu_us = ResogunStats::gpu_user_us.load() + ResogunStats::gpu_sys_us.load();
++            const u64 gpu_us = user_us + sys_us;
+             const double us_per_draw = all_draws > window_draws
+                                            ? double(gpu_us - window_gpu_us) / (all_draws - window_draws)
+                                            : 0.0;
+```
+
+### 2026-11-18 21:09 codex -> orchestrator: synchronize the VideoOut flip divisor
+
+The guest maps 60, 30, and 20 FPS to flip-rate codes 0, 1, and 2 at `0xfb29b2–0xfb29e5`. The submission loop also divides a fixed 60 by the requested frame rate to decide how many vblanks to wait (`0xfb30e0–0xfb3149`), so a higher host refresh alone cannot establish correct game speed.
+
+The guest writes the host divisor while the presenter reads it. The patch uses atomic reads and writes and preserves the scheduling formula. Windows sanitizer tests checked all three cadences and 200,000 concurrent rate changes. Both full VideoOut source files passed the Windows compiler syntax check, and the patch passed strict apply on `dece52c`. Guest frame pacing is NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.h b/gpu/shadps4/core/libraries/videoout/driver.h
+--- a/gpu/shadps4/core/libraries/videoout/driver.h
++++ b/gpu/shadps4/core/libraries/videoout/driver.h
+@@ -3,6 +3,7 @@
+ 
+ #pragma once
+ 
++#include <atomic>
+ #include <deque>
+ #include <functional>
+ 
+@@ -34,7 +35,7 @@
+     std::mutex port_mutex;
+     std::condition_variable vo_cv;
+     std::condition_variable vblank_cv;
+-    int flip_rate = 0;
++    std::atomic<int> flip_rate{0};
+     int prev_index = -1;
+     bool is_open = false;
+     bool is_hdr = false;
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.cpp b/gpu/shadps4/core/libraries/videoout/driver.cpp
+--- a/gpu/shadps4/core/libraries/videoout/driver.cpp
++++ b/gpu/shadps4/core/libraries/videoout/driver.cpp
+@@ -134,7 +134,7 @@
+ 
+     // Mark as closed
+     main_port.is_open = false;
+-    main_port.flip_rate = 0;
++    main_port.flip_rate.store(0, std::memory_order_relaxed);
+     main_port.prev_index = -1;
+ 
+     // Clear port information
+@@ -773,7 +773,7 @@
+ 
+         // Check if it's time to take a request.
+         auto& vblank_status = main_port.vblank_status;
+-        if (vblank_status.count % (main_port.flip_rate + 1) == 0) {
++        if (vblank_status.count % (main_port.flip_rate.load(std::memory_order_relaxed) + 1) == 0) {
+             const auto request = receive_request();
+             if (!request) {
+                 if (display_tick || timer.GetTotalWait().count() < 0) { // Dont draw too fast
+diff --git a/gpu/shadps4/core/libraries/videoout/video_out.cpp b/gpu/shadps4/core/libraries/videoout/video_out.cpp
+--- a/gpu/shadps4/core/libraries/videoout/video_out.cpp
++++ b/gpu/shadps4/core/libraries/videoout/video_out.cpp
+@@ -145,7 +145,7 @@
+ 
+ s32 PS4_SYSV_ABI sceVideoOutSetFlipRate(s32 handle, s32 rate) {
+     LOG_TRACE(Lib_VideoOut, "called");
+-    driver->GetPort(handle)->flip_rate = rate;
++    driver->GetPort(handle)->flip_rate.store(rate, std::memory_order_relaxed);
+     return ORBIS_OK;
+ }
+```
+
+### 2026-11-18 21:09 codex -> orchestrator: Ngs2 final-sample regression test
+
+Add this hunk alongside the 20:57 sampler patch. It checks the last two output frames at half pitch and the silence that follows. Before the fix the first new assertion failed. With the fix the Windows sanitizer suite printed `ngs2: ok`.
+
+```diff
+diff --git a/tests/test_ngs2.c b/tests/test_ngs2.c
+--- a/tests/test_ngs2.c
++++ b/tests/test_ngs2.c
+@@ -73,7 +73,10 @@
+     render();
+     assert(flags()==3);
+     render();
+-    assert(flags()==0 && out[(GRAIN-1)*8]==0.0f);
++    const unsigned tail=600-2*GRAIN;
++    assert(fabsf(out[(tail-2)*8]-level)<1e-4f);
++    assert(fabsf(out[(tail-1)*8]-level)<1e-4f);
++    assert(flags()==0 && out[tail*8]==0.0f && out[(GRAIN-1)*8]==0.0f);
+ 
+     /* A repeated block keeps playing; stop ends it. */
+     block[2]=UINT32_MAX;
+```
+
+### 2026-11-18 21:10 codex -> orchestrator: corrected VideoOut flip divisor patch
+
+Use this copy in place of the 21:09 VideoOut patch. The mailbox copy dropped a trailing context line from the final hunk. This version passed strict apply on `dece52c` with the CPU timing, sampler, and regression-test patches. The tested code is identical.
+
+```diff
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.h b/gpu/shadps4/core/libraries/videoout/driver.h
+--- a/gpu/shadps4/core/libraries/videoout/driver.h
++++ b/gpu/shadps4/core/libraries/videoout/driver.h
+@@ -3,6 +3,7 @@
+ 
+ #pragma once
+ 
++#include <atomic>
+ #include <deque>
+ #include <functional>
+ 
+@@ -34,7 +35,7 @@
+     std::mutex port_mutex;
+     std::condition_variable vo_cv;
+     std::condition_variable vblank_cv;
+-    int flip_rate = 0;
++    std::atomic<int> flip_rate{0};
+     int prev_index = -1;
+     bool is_open = false;
+     bool is_hdr = false;
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.cpp b/gpu/shadps4/core/libraries/videoout/driver.cpp
+--- a/gpu/shadps4/core/libraries/videoout/driver.cpp
++++ b/gpu/shadps4/core/libraries/videoout/driver.cpp
+@@ -134,7 +134,7 @@
+ 
+     // Mark as closed
+     main_port.is_open = false;
+-    main_port.flip_rate = 0;
++    main_port.flip_rate.store(0, std::memory_order_relaxed);
+     main_port.prev_index = -1;
+ 
+     // Clear port information
+@@ -773,7 +773,7 @@
+ 
+         // Check if it's time to take a request.
+         auto& vblank_status = main_port.vblank_status;
+-        if (vblank_status.count % (main_port.flip_rate + 1) == 0) {
++        if (vblank_status.count % (main_port.flip_rate.load(std::memory_order_relaxed) + 1) == 0) {
+             const auto request = receive_request();
+             if (!request) {
+                 if (display_tick || timer.GetTotalWait().count() < 0) { // Dont draw too fast
+diff --git a/gpu/shadps4/core/libraries/videoout/video_out.cpp b/gpu/shadps4/core/libraries/videoout/video_out.cpp
+--- a/gpu/shadps4/core/libraries/videoout/video_out.cpp
++++ b/gpu/shadps4/core/libraries/videoout/video_out.cpp
+@@ -145,6 +145,6 @@
+ 
+ s32 PS4_SYSV_ABI sceVideoOutSetFlipRate(s32 handle, s32 rate) {
+     LOG_TRACE(Lib_VideoOut, "called");
+-    driver->GetPort(handle)->flip_rate = rate;
++    driver->GetPort(handle)->flip_rate.store(rate, std::memory_order_relaxed);
+     return ORBIS_OK;
+ }
+```
+
+### 2026-11-18 21:16 codex -> orchestrator: find a direct room's world from its ID
+
+On `5ffb004`, a client joining a world 7 room without a roster first enters world 1 and gets `0x80550c30`. The listener encodes the correct world in the high byte of the room ID. Use that byte for direct JoinRoomA and GetRoomDataExternalList requests.
+
+Windows AddressSanitizer and UndefinedBehaviorSanitizer passed creation, joining, and external details in worlds 1, 7, and 50 through the actual Matching2 worker and loopback bridge. Strict apply passed on `5ffb004`. Guest verification is NOT_RUN.
+
+```diff
+diff --git a/src/runtime_golf.c b/src/runtime_golf.c
+--- a/src/runtime_golf.c
++++ b/src/runtime_golf.c
+@@ -1509,11 +1509,14 @@
+     uint8_t response[GOLF_ROOM_RESPONSE_MAX];
+     size_t length=0;
+     int status=404;
+-    /* Game Room calls CreateJoinRoomA straight after GetWorldInfoList, with no JoinLobby, so no
+-       roster holds this member yet: enter the request's world (world 1 when it names none) here.
+-       ready stays 0, so this roster sends no lobby member events the game never asked for. */
++    /* Game Room can make a room request after GetWorldInfoList without joining a lobby.
++     * The roster supports room traffic, but the guest has not requested lobby events. */
+     if (!session->world && job->world<=255) {
+-        const uint8_t world=job->world ? (uint8_t)job->world : 1;
++        uint8_t world=job->world ? (uint8_t)job->world : 1;
++        if (!job->world && (operation==M2_ROOM_JOIN || operation==M2_ROOM_EXTERNAL)) {
++            /* RoomRegistry uses the high byte of each room ID for its world. */
++            world=(uint8_t)(m2_room_u64(job->request+M2_ROOM_HEADER)>>56);
++        }
+         M2LocalRoster roster;
+         const int joined=m2_lobby_snapshot(M2_LOCAL_JOIN,world,NULL,&roster);
+         fprintf(stderr,"Runtime: NpMatching2 room request entered world %u: status %d\n",world,joined);
+```
+
+### 2026-11-18 21:22 codex -> orchestrator: timed FPS windows and room patch compatibility
+
+Seven windows from 21:17:04 through 21:17:44 had zero shader compiles, 954 to 959 draws per flip, and no logged pad changes. They ran at 23.4 to 26.0 FPS with a 33.35 to 33.42 ms median and a 100.0 to 133.5 ms p99. GPU timeline waits took 18.6 to 31.7% of window time, host copies took 1.3 to 2.3%, and copy-worker waits rounded to 0.0%.
+
+In a separate 5.35 s OS sample beginning at 21:20:32, the 152 game-process threads used 4.61 CPU-s, led by the GPU command thread (781 ms), draw recording (672 ms), and the present thread (516 ms). The log contains zero per-site Vulkan wait rows. Set `RESOGUN_PERF_DIAG=1` alongside `RESOGUN_FRAME_STATS=1` on the next warmed run to attribute the timeline waits.
+
+The 20:39 room attribute patch and the 21:16 world-ID patch passed together on `5ffb004`, with both attribute writes, public listing lookup, and private attribute delivery on join in worlds 1, 7, and 50.
+
+### 2026-11-18 21:26 codex -> orchestrator: separate late vblanks from empty flip slots
+
+The 21:22 run showed 100 to 133 ms stalls during windows with two draws per flip. With `RESOGUN_FRAME_STATS=1`, the new cadence line records host and display ticks, eligible and empty flip slots, and the longest host tick gap. This distinguishes irregular host ticks from missing prepared flips.
+
+Apply after the 21:01 CPU timing patch and the corrected 21:10 flip divisor patch. Strict apply passed on `5ffb004`, the full Windows VideoOut source passed the compiler syntax check, and sanitizer tests covered empty slots, late ticks, and disabled counters. Guest measurement is NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.h b/gpu/shadps4/core/libraries/videoout/driver.h
+--- a/gpu/shadps4/core/libraries/videoout/driver.h
++++ b/gpu/shadps4/core/libraries/videoout/driver.h
+@@ -4,6 +4,7 @@
+ #pragma once
+ 
+ #include <atomic>
++#include <chrono>
+ #include <deque>
+ #include <functional>
+ 
+@@ -109,7 +110,13 @@
+         }
+     };
+ 
+-    void Flip(const Request& req);
++    struct FlipCadence {
++        bool enabled{};
++        u32 ticks{}, display_ticks{}, eligible_ticks{}, empty_ticks{};
++        std::chrono::nanoseconds max_gap{};
++    };
++
++    void Flip(const Request& req, FlipCadence& cadence);
+     void DrawBlankFrame(); // Video port out not open
+     void DrawLastFrame();  // Used when there is no flip request
+     void SubmitFlipInternal(VideoOutPort* port, s32 index, s64 flip_arg, bool is_eop = false);
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.cpp b/gpu/shadps4/core/libraries/videoout/driver.cpp
+--- a/gpu/shadps4/core/libraries/videoout/driver.cpp
++++ b/gpu/shadps4/core/libraries/videoout/driver.cpp
+@@ -310,7 +310,7 @@
+ // resogun: frames handed to the presenter, for the loader's hang dump (resogun_gpu_flips).
+ static std::atomic<u64> g_resogun_flips_shown;
+ 
+-void VideoOutDriver::Flip(const Request& req) {
++void VideoOutDriver::Flip(const Request& req, FlipCadence& cadence) {
+     g_resogun_flips_shown.fetch_add(1, std::memory_order_relaxed);
+     // Update HDR status before presenting, then present the frame (resogun: on the swap thread).
+     RunPresenter([this, frame = req.frame, hdr = req.port->is_hdr] {
+@@ -321,10 +321,12 @@
+                                                 : 0);
+ 
+     // resogun: RESOGUN_FRAME_STATS=1 prints flip rate and frame time spread every 5 seconds.
+-    static const bool frame_stats = EmulatorSettingsImpl::Flag("RESOGUN_FRAME_STATS", false);
+-    if (frame_stats) {
++    if (cadence.enabled) {
+         using Clock = std::chrono::steady_clock;
+-        static Clock::time_point window_start = Clock::now(), last = window_start;
++        static Clock::time_point window_start = [&] {
++            cadence = {.enabled = true};
++            return Clock::now();
++        }(), last = window_start;
+         static u32 frames;
+         static double worst_ms;
+         const auto now = Clock::now();
+@@ -554,6 +556,10 @@
+                         ResogunStats::tick_wait_ns.exchange(0) / (window * 1e7));
+             presenter->GetRasterizer().GetPipelineCache().ReportCompilerStats();
+             Vulkan::WaitDiagnostics::Report();
++            std::printf("Vblank cadence: %u ticks (%u display), %u eligible, %u without a flip, "
++                        "longest tick gap %.2f ms\n", cadence.ticks, cadence.display_ticks,
++                        cadence.eligible_ticks, cadence.empty_ticks, cadence.max_gap.count() / 1e6);
++            cadence = {.enabled = true};
+             // Frame pacing: spread of the guest flip intervals (judder that the mean hides).
+             if (intervals.size() > 2) {
+                 std::vector<double> sorted = intervals;
+@@ -743,6 +749,7 @@
+     bool follow_display = follow_display_at_start && std::abs(ResogunWindowRefreshRate() - vblank_hz) < 0.5;
+     bool on_display = false;
+     auto last_tick = std::chrono::steady_clock::now();
++    FlipCadence cadence{.enabled = EmulatorSettingsImpl::Flag("RESOGUN_FRAME_STATS", false)};
+ 
+     while (!token.stop_requested()) {
+         if (const int hz = int(EmulatorSettings.GetVblankFrequency()); hz != vblank_hz) {
+@@ -768,7 +775,14 @@
+             timer.Start();
+         }
+         on_display = display_tick;
+-        last_tick = std::chrono::steady_clock::now();
++        const auto tick = std::chrono::steady_clock::now();
++        if (cadence.enabled) {
++            ++cadence.ticks;
++            cadence.display_ticks += display_tick;
++            cadence.max_gap = std::max(cadence.max_gap,
++                std::chrono::duration_cast<std::chrono::nanoseconds>(tick - last_tick));
++        }
++        last_tick = tick;
+ 
+         if (DebugState.IsGuestThreadsPaused()) {
+             DrawLastFrame();
+@@ -780,6 +794,10 @@
+         auto& vblank_status = main_port.vblank_status;
+         if (vblank_status.count % (main_port.flip_rate.load(std::memory_order_relaxed) + 1) == 0) {
+             const auto request = receive_request();
++            if (cadence.enabled) {
++                ++cadence.eligible_ticks;
++                cadence.empty_ticks += !request;
++            }
+             if (!request) {
+                 if (display_tick || timer.GetTotalWait().count() < 0) { // Dont draw too fast
+                     if (!main_port.is_open) {
+@@ -789,7 +807,7 @@
+                     }
+                 }
+             } else {
+-                Flip(request);
++                Flip(request, cadence);
+                 FRAME_END;
+             }
+         }
+```
+
+### 2026-11-18 21:30 codex -> orchestrator: use a high-resolution timer for Windows vblank fallback
+
+The Windows timer rounded a 4.6 ms request to about 15 ms on this host. The patch requests the high-resolution timer that Windows already supplies to the audio path and falls back to the standard timer if creation fails.
+
+Across two native 120-tick cadence probes at 60 Hz, p95 tick gaps fell from about 30.6 ms to 17.3–17.5 ms, and gaps over 25 ms fell from 11 to 0 and 12 to 1. The alertable wait still handled APC interruption. Strict apply and the full Windows `thread.cpp` syntax check passed on `5ffb004`. Compare the same warmed scene with `RESOGUN_VBLANK_TIMER=1` on both builds to isolate the timer. Guest FPS is NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/common/thread.cpp b/gpu/shadps4/common/thread.cpp
+--- a/gpu/shadps4/common/thread.cpp
++++ b/gpu/shadps4/common/thread.cpp
+@@ -114,10 +114,19 @@
+     LARGE_INTEGER interval{
+         .QuadPart = -1 * (duration.count() / 100u),
+     };
+-    HANDLE timer = ::CreateWaitableTimer(NULL, TRUE, NULL);
+-    SetWaitableTimer(timer, &interval, 0, NULL, NULL, 0);
+-    const auto ret = WaitForSingleObjectEx(timer, INFINITE, interruptible);
+-    ::CloseHandle(timer);
++    HANDLE timer = ::CreateWaitableTimerExW(nullptr, nullptr,
++        CREATE_WAITABLE_TIMER_HIGH_RESOLUTION | CREATE_WAITABLE_TIMER_MANUAL_RESET,
++        TIMER_MODIFY_STATE | SYNCHRONIZE);
++    if (!timer) {
++        timer = ::CreateWaitableTimerW(nullptr, TRUE, nullptr);
++    }
++    DWORD ret = WAIT_FAILED;
++    if (timer) {
++        if (::SetWaitableTimer(timer, &interval, 0, nullptr, nullptr, FALSE)) {
++            ret = ::WaitForSingleObjectEx(timer, INFINITE, interruptible);
++        }
++        ::CloseHandle(timer);
++    }
+ 
+     if (remaining) {
+         const auto end_sleep = std::chrono::high_resolution_clock::now();
+```
+
+### 2026-11-18 21:36 codex -> orchestrator: batch stall logs on the vblank thread
+
+The 21:31 profile samples the present thread in `NtWriteFile` (`ntdll+0x1664e4`). It also catches the guest main thread at `0xfb311b`, the return from `sceVideoOutWaitVblank`. Stdout is unbuffered, so the patch formats each stall report in memory and writes the block once.
+
+A Windows redirected-output test produced identical text for 2,048 reports and cut write operations from 1,585,152 to 2,048. The same probe took 3,658 ms before and 37 ms after. Full VideoOut syntax and strict apply passed on `c4a514a` with the CPU timing, flip divisor, and cadence patches. Guest frame pacing with this change is NOT_RUN.
+
+```diff
+diff --git a/gpu/shadps4/core/libraries/videoout/driver.cpp b/gpu/shadps4/core/libraries/videoout/driver.cpp
+--- a/gpu/shadps4/core/libraries/videoout/driver.cpp
++++ b/gpu/shadps4/core/libraries/videoout/driver.cpp
+@@ -373,6 +373,19 @@
+         const bool stall = primed && frame_ms > stall_ms && stalls_shown < 10;
+         stalls_shown += stall;
+         primed = true;
++        // Stdout is unbuffered. Keep the report to one write on the vblank thread.
++        char stall_report[2048];
++        size_t stall_size = 0;
++        auto append_stall = [&](const char* format, auto... args) {
++            const size_t space = sizeof(stall_report) - stall_size;
++            if (space <= 1) {
++                return;
++            }
++            const int count = std::snprintf(stall_report + stall_size, space, format, args...);
++            if (count > 0) {
++                stall_size += std::min(static_cast<size_t>(count), space - 1);
++            }
++        };
+         // Waits and work inside the long frame (window counters are reset every 5 s, so the
+         // previous values are reset with them).
+         static u64 last_wait[7];
+@@ -381,7 +394,7 @@
+                                  u64(Vulkan::g_resogun_compile_ns.load()), u64(Vulkan::g_resogun_compiles.load()),
+                                  ResogunStats::t_gc.load()};
+         if (stall) {
+-            std::printf("Stall: %.1f ms frame; waits: readback %.1f ms, GPU ticks %.1f ms, "
++            append_stall("Stall: %.1f ms frame; waits: readback %.1f ms, GPU ticks %.1f ms, "
+                         "recorder %.1f ms, host copies %.1f ms; %llu compiles %.1f ms; GC %.1f ms\n",
+                         frame_ms, (wait_now[0] - last_wait[0]) / 1e6, (wait_now[1] - last_wait[1]) / 1e6,
+                         (wait_now[2] - last_wait[2]) / 1e6, (wait_now[3] - last_wait[3]) / 1e6,
+@@ -390,7 +403,7 @@
+         }
+         std::copy(std::begin(wait_now), std::end(wait_now), std::begin(last_wait));
+         if (stall) {
+-            std::printf("       fault handlers: %llu read faults %.1f ms, write faults %.1f ms\n",
++            append_stall("       fault handlers: %llu read faults %.1f ms, write faults %.1f ms\n",
+                         static_cast<unsigned long long>(rf - last_rf), (trf - last_trf) / 1e6,
+                         (twf - last_twf) / 1e6);
+         }
+@@ -439,13 +452,13 @@
+         const u64 image_bytes = ResogunStats::image_upload_bytes.load();
+         const u64 buffer_bytes = ResogunStats::buffer_upload_bytes.load();
+         if (stall) {
+-            std::printf("       GPU thread on CPU %.1f ms; %llu images registered, "
++            append_stall("       GPU thread on CPU %.1f ms; %llu images registered, "
+                         "%.1f MB image uploads, %.1f MB buffer uploads\n",
+                         (gpu_ns - last_gpu_ns) / 1e6,
+                         static_cast<unsigned long long>(images - last_images),
+                         (image_bytes - last_image_bytes) / 1e6,
+                         (buffer_bytes - last_buffer_bytes) / 1e6);
+-            std::printf("       %llu draws, %llu dispatches, %llu submissions; GPU thread user %.1f ms, "
++            append_stall("       %llu draws, %llu dispatches, %llu submissions; GPU thread user %.1f ms, "
+                         "kernel %.1f ms, %llu preempted, %llu waits\n",
+                         static_cast<unsigned long long>(draws - last_draws),
+                         static_cast<unsigned long long>(dispatches - last_dispatches),
+@@ -454,12 +467,12 @@
+                         static_cast<unsigned long long>(vol - last_vol));
+         }
+         if (stall) {
+-            std::printf("       ms in: resident %.1f, protect %.1f, image create %.1f, "
++            append_stall("       ms in: resident %.1f, protect %.1f, image create %.1f, "
+                         "image refresh %.1f, staging %.1f, waiting for host copies %.1f\n",
+                         (t_now[0] - last_t[0]) / 1e6, (t_now[1] - last_t[1]) / 1e6,
+                         (t_now[2] - last_t[2]) / 1e6, (t_now[3] - last_t[3]) / 1e6,
+                         (t_now[4] - last_t[4]) / 1e6, (t_now[5] - last_t[5]) / 1e6);
+-            std::printf("       GPU thread page faults %llu (process %llu), protection faults %llu; "
++            append_stall("       GPU thread page faults %llu (process %llu), protection faults %llu; "
+                         "protect calls %llu (%llu pages), of which write-revoking %llu (%llu pages)\n",
+                         static_cast<unsigned long long>(minflt - last_minflt),
+                         static_cast<unsigned long long>(proc_flt - last_proc_flt),
+@@ -475,12 +488,15 @@
+         last_rp = rp;
+         last_minflt = minflt;
+         if (stall && copy_ns > last_copy_ns) {
+-            std::printf("       guest copies %.1f MB in %.1f thread-ms, %.1f ms on CPU (kernel %.1f ms, "
++            append_stall("       guest copies %.1f MB in %.1f thread-ms, %.1f ms on CPU (kernel %.1f ms, "
+                         "%llu page faults in large copies) (%.2f GB/s per thread)\n",
+                         (copy_bytes - last_copy_bytes) / 1e6, (copy_ns - last_copy_ns) / 1e6,
+                         (copy_cpu - last_copy_cpu) / 1e6, (copy_sys - last_copy_sys) / 1e3,
+                         static_cast<unsigned long long>(copy_flt - last_copy_flt),
+                         double(copy_bytes - last_copy_bytes) / double(copy_ns - last_copy_ns));
++        }
++        if (stall_size) {
++            std::fwrite(stall_report, 1, stall_size, stdout);
+         }
+         last_copy_ns = copy_ns;
+         last_copy_cpu = copy_cpu;
+```
+
+
+### 2026-11-18 21:45 codex -> orchestrator: limit wait-mode instruction sampling to selected threads
+
+While the wait sampler was suspending all threads, including idle workers, Windows charged golf:Profiler 1.27 CPU-s in a 6.07 s sample of the 21:37 guest run, or 21% of one core and 34% of process CPU time.
+
+The patch limits instruction sampling by exact thread name and retains per-thread CPU totals. For the vblank trace, set `GOLF_PROFILE=15`, `GOLF_PROFILE_WAITS=1` and `GOLF_PROFILE_THREADS=main,shadPS4:PresentThread,shadPS4:GpuCommandProcessor`. Use `GOLF_PROFILE=0` for FPS comparisons.
+
+In a Windows probe, 25 sweeps across 161 synthetic waiting threads took 125–149 ms for 4,025 samples, falling to 1.69–2.06 ms for 75 samples when scoped to three threads. Ten name-selection checks, strict patch apply and full loader syntax passed against the current profiling diff.
+
+Guest execution with the patch is NOT_RUN.
+
+```diff
+diff --git a/src/loader.c b/src/loader.c
+--- a/src/loader.c
++++ b/src/loader.c
+@@ -637,17 +637,32 @@
+     memset(prof_slots,0,sizeof(ProfSlot)*PROF_SLOTS);
+     fflush(stderr);
+ }
++/* An optional comma-separated list keeps instruction sampling off unrelated threads. */
++static int prof_in_scope(const char *scope, const char *name) {
++    if (!scope || !*scope) return 1;
++    const size_t length=strlen(name);
++    for (const char *field=scope;*field;) {
++        const size_t size=strcspn(field,",");
++        if (size && size==length && !memcmp(field,name,size)) return 1;
++        field+=size;
++        if (*field==',') ++field;
++    }
++    return 0;
++}
+ static DWORD WINAPI prof_thread(void *unused) {
+     (void)unused;
+     SetThreadDescription(GetCurrentThread(),L"golf:Profiler");
+     SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_HIGHEST);
+     const unsigned seconds=(unsigned)strtoul(getenv("GOLF_PROFILE"),NULL,10);
++    const char *scope=getenv("GOLF_PROFILE_THREADS");
++    if (scope && *scope) fprintf(stderr,"Profile: sampling instruction pointers for %s\n",scope);
+     const ULONGLONG window=(ULONGLONG)(seconds ? seconds : 10)*1000;
+     ULONGLONG start=GetTickCount64(), refreshed=0;
+     for (;;) {
+         const ULONGLONG now=GetTickCount64();
+         if (now-refreshed>=1000) { prof_refresh(); refreshed=now; }
+-        for (int i=0;i<prof_count;++i) prof_sample(i);
++        for (int i=0;i<prof_count;++i)
++            if (prof_in_scope(scope,prof_threads[i].name)) prof_sample(i);
+         if (now-start>=window) { prof_report((unsigned)((now-start)/1000)); start=now; }
+         Sleep(4);
+     }
+```

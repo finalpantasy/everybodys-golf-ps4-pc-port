@@ -284,6 +284,13 @@ enable the empty finish-board and sign-board lists.
 [Finish-board format](../analysis/online/protocol.md#finish-board-list)
 · [Sign-board format](../analysis/online/protocol.md#sign-board-list-and-download)
 
+For an empty event-regulation reply, set `--empty-regulations` on
+the discovery generator and listener. Give the listener the daily
+score fixture with `--daily-score-block PATH`. The runtime route in
+the mailbox forwards both the current-day and dated calendar POSTs.
+Both shapes passed loopback replay. Guest acceptance is NOT_RUN.
+[Event regulation format](../analysis/online/protocol.md#event-regulations)
+
 To advertise the property and telemetry routes, pass `--cached-property`
 and `--discard-telemetry` to the generator and listener.
 

@@ -33,6 +33,7 @@ SERVER_TIME_PATH = "/nmg-us/replay-probe/gameapi_getservertime"
 EULA_PATH = "/nmg-us/replay-probe/gameapi_geteula"
 NOTICE_PATH = "/nmg-us/replay-probe/gameapi_getinfolist"
 BONUS_LIST_PATH = "/nmg-us/replay-probe/gameapi_getbonuslist"
+REGULATION_PATH = "/nmg-us/replay-probe/gameapi_getregulationdata"
 DAILY_SCORE_PATH = "/nmg-us/replay-probe/gameapi_getscorelist"
 SCORE_BOARD_PREFIX = DAILY_SCORE_PATH + "?account="
 REGISTRATION_OPERATIONS = (
@@ -108,6 +109,10 @@ NATIONAL_BOARD_MAX_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(
 NATIONAL_BOARD_REPLY = pack("<4HI2H", 0x8000, 1, 0x0000, 2, 1, 0x0083, 3) + b"local\0\0\0" + TERMINATOR
 DAILY_SCORE_TAIL = pack("<2HI2HI", 0x4000, 2, 1, 0x4010, 2, 1000) + SERVER_TIME_SUFFIX
 DAILY_SCORE_FIELDS = ((0x0020, 2, 15), (0x0060, 3, 13), (0x4140, 7, 7))
+REGULATION_FIELDS = DAILY_SCORE_FIELDS[:2]
+DATED_REGULATION_FIELDS = REGULATION_FIELDS + ((0x6010, 2, 2),)
+REGULATION_MIN_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(low for _, low, _ in REGULATION_FIELDS)
+REGULATION_MAX_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(high for _, _, high in DATED_REGULATION_FIELDS)
 DAILY_SCORE_FIXED_BYTES = len(SERVER_TIME_PREFIX) + 4 + len(DAILY_SCORE_TAIL)
 DAILY_SCORE_MIN_BYTES = DAILY_SCORE_FIXED_BYTES + 4 * sum(minimum for _, minimum, _ in DAILY_SCORE_FIELDS)
 DAILY_SCORE_MAX_BYTES = DAILY_SCORE_FIXED_BYTES + 4 * sum(maximum for _, _, maximum in DAILY_SCORE_FIELDS)
@@ -205,7 +210,8 @@ NATIONAL_OWN_SCORE_MIN_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(
 NATIONAL_OWN_SCORE_MAX_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(
     maximum for _, _, maximum in NATIONAL_OWN_SCORE_FIELDS
 )
-TITLE_SUCCESS_REPLY = pack("<4HI", 0x8000, 1, 0x0000, 2, 1) + TERMINATOR
+TITLE_SUCCESS_PREFIX = pack("<4HI", 0x8000, 1, 0x0000, 2, 1)
+TITLE_SUCCESS_REPLY = TITLE_SUCCESS_PREFIX + TERMINATOR
 BOARD_LIST_FIELDS = ((0x0020, 2, 15), (0x0060, 3, 13), (0x4000, 2, 2), (0x4010, 2, 2))
 BOARD_LIST_MIN_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(minimum for _, minimum, _ in BOARD_LIST_FIELDS)
 BOARD_LIST_MAX_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(maximum for _, _, maximum in BOARD_LIST_FIELDS)
@@ -667,6 +673,19 @@ def valid_daily_score_request(body: bytes) -> bool:
             event_name is not None and re.fullmatch(rb"Daily_[0-9]{8}_[0-9]{2}_score", event_name) is not None)
 
 
+def valid_regulation_request(body: bytes) -> bool:
+    fields = title_fields(body, SERVER_TIME_SUFFIX, REGULATION_FIELDS)
+    if fields is None:
+        fields = title_fields(body, SERVER_TIME_SUFFIX, DATED_REGULATION_FIELDS)
+        if fields is None:
+            return False
+        try:
+            datetime.strptime(fields[2].hex(), "%Y%m%d")
+        except ValueError:
+            return False
+    return padded_string(fields[0]) is not None and len(fields[1]) % 8 == 0
+
+
 def daily_score_records(block: bytes) -> bytes:
     if len(block) != 8:
         raise ValueError("Daily score fixture must contain one encrypted 8-byte block")
@@ -778,7 +797,8 @@ class GolfServer(ThreadingHTTPServer):
                  login_completion: bool = False, empty_national_boards: bool = False,
                  empty_own_score: bool = False, score_db: Path | None = None,
                  event_group: str | tuple[str, ...] | None = None, local_lobbies: bool = False,
-                 national_tournament: bool = False, empty_bonus_list: bool = False):
+                 national_tournament: bool = False, empty_bonus_list: bool = False,
+                 empty_regulations: bool = False):
         if discovery is not None and (not 0 < len(discovery) <= MAX_DISCOVERY_BYTES or
                                       len(discovery) % DISCOVERY_BLOCK):
             raise ValueError(f"Discovery fixture must contain complete 8-byte blocks, up to {MAX_DISCOVERY_BYTES} bytes")
@@ -788,6 +808,8 @@ class GolfServer(ThreadingHTTPServer):
             raise ValueError("Select one login reply")
         if national_tournament and server_time is None:
             raise ValueError("National tournament replay requires --server-time")
+        if empty_regulations and daily_score_block is None:
+            raise ValueError("Empty regulation replay requires --daily-score-block")
         self.discovery = discovery
         self.server_time = server_time_records(server_time) if server_time is not None else None
         self.eula = eula_records(eula_text) if eula_text is not None else None
@@ -800,6 +822,10 @@ class GolfServer(ThreadingHTTPServer):
         elif login_completion:
             self.login_reply = LOGIN_SCORE_SESSION_REPLY if empty_own_score else LOGIN_COMPLETE_REPLY
         self.daily_score = daily_score_records(daily_score_block) if daily_score_block is not None else None
+        self.regulations = (
+            TITLE_SUCCESS_PREFIX + pack("<2H", 0x0060, 3) + daily_score_block
+            + pack("<2HI", 0x6000, 2, 0) + TERMINATOR
+        ) if empty_regulations else None
         self.empty_own_score = empty_own_score
         self.empty_national_boards = empty_national_boards
         self.national_board = national_tournament_board(server_time) if national_tournament else None
@@ -935,6 +961,10 @@ class GolfHandler(BaseHTTPRequestHandler):
             response = BONUS_LIST_REPLY
             minimum, maximum = BONUS_LIST_MIN_BYTES, BONUS_LIST_MAX_BYTES
             validate = partial(valid_title_session_request, layout=BONUS_LIST_FIELDS)
+        elif self.path == REGULATION_PATH and self.server.regulations is not None:
+            response = self.server.regulations
+            minimum, maximum = REGULATION_MIN_BYTES, REGULATION_MAX_BYTES
+            validate = valid_regulation_request
         elif self.is_daily_score():
             response = self.server.daily_score
             minimum, maximum = DAILY_SCORE_MIN_BYTES, DAILY_SCORE_MAX_BYTES
@@ -1260,6 +1290,7 @@ class GolfHandler(BaseHTTPRequestHandler):
               or (self.path == EULA_PATH and self.server.eula is not None)
               or (self.path == NOTICE_PATH and self.server.empty_notices)
               or (self.path == BONUS_LIST_PATH and self.server.empty_bonus_list)
+              or (self.path == REGULATION_PATH and self.server.regulations is not None)
               or self.is_daily_score()
               or (self.server.empty_own_score and valid_session_target(self.path, SCORE_BOARD_TARGET))
               or (self.server.scores is not None and
@@ -1307,6 +1338,8 @@ def main():
     parser.add_argument("--empty-bonus-list", action="store_true", help="Replay an empty local bonus list")
     parser.add_argument("--daily-score-block", type=Path,
                         help="Encrypted block for the local daily score-list probe")
+    parser.add_argument("--empty-regulations", action="store_true",
+                        help="Replay no local event regulations (requires --daily-score-block)")
     parser.add_argument("--empty-own-score", action="store_true",
                         help="Enable local score queries and empty leaderboard replies")
     parser.add_argument("--score-db", type=Path,
@@ -1358,7 +1391,7 @@ def main():
                         empty_own_score=args.empty_own_score, score_db=args.score_db,
                         event_group=tuple(args.event_group or ()),
                         local_lobbies=args.local_lobbies, national_tournament=args.national_tournament,
-                        empty_bonus_list=args.empty_bonus_list) as server:
+                        empty_bonus_list=args.empty_bonus_list, empty_regulations=args.empty_regulations) as server:
             print(f"Listening on http://{LOOPBACK}:{server.server_port}", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

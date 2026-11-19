@@ -14,7 +14,7 @@ from golf_server import (
     NATIONAL_OWN_SCORE_PATH, NATIONAL_REGISTRATION_PREFIX, NATIONAL_SCORE_LIST_PATH,
     NOTICE_PATH, OWN_SCORE_PATH,
     PROPERTY_INFO_PATH,
-    REGISTRATION_OPERATIONS, REGISTRATION_PREFIXES, RIVAL_LIST_PATH, SCORE_BOARD_PREFIX,
+    REGISTRATION_OPERATIONS, REGISTRATION_PREFIXES, REGULATION_PATH, RIVAL_LIST_PATH, SCORE_BOARD_PREFIX,
     SCORE_DISTRIBUTION_PATH, SERVER_TIME_PATH, SIGN_BOARD_PATH, TOP_PLAYER_PATH, USER_STATUS_PATH,
 )
 
@@ -33,7 +33,7 @@ def discovery_document(*, eula: bool = False, empty_notices: bool = False,
                        discard_telemetry: bool = False, empty_national_boards: bool = False,
                        empty_own_score: bool = False, score_registration: bool = False,
                        event_schedule: bool = False, national_tournament: bool = False,
-                       empty_bonus_list: bool = False) -> bytes:
+                       empty_bonus_list: bool = False, empty_regulations: bool = False) -> bytes:
     with URL_MAP.open(encoding="utf-8", newline="") as stream:
         entries = list(csv.DictReader(stream, delimiter="\t"))
     entries.sort(key=lambda row: (
@@ -50,6 +50,8 @@ def discovery_document(*, eula: bool = False, empty_notices: bool = False,
         urls["gameapi_getinfolist"] = f"https://{LOOPBACK}:8765{NOTICE_PATH}"
     if empty_bonus_list:
         urls["gameapi_getbonuslist"] = f"https://{LOOPBACK}:8765{BONUS_LIST_PATH}"
+    if empty_regulations:
+        urls["gameapi_getregulationdata"] = f"https://{LOOPBACK}:8765{REGULATION_PATH}"
     if daily_scores:
         urls["gameapi_getscorelist"] = f"https://{LOOPBACK}:8765{DAILY_SCORE_PATH}"
     if empty_own_score or score_registration:
@@ -142,7 +144,7 @@ def build_fixture(eboot: Path, libcrypto: str, *, eula: bool = False, empty_noti
                   discard_telemetry: bool = False, empty_national_boards: bool = False,
                   empty_own_score: bool = False, score_registration: bool = False,
                   event_schedule: bool = False, national_tournament: bool = False,
-                  empty_bonus_list: bool = False) -> bytes:
+                  empty_bonus_list: bool = False, empty_regulations: bool = False) -> bytes:
     elf = read_prepared_eboot(eboot)
     # The prepared ELF maps these guest addresses at file offset VA + 0x4000.
     seed = elf[0x1361ED2 + 0x4000:0x1361EDA + 0x4000]
@@ -152,7 +154,8 @@ def build_fixture(eboot: Path, libcrypto: str, *, eula: bool = False, empty_noti
                                cached_property=cached_property, discard_telemetry=discard_telemetry,
                                empty_national_boards=empty_national_boards, empty_own_score=empty_own_score,
                                score_registration=score_registration, event_schedule=event_schedule,
-                               national_tournament=national_tournament, empty_bonus_list=empty_bonus_list)
+                               national_tournament=national_tournament, empty_bonus_list=empty_bonus_list,
+                               empty_regulations=empty_regulations)
     return encrypt_blocks(plain, seed, iv, libcrypto)
 
 
@@ -166,6 +169,8 @@ def main():
                         help="Use the plaintext notice-list loopback route")
     parser.add_argument("--empty-bonus-list", action="store_true",
                         help="Use the plaintext bonus-list loopback route")
+    parser.add_argument("--empty-regulations", action="store_true",
+                        help="Use the plaintext regulation loopback route")
     parser.add_argument("--daily-scores", action="store_true",
                         help="Use the plaintext daily score-list loopback route")
     parser.add_argument("--empty-own-score", action="store_true",
@@ -198,7 +203,7 @@ def main():
                                 empty_national_boards=args.empty_national_boards,
                                 empty_own_score=args.empty_own_score, score_registration=args.score_registration,
                                 event_schedule=args.event_schedule, national_tournament=args.national_tournament,
-                                empty_bonus_list=args.empty_bonus_list)
+                                empty_bonus_list=args.empty_bonus_list, empty_regulations=args.empty_regulations)
         args.output.parent.mkdir(parents=True, exist_ok=True)
         with args.output.open("xb") as stream:
             stream.write(fixture)

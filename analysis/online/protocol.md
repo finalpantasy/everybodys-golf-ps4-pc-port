@@ -605,19 +605,27 @@ at `0x10fcee0`. Each row advances by `0x68` (`0xb73726–0xb73862`,
 
 | Columns | Slot `0x15` destination and evidence |
 |---|---|
-| 1 | A packed date at row `+0x40` (`0xb737c8–0xb73862`). Bits 31–28 are year minus 2011, bits 27–24 are month, and bits 23–19 are day (`0xb74b77–0xb74b91`, `0x14a791–0x14a7e7`). |
-| 2 | Text at the row start, copied by `strcpy` (`0xb7385a–0xb7388f`). |
+| 1 | The unsigned decimal text representation of the packed date, stored at row `+0x40` (`0xb737c8–0xb73862`). Bits 31–28 are year minus 2011, bits 27–24 are month, and bits 23–19 are day (`0xb74b77–0xb74b91`, `0x14a791–0x14a7e7`). |
+| 2 | Text at the row start, copied by `strcpy` (`0xb7385a–0xb7388f`). Keep it to 63 bytes to leave room for the NUL before the date. |
 | 3–6 | Four bytes at `+0x44` through `+0x47` (`0xb7390f–0xb73b57`). |
 | 7–10 | A 32-bit word at `+0x48`, bytes at `+0x4c` and `+0x4d`, and a 16-bit word at `+0x4e` (`0xb73b5f–0xb73da7`). |
 | 11–32 | One byte each at `+0x50` through `+0x65` (`0xb73db0–0xb74a60`). |
 | 33–35 | Converted values have no stores into the row. The guest writes the date helper’s return value to `+0x66` (`0xb74a68–0xb74c18`). |
 
-The saved Open Course traces contain no regulation request. The
+The 36-byte local reply begins with `0x8000/1` and `0x0000/2`
+with status 1. It carries the encrypted daily score fixture in
+`0x0060/3`, `0x6000/2` with four zero bytes, and `0x8010/1`.
+The empty text clears the slot `0x12` result count and leaves
+the slot `0x15` calendar untouched while advancing to the next
+date (`0xb689c9–0xb689d4`, `0xb76b67–0xb76b70`,
+`0xb791ec–0xb79202`, `0xb74c96–0xb74cb6`, `0xb712b2–0xb712d7`).
+
+Loopback tests replayed both POST shapes with requests from 122
+through 222 bytes, including invalid dates and record framing.
+The saved Open Course traces contain no regulation request. Guest
+acceptance and populated regulation replay are NOT_RUN. The
 populated columns' gameplay meanings and the deployed text are
-unverified. A candidate for the slot `0x12` empty-text branch is
-`0x6000/2` with four zero bytes followed by the terminator. The
-slot `0x15` calendar cache needs a populated row. Local replay for
-these slots is NOT_RUN.
+unverified.
 
 ### Daily event rivals
 
@@ -1916,7 +1924,13 @@ ID, saved request ID, and a result pointer to
 `sceNpMatching2SignalingGetPeerNetInfoResult`, with the leading eight
 bytes of the result set to its size, 24. A zero return clears the
 request ID and sets byte `0x50` in the peer object
-(`0xa8216c–0xa82178`). Other result fields are unverified.
+(`0xa8216c–0xa82178`). Peer initialization zeros the request ID at
+`+0x30` (`0xa743d1`, `0xa74f85`). Teardown passes that field to
+`sceNpMatching2SignalingCancelPeerNetInfo` only when nonzero
+(`0xa7414e–0xa74160`, `0xa746e7–0xa746f9`). The 1.17 EBOOT imports
+the cancel and result NIDs. Its import table omits the request NID
+`8CqniKDzjvg`. The request ID producer and the remaining result
+fields are unverified.
 
 #### Room attribute updates
 
@@ -1979,6 +1993,15 @@ passes at `0xa778e1–0xa7793b`. Later owner updates store them
 independently and an identical retry returns the current revision.
 Loopback tests cover both view formats, owner checks, closing and
 reopening, and late join with the latest private attribute.
+
+Room IDs carry the world in the high byte and its room sequence in
+the low 56 bits. Runtime `5ffb004` acquires the roster when
+`CreateJoinRoomA` follows `GetWorldInfoList` without a `JoinLobby`
+call. The follow-up patch uses the world byte for `JoinRoomA` and
+external lookup when the roster is absent. Windows sanitizer tests
+through the Matching2 worker covered worlds 1, 7, and 50, including
+both attribute setters, public listing lookup, and private attribute
+delivery on join. Guest verification is NOT_RUN.
 
 An identical create retry on the same lease returns its current room
 view. A repeated join leaves membership unchanged. The staged runtime
