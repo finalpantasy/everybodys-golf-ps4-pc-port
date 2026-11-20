@@ -64,7 +64,7 @@ The launcher also has:
 - Display: window mode, output resolution, render resolution, 60 FPS mode, SMAA, FSR 1 sharpening, vsync and HDR.
 - Saves: several saves, each with its own golfer and progress. Make a new one, copy, rename, back up to `data\backups`, or move one to the Recycle Bin.
 - HD textures: tick "Collect textures while playing", play a while, then build an upscaled pack with Real-ESRGAN (2x or 4x, bundled) and turn it on. The pack is made from your own copy and stays on your PC.
-- Online: host the bundled server on your PC or join a friend's. Pick a name and a port, press Copy invite for friends, and send them the text: it lists your home network address and any VPN address (Tailscale, ZeroTier) with the port. Friends outside your home network need the port forwarded on your router (the launcher can ask the router with UPnP) or a shared VPN.
+- Online: host the bundled server on your PC or join a friend's. Pick a name and a port, press Copy invite for friends, and send them the text: it lists your home network address and any VPN address (Tailscale, ZeroTier) with the port. Friends outside your home network need the port forwarded on your router (the launcher can ask the router with UPnP) or a shared VPN. With Online set to Off the game starts signed out and plays offline.
 
 ### Settings in the game
 
