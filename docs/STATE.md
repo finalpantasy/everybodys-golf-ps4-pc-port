@@ -88,12 +88,12 @@ Other open items: `IT_SET_PREDICATION` is not implemented (warned once), `sceGnm
 - Black faces: `v_writelane` was emitted as 0. Fixed by porting two hunks of the golf-fix v41 shadPS4 patch (`tools/golf-fix-pro-v41/source/golf-fix-v41.patch`, GPL-2.0-or-later).
 - PM4 type 0 packets are skipped with one warning per register instead of asserting.
 - Shader resource lists hold 128 images and 64 samplers; a draw with more bindings than the old limit threw.
-- A local PSN account answers sign-in and NpWebApi locally (`src/runtime_golf.c`). 31 add-on labels from the game's own entitlement table are reported installed. Whether the game shows those items is NOT_VERIFIED.
+- A local PSN account answers sign-in and NpWebApi locally (`src/runtime_golf.c`). 31 add-on labels from the game's own entitlement table are reported installed. The game shows the items (2026-11-19, runtime `0bb035e`, after-tutorial save): in Customize Character, Fashion, Sets lists cat, rabbit and bear kigurumi, Top lists polo shirts and Accessories 2 lists three items, each with a DLC badge and NEW tag. With `GOLF_ENTITLEMENTS=original` the same save does not load: the game names Kigurumi (Rabbit)-01, Kigurumi (Bear)-01 and AmaPolo as missing additional items. Not checked yet: DLC courses, clubs, balls, carts and caddies.
 
 ### Switches
 
 - `GOLF_NP=offline`: signed-out console instead of the local account. The launcher passes it (`--np-mode offline`) when Online is Off: signed in with no server, the game showed "Server connection failed" on the island at a random moment, and the dialog took the next Cross presses. `GOLF_ONLINE_ID=<name>`: the local online id (default `Golfer`).
-- `GOLF_ENTITLEMENTS=original`: report no add-ons.
+- `GOLF_ENTITLEMENTS=original`: report no add-ons. A save that holds add-on items will not load in this mode (the game names the missing items).
 - `RESOGUN_IME_TEXT=<text>`: answer every keyboard dialog with this text (needed for unattended boots: the on-screen dialog waits for a real controller or keyboard).
 - `RESOGUN_FILE_TRACE_MATCH=<text>`: log every open whose path contains the text, found or not.
 - `RESOGUN_FAULT_PEEK=<reg><+|->0x<offset>`: print the string at that address in a fault report.

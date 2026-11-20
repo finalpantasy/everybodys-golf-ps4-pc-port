@@ -21,7 +21,7 @@ What works:
 - Stereo music and sound effects.
 - 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
 - Texture packs: dump the game's textures, upscale them, and the port draws the upscaled copies instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
-- A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed.
+- A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed. Add-on outfits show in Customize Character with a DLC badge (kigurumi sets, polo shirts, accessories).
 - With the bundled server, the daily ranking opens, Open Course hole scores register, and a Game Room can be created up to its participant list.
 - Render resolution changes while you play (tested on the island: 1080 to 1440 and back, with no restart).
 
@@ -29,7 +29,7 @@ Known problems:
 
 - Course loads are slow. A repeat load of Eagle City took 40 to 60 seconds in one test (90 to 140 before); a course not loaded before takes longer, and some pipelines still recompile on every load.
 - Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
-- Whether the game shows the add-on items is not verified.
+- Add-on courses, clubs, balls, carts and caddies are not checked yet.
 - Online with friends shares rankings only. Each round is still played alone: the game's matchmaking runs inside each PC, so other players never appear on your course. Joining from a second PC and the router port mapping are not tested yet.
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
