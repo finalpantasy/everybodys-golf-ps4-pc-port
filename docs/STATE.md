@@ -231,7 +231,7 @@ The import checker remains nonzero by design; `work/game-1.17-prepared/missing-i
 
 ## Verification commands
 
-Run from `F:/everybodys golf ps4` with `MSYS2_ROOT=F:\everybodys golf ps4\tools\msys2\msys64`:
+Run from `A:/everybodys golf ps4` with `MSYS2_ROOT=A:\everybodys golf ps4\tools\msys2\msys64`:
 
 ```bash
 python external/resogun-recomp/run.py check --game work/game-1.17 --out work/game-1.17-prepared --any-build

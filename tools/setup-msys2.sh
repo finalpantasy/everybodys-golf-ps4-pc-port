@@ -28,5 +28,5 @@ pacman -S --needed --noconfirm \
   mingw-w64-clang-x86_64-nlohmann-json \
   mingw-w64-clang-x86_64-openssl \
   mingw-w64-clang-x86_64-miniupnpc
-pacman -Q > "/f/everybodys golf ps4/tools/msys2-package-versions.txt"
+pacman -Q > "/a/everybodys golf ps4/tools/msys2-package-versions.txt"
 printf 'MSYS2 CLANG64 setup complete\n'
