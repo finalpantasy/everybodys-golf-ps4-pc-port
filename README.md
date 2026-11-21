@@ -51,13 +51,27 @@ The entitlement unlock is implemented and not yet verified in the game. Online p
 
 Packages, keys, licenses and game data stay out of the repository. See `.gitignore`.
 
-## Install (Windows)
+## Download and install (Windows)
 
-1. Run `EverybodysGolfPC-Setup-<version>.exe`. It installs for your user only and needs no admin rights. The default folder is `C:\Games\Everybody's Golf PC`; any folder you can write to works.
-2. Start Everybody's Golf from the Start menu. On the Game files tab, choose your base game folder, the 1.17 update folder (leave it empty if your dump already has the update) and any DLC folders, then press Set up game files. It takes a few seconds.
+**[Download the latest release](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/latest)** (`everybodys-golf-pc-<version>-windows-x64.zip`).
+
+1. Unpack the whole zip into a folder of its own. Any folder you can write to works; no admin rights are needed.
+2. Start `EverybodysGolf.exe`. The first time, it opens on Game files. Choose your base game folder, the 1.17 update folder (leave it empty if your dump already has the update) and any DLC folders, then press Set up game files. It takes a few seconds and only reads your dump.
 3. Press Play.
 
-Settings, saves, logs and the prepared game stay in `data\` inside the install folder, never in AppData. The installer adds only a Start menu shortcut and an uninstall entry for your user. Uninstalling keeps `data\` unless you say otherwise.
+![The launcher's Play tab](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.0/03-play.png)
+
+![The launcher's Graphics tab](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.0/05-graphics.png)
+
+![The home island, drawn by the port](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.0/09-game-island.png)
+
+### Updates
+
+Once a day at most, the launcher asks GitHub for a newer release. When there is one, it shows the release notes and offers Update now, Later or Skip this version. Update now downloads the new zip, checks it against its SHA-256 file, replaces only the program files and restarts. Saves, settings and the prepared game in `data\` are kept, and a failed update puts the previous version back. Turn the check off on the Play tab.
+
+![The update dialog](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.0/11-update-offer.png)
+
+Settings, saves, logs and the prepared game stay in `data\` inside the install folder, never in AppData. To remove everything, delete the folder.
 
 The launcher also has:
 
