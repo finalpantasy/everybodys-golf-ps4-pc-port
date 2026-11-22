@@ -22,7 +22,8 @@ What works:
 - 60 FPS in free roam, at the tee and during shots (the game's own PS4 Pro frame rate mode, held on in every scene; `frame_rate_priority=0` in settings.ini turns it off).
 - Texture packs: dump the game's textures, upscale them, and the port draws the upscaled copies instead ([docs/texture-packs.md](docs/texture-packs.md)). Packs are made from your own copy and never shipped.
 - A local PSN account stands in for sign-in, and 31 add-on entitlements are reported as installed. Add-on outfits show in Customize Character with a DLC badge (kigurumi sets, polo shirts, accessories).
-- With the bundled server, the daily ranking opens, Open Course hole scores register, and a Game Room can be created up to its participant list.
+- Online play with friends: one player presses Host a game on the launcher's Online tab and sends the invite code; the others paste it and join. Players show up in the same Open Course lobby, each with their own golfer and name. Games on your home network show up in a list, and the launcher opens the router port with UPnP.
+- Trophies: all 31 have their real names and grades, a popup shows when one unlocks, and the Trophies tab lists them per save.
 - Render resolution changes while you play (tested on the island: 1080 to 1440 and back, with no restart).
 
 Known problems:
@@ -30,7 +31,7 @@ Known problems:
 - Course loads are slow. A repeat load of Eagle City took 40 to 60 seconds in one test (90 to 140 before); a course not loaded before takes longer, and some pipelines still recompile on every load.
 - Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
 - Add-on courses, clubs, balls, carts and caddies are not checked yet.
-- Online with friends shares rankings only. Each round is still played alone: the game's matchmaking runs inside each PC, so other players never appear on your course. Joining from a second PC and the router port mapping are not tested yet.
+- Online play is tested with two copies of the game on one PC, joined by invite code through the router, including with 80 ms of added lag. Play between two homes and a full round together are not tested yet. Reports are welcome.
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
 
@@ -41,7 +42,7 @@ Progress is measured by these steps: prepared image, boot, guest rendering, real
 - Restored limited-event gear, based on evidence of the original event, redemption and shop behavior.
 - Higher frame rates and resolutions on PC.
 
-The entitlement unlock is implemented and not yet verified in the game. Online play works in part: one server, on your PC or a friend's, keeps everyone's Open Course rankings; playing a round together is not implemented. Event gear is not implemented.
+The entitlement unlock is implemented and not yet verified in the game. Online play works in part: the host's PC runs the server and relays the game's traffic, so players meet in the same Open Course lobby; a full round together is not tested yet. Event gear is not implemented.
 
 ## What you need
 
@@ -78,7 +79,14 @@ The launcher also has:
 - Display: window mode, output resolution, render resolution, 60 FPS mode, SMAA, FSR 1 sharpening, vsync and HDR.
 - Saves: several saves, each with its own golfer and progress. Make a new one, copy, rename, back up to `data\backups`, or move one to the Recycle Bin.
 - HD textures: tick "Collect textures while playing", play a while, then build an upscaled pack with Real-ESRGAN (2x or 4x, bundled) and turn it on. The pack is made from your own copy and stays on your PC.
-- Online: host the bundled server on your PC or join a friend's. Pick a name and a port, press Copy invite for friends, and send them the text: it lists your home network address and any VPN address (Tailscale, ZeroTier) with the port. Friends outside your home network need the port forwarded on your router (the launcher can ask the router with UPnP) or a shared VPN. With Online set to Off the game starts signed out and plays offline.
+- Trophies: every trophy of the selected save, with its grade and the time it was earned.
+- Online: press Host a game, then Copy, and send the invite code (four groups of four letters and digits) to your friends. They paste it into Join (on the same home network, Find games on my network lists the host instead). Everyone presses Play, then picks Online > Open Course in the game. All game traffic passes through the host's PC, so only the host needs an open port: "Open the port on my router" asks the router with UPnP or NAT-PMP. If the router refuses, forward TCP port 48765 to the host's PC by hand, or have everyone join one VPN such as Tailscale. With Online set to Off the game starts signed out and plays offline.
+
+![The launcher's Online tab](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.3/online-tab.png)
+
+![The launcher's Trophies tab](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.3/trophies-tab.png)
+
+![Two copies of the game on one PC, joined by invite code: GolferA and GolferB in the same lobby. Drawn by the port.](https://github.com/finalpantasy/everybodys-golf-ps4-pc-port/releases/download/v0.1.3/online-lobby.png)
 
 ### Settings in the game
 
