@@ -22,6 +22,45 @@ when listening and one line per request.
 python -I server/host.py --eboot work/game-1.17-prepared/eboot.elf     --libcrypto tools/msys2/msys64/clang64/bin/libcrypto-4-x64.dll     --state work/online/host --port 48765 --bind 0.0.0.0
 ```
 
+### Multiplayer (`--online`)
+
+`--online` is what the launcher's Host a game button runs. It listens on
+every adapter (port 48765 unless `--port`), turns on the lobby routes,
+and keeps a random 27-bit room key in `<state>/room-key.txt`. Callers
+from public addresses must send the key in `X-Golf-Key`; this PC, home
+networks and VPN ranges (private and 100.64.0.0/10 addresses) need not,
+unless `--strict-key`. Lobby, channel and packet exchanges keep their
+connection alive, and each exchange carries up to 64 packets each way.
+
+Every packet between players goes through this server (the runtime's
+RUDP and signaling HLE never send to a peer directly), so guests talk to
+one address and only the host may need an open port. In the background
+the host asks the router for TCP port mapping (`portmap.py`: UPnP IGD,
+then NAT-PMP, then PCP; `--no-port-mapping` skips it). It takes the
+public address from the router, or else from one HTTPS what-is-my-IP
+request (`--no-web-lookup` skips it). It writes `<state>/online.txt`:
+
+```text
+port=48765
+key=24503d5
+lan=192.168.1.20 R2M0-255Y-FN4A-0YN1
+vpn=100.95.1.2 CHFG-20NY-FN4A-0YNJ
+internet=203.0.113.50 SC07-2CNY-FN4A-0YNA
+portmap=upnp
+note=The router forwards TCP port 48765 to this PC (UPNP).
+```
+
+An invite code (`invite.py`, decoded by the runtime's
+`src/invite_code.h`) is 16 Crockford base32 symbols: IPv4 address (32
+bits), port (16), room key (27) and a check symbol (5). Case, spaces and
+dashes do not matter, and I, L and O read as 1, 1 and 0. The runtime
+takes `--join CODE` (or `--join HOST[:PORT]` on a home network or VPN).
+The host also answers `EGOLF-FIND 1` broadcasts on UDP 48765 with
+`EGOLF-HOST 1 <code> <name>`, for the launcher's Find games on my
+network. `--stop-file PATH` stops it cleanly (closing the router port)
+when the file appears; `--auto` finds the game, libcrypto and `data\server`
+of an installed release, as `tools\server\host-online.cmd` uses.
+
 Scores are stored per online name. Loopback clients that send
 `X-Golf-Online-Id` can use separate names on the same address. The header
 must match the name in login and score registration requests. Clients
