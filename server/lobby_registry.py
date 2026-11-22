@@ -47,9 +47,13 @@ CHANNEL_MASK = 0x0f
 # round trip, 16 capped a 50 ms internet link below the hub's ~450 packets a second.
 PACKETS_PER_EXCHANGE = 64
 MAX_PACKET_BYTES = (1 << 16) - 1
-MAX_INBOX_BYTES = 65536
-MAX_INBOX_PACKETS = 64
-PEER_REQUEST_MAX = PEER_REQUEST.size + PACKETS_PER_EXCHANGE * ROOM_OUTBOUND.size + MAX_INBOX_BYTES
+# One exchange carries at most MAX_EXCHANGE_BYTES of payload each way; an inbox holds several
+# exchanges' worth, so a full upload is not refused while the recipient still has unread packets
+# (each refusal costs a round trip).
+MAX_EXCHANGE_BYTES = 65536
+MAX_INBOX_BYTES = 4 * MAX_EXCHANGE_BYTES
+MAX_INBOX_PACKETS = 4 * PACKETS_PER_EXCHANGE
+PEER_REQUEST_MAX = PEER_REQUEST.size + PACKETS_PER_EXCHANGE * ROOM_OUTBOUND.size + MAX_EXCHANGE_BYTES
 
 
 @dataclass(frozen=True)
@@ -129,7 +133,7 @@ def parse_upload(body: bytes, count: int, scoped: bool) -> list[tuple[int, int, 
         offset += layout.size
         payload_bytes += size
         if (not destination or not 25000 <= source_port <= 25003 or destination_port != (source_port ^ 1)
-                or not 0 < size <= MAX_PACKET_BYTES or payload_bytes > MAX_INBOX_BYTES
+                or not 0 < size <= MAX_PACKET_BYTES or payload_bytes > MAX_EXCHANGE_BYTES
                 or len(body) - offset < size or (scoped and not generation)):
             return None
         packets.append((destination, source_port, destination_port, body[offset:offset + size], generation))
@@ -369,7 +373,13 @@ class LobbyRegistry:
 
             sender.acknowledge(ack)
             sender.expires = now + LEASE_SECONDS
-            incoming = list(islice(sender.inbox, PACKETS_PER_EXCHANGE))
+            incoming = []
+            payload = 0
+            for packet in islice(sender.inbox, PACKETS_PER_EXCHANGE):
+                payload += len(packet.data)
+                if payload > MAX_EXCHANGE_BYTES:
+                    break
+                incoming.append(packet)
             if incoming:
                 sender.read_advertised = max(sender.read_advertised, incoming[-1].sequence)
             return HTTPStatus.OK, (PEER_RESPONSE.pack(sender.upload_seq, len(incoming), 0)

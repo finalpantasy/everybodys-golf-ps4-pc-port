@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 import re
 import sqlite3
+import sys
 from socketserver import TCPServer
 from struct import pack, unpack_from
 from threading import Lock
@@ -987,6 +988,12 @@ class GolfServer(ThreadingHTTPServer):
         TCPServer.server_bind(self)
         # HTTPServer.server_bind normally resolves its own host name.
         self.server_name, self.server_port = self.server_address
+
+    def handle_error(self, request, client_address):
+        # A player closing the game drops its kept-alive connections: not worth a traceback.
+        if isinstance(sys.exc_info()[1], (ConnectionError, TimeoutError)):
+            return
+        super().handle_error(request, client_address)
 
     def get_request(self):
         client, address = super().get_request()

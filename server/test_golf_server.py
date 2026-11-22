@@ -384,16 +384,19 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(local_lobbies=True)
         _, tx, _ = self.lobby_exchange(client, 1, 7, name=b"Sender")
         peer, rx, _ = self.lobby_exchange(client, 1, 7, name=b"Peer")
-        batch = [(peer, 25000, 25001, bytes(4096))] * 16
-        self.lobby_packets(client, 7, tx, sequence=1, packets=batch)
-        self.lobby_packets(client, 7, tx, sequence=2, packets=[batch[0]], expected=429)
+        batch = [(peer, 25000, 25001, bytes(4096))] * 16  # one exchange's worth: 64 KB
+        for sequence in range(1, 5):  # the inbox holds four exchanges
+            self.lobby_packets(client, 7, tx, sequence=sequence, packets=batch)
+        self.lobby_packets(client, 7, tx, sequence=5, packets=[batch[0]], expected=429)
         _, received = self.lobby_packets(client, 7, rx)
-        self.assertEqual(len(received), 16)
-        self.assertEqual(received[-1][0], 16)
-        self.assertEqual(self.lobby_packets(client, 7, rx, ack=16), (0, []))
-        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=2, packets=[batch[0]]), (2, []))
-        _, received = self.lobby_packets(client, 7, rx, ack=16)
-        self.assertEqual([row[0] for row in received], [17])
+        self.assertEqual([row[0] for row in received], list(range(1, 17)))
+        for ack in (16, 32, 48):
+            _, received = self.lobby_packets(client, 7, rx, ack=ack)
+            self.assertEqual([row[0] for row in received], list(range(ack + 1, ack + 17)))
+        self.assertEqual(self.lobby_packets(client, 7, rx, ack=64), (0, []))
+        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=5, packets=[batch[0]]), (5, []))
+        _, received = self.lobby_packets(client, 7, rx, ack=64)
+        self.assertEqual([row[0] for row in received], [65])
 
     def test_local_peer_packets_use_the_full_wire_payload_width(self):
         client = self.start(local_lobbies=True)
@@ -406,11 +409,16 @@ class GolfServerTests(unittest.TestCase):
         packets = [(peer, 25000, 25001, data), (peer, 25002, 25003, b"X")]
         self.assertEqual(self.lobby_packets(client, 7, tx, sequence=1, packets=packets), (1, []))
         self.assertEqual(self.lobby_packets(client, 7, tx, sequence=1, packets=packets), (1, []))
-        self.lobby_packets(client, 7, tx, sequence=2, packets=[packets[1]], expected=429)
+        for sequence in range(2, 5):  # the inbox holds four full exchanges
+            self.assertEqual(self.lobby_packets(client, 7, tx, sequence=sequence, packets=packets), (sequence, []))
+        self.lobby_packets(client, 7, tx, sequence=5, packets=[packets[1]], expected=429)
         self.assertEqual(self.lobby_packets(client, 7, rx),
                          (0, [(1, sender, 25000, 25001, data), (2, sender, 25002, 25003, b"X")]))
-        self.assertEqual(self.lobby_packets(client, 7, rx, ack=2), (0, []))
-        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=2, packets=[packets[1]]), (2, []))
+        for ack in (2, 4, 6):  # each answer stops at one exchange's payload
+            self.assertEqual(self.lobby_packets(client, 7, rx, ack=ack),
+                             (0, [(ack + 1, sender, 25000, 25001, data), (ack + 2, sender, 25002, 25003, b"X")]))
+        self.assertEqual(self.lobby_packets(client, 7, rx, ack=8), (0, []))
+        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=5, packets=[packets[1]]), (5, []))
 
     def lobby_channels(self, client, world, token, peer, revision, mask, expected=200, scoped=False):
         request = pack("<BBH16sQ", world, mask, peer, token, revision)
