@@ -15,6 +15,7 @@ from golf_server import GolfHandler, GolfServer
 from lobby_registry import LOBBY_PATH, LOBBY_REQUEST
 import invite
 import online
+import time
 import portmap
 
 
@@ -140,6 +141,8 @@ class RoomKeyServerTests(unittest.TestCase):
 class FakeRouter(BaseHTTPRequestHandler):
     """A UPnP IGD description and WANIPConnection control point."""
     mappings: dict = {}
+    leases: list = []
+    permanent_only = True
 
     def log_message(self, *args):
         pass
@@ -162,7 +165,8 @@ class FakeRouter(BaseHTTPRequestHandler):
         fields = dict(__import__("re").findall(r"<(New\w+)>([^<]*)</New\w+>", text))
         status, reply = 200, ""
         if action == "AddPortMapping":
-            if fields["NewLeaseDuration"] != "0":
+            FakeRouter.leases.append(fields["NewLeaseDuration"])
+            if fields["NewLeaseDuration"] != "0" and FakeRouter.permanent_only:
                 status = 500  # permanent leases only (error 725)
             else:
                 FakeRouter.mappings[fields["NewExternalPort"]] = fields["NewInternalClient"]
@@ -181,7 +185,44 @@ class FakeRouter(BaseHTTPRequestHandler):
 
 
 class PortMappingTests(unittest.TestCase):
+    def router(self, permanent_only):
+        router = ThreadingHTTPServer(("127.0.0.1", 0), FakeRouter)
+        Thread(target=router.serve_forever, daemon=True).start()
+        self.addCleanup(router.server_close)
+        self.addCleanup(router.shutdown)
+        FakeRouter.mappings, FakeRouter.leases, FakeRouter.permanent_only = {}, [], permanent_only
+        return f"http://127.0.0.1:{router.server_port}/desc.xml"
+
+    def test_upnp_requests_a_finite_lease(self):
+        mapping = portmap.upnp_map(48765, "192.168.1.20", [self.router(False)])
+        self.assertEqual((FakeRouter.leases, mapping.lifetime), (["3600"], 3600))
+
+    def test_upnp_725_falls_back_once_with_one_log_sentence(self):
+        location = self.router(True)
+        portmap.permanent_logged.clear()
+        with patch("sys.stderr") as err:
+            mapping = portmap.upnp_map(48765, "192.168.1.20", [location])
+            portmap.upnp_map(48765, "192.168.1.20", [location])
+        self.assertEqual((FakeRouter.leases, mapping.lifetime), (["3600", "0", "3600", "0"], 0))
+        self.assertEqual(sum(c.args[0].count("permanent") for c in err.write.call_args_list if c.args), 1)
+
+    def test_opener_renews_at_a_third_of_the_lease_and_unmaps_on_close(self):
+        location = self.router(False)
+        opener = portmap.PortOpener(48765, web_lookup=False, gateway="127.0.0.1")
+        with patch.object(portmap, "LEASE_SECONDS", 3), patch.object(portmap, "RENEW_DIVISOR", 30),                 patch.object(portmap, "ssdp_locations", return_value=[location]),                 patch.object(portmap, "local_address", return_value="192.168.1.20"):
+            opener.start()
+            self.assertTrue(opener.done.wait(5))
+            deadline = time.time() + 5
+            while len(FakeRouter.leases) < 3 and time.time() < deadline:
+                time.sleep(0.02)
+            self.assertGreaterEqual(len(FakeRouter.leases), 3)
+            self.assertEqual(set(FakeRouter.leases), {"3"})
+            self.assertEqual(FakeRouter.mappings, {"48765": "192.168.1.20"})
+            opener.close()
+        self.assertEqual(FakeRouter.mappings, {})
+
     def test_upnp_maps_falls_back_to_a_permanent_lease_and_unmaps(self):
+        FakeRouter.permanent_only = True
         router = ThreadingHTTPServer(("127.0.0.1", 0), FakeRouter)
         Thread(target=router.serve_forever, daemon=True).start()
         self.addCleanup(router.server_close)
@@ -222,8 +263,8 @@ class PortMappingTests(unittest.TestCase):
         port, seen = self.fake_gateway(answer)
         with patch.object(portmap, "NATPMP_PORT", port):
             mapping = portmap.natpmp_map("127.0.0.1", 48765)
-        self.assertEqual((mapping.method, mapping.external_ip, mapping.lifetime), ("nat-pmp", "198.51.100.4", 7200))
-        self.assertEqual(struct.unpack(">BBHHHI", seen[0]), (0, 2, 0, 48765, 48765, 7200))
+        self.assertEqual((mapping.method, mapping.external_ip, mapping.lifetime), ("nat-pmp", "198.51.100.4", 3600))
+        self.assertEqual(struct.unpack(">BBHHHI", seen[0]), (0, 2, 0, 48765, 48765, 3600))
 
     def test_pcp_maps_with_its_nonce(self):
         def answer(data):

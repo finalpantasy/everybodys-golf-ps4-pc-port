@@ -16,6 +16,7 @@ import secrets
 import socket
 import struct
 import subprocess
+import sys
 import threading
 import time
 import urllib.error
@@ -26,7 +27,8 @@ from xml.etree import ElementTree
 SSDP = ("239.255.255.250", 1900)
 NATPMP_PORT = 5351
 DESCRIPTION = "Everybody's Golf server"
-LEASE_SECONDS = 7200
+LEASE_SECONDS = 3600  # finite, so a killed server's mapping expires on its own
+RENEW_DIVISOR = 3  # renew at one third of the lease
 PUBLIC_IP_URLS = ("https://api.ipify.org", "https://checkip.amazonaws.com")
 WAN_SERVICES = (
     "urn:schemas-upnp-org:service:WANIPConnection:2",
@@ -167,6 +169,9 @@ def soap(control: str, service: str, action: str, arguments: dict[str, str], tim
     return {e.tag.rsplit("}", 1)[-1]: (e.text or "") for e in root.iter() if len(e) == 0}
 
 
+permanent_logged: list = []  # one log sentence per process
+
+
 def upnp_map(port: int, local_ip: str, locations: list[str]) -> Mapping | None:
     for location in locations:
         try:
@@ -184,6 +189,10 @@ def upnp_map(port: int, local_ip: str, locations: list[str]) -> Mapping | None:
             soap(control, service, "AddPortMapping", args)
         except (OSError, ElementTree.ParseError):
             # Some routers take permanent leases only (error 725).
+            if not permanent_logged:
+                print("The router accepts only permanent port mappings, so the port stays open "
+                      "until the server is stopped cleanly.", file=sys.stderr, flush=True)
+                permanent_logged.append(1)
             args["NewLeaseDuration"] = "0"
             lifetime = 0
             try:
@@ -348,8 +357,8 @@ class PortOpener:
         self.done.set()
         if self.on_done:
             self.on_done(self)
-        # Renew halfway through the lease.
-        while self.mapping.method and self.mapping.lifetime and not self.stopping.wait(self.mapping.lifetime / 2):
+        # Renew at one third of the lease, so two attempts fit before it expires.
+        while self.mapping.method and self.mapping.lifetime and not self.stopping.wait(self.mapping.lifetime / RENEW_DIVISOR):
             renewed = self.open_once()
             if renewed.method:
                 self.mapping = renewed
