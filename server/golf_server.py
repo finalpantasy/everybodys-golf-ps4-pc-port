@@ -7,6 +7,7 @@ from functools import partial
 from hashlib import md5
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from ipaddress import AddressValueError, IPv4Address
 import json
 from pathlib import Path
 import re
@@ -261,6 +262,8 @@ NATIONAL_JOIN_REPLY = SCORE_SUCCESS_PREFIX + pack("<2HI", 0x4962, 2, 0) + TERMIN
 NATIONAL_SCORE_LIST_REPLY = SCORE_SUCCESS_PREFIX + pack("<2HI2HI", 0x4200, 2, 0, 0x4210, 2, 1) + TERMINATOR
 TOP_PLAYER_REPLY = SCORE_SUCCESS_PREFIX + pack("<2HI", 0x4970, 2, 0) + TERMINATOR
 SCORE_DISTRIBUTION_REPLY = SCORE_SUCCESS_PREFIX + pack("<2H", 0x4950, 2) + b"[]\0\0" + TERMINATOR
+# The record length is a 16-bit word count, including its header and padded NUL.
+MAX_DISTRIBUTION_JSON = 4 * (0xFFFF - 1) - 1
 CHARACTER_ASSIGNMENT_REPLY = SCORE_SUCCESS_PREFIX + TERMINATOR
 CHARACTER_COUNT_REPLY = SCORE_SUCCESS_PREFIX + pack("<2HI2HI", 0x7707, 2, 0, 0x7708, 2, 0) + TERMINATOR
 SIGN_BOARD_REPLY = SCORE_SUCCESS_PREFIX + pack("<2HI", 0x7802, 2, 0) + TERMINATOR
@@ -578,9 +581,10 @@ def score_list_row(row: tuple[bytes, int, int | None], rank: int) -> bytes:
             + pack("<2H", 0x4260, 1))
 
 
-def recorded_score_list_reply(rows: Sequence[tuple[tuple[bytes, int, int | None], int]]) -> bytes:
+def recorded_score_list_reply(rows: Sequence[tuple[tuple[bytes, int, int | None], int]], *,
+                              start: int = 1) -> bytes:
     """A paged list: the row count, the window, then one 0x4250..0x4260 row per (row, rank)."""
-    window = pack("<2HI2HI", 0x4200, 2, len(rows), 0x4210, 2, 1)
+    window = pack("<2HI2HI", 0x4200, 2, len(rows), 0x4210, 2, start)
     return SCORE_SUCCESS_PREFIX + window + b"".join(score_list_row(*entry) for entry in rows) + TERMINATOR
 
 
@@ -601,6 +605,7 @@ class ScoreStore:
         self.path = path
         self.path.parent.mkdir(parents=True, exist_ok=True)
         with closing(sqlite3.connect(path)) as db, db:
+            db.execute("BEGIN IMMEDIATE")
             columns = db.execute("PRAGMA table_info(local_scores)").fetchall()
             if not columns:
                 db.execute(self.CREATE.format("local_scores"))
@@ -615,13 +620,14 @@ class ScoreStore:
     CREATE = ("CREATE TABLE {} (event_group BLOB NOT NULL, player BLOB NOT NULL, "
               "primary_score INTEGER NOT NULL, secondary_score INTEGER, PRIMARY KEY (event_group, player))")
 
-    def write(self, score: tuple[bytes, bytes, int, int | None], *, keep_lower_primary: bool) -> None:
+    def write(self, score: tuple[bytes, bytes, int, int | None]) -> None:
+        better_or_equal = ">=" if self.order(score[0]) == "DESC" else "<="
         with closing(sqlite3.connect(self.path, timeout=2)) as db, db:
             db.execute("INSERT INTO local_scores VALUES (?, ?, ?, ?) "
                        "ON CONFLICT (event_group, player) DO UPDATE SET "
                        "primary_score = excluded.primary_score, secondary_score = excluded.secondary_score "
-                       "WHERE NOT ? OR excluded.primary_score <= local_scores.primary_score",
-                       (*score, keep_lower_primary))
+                       f"WHERE excluded.primary_score {better_or_equal} local_scores.primary_score",
+                       score)
 
     @staticmethod
     def checked(row: tuple) -> tuple[bytes, int, int | None]:
@@ -643,6 +649,27 @@ class ScoreStore:
                               (group, limit)).fetchall()
         return [self.checked(row) for row in rows]
 
+    def ranked_page(self, group: bytes, start: int, limit: int) -> list[tuple[tuple[bytes, int, int | None], int]]:
+        """Rank the full group before taking a one-based page."""
+        order = self.order(group)
+        with closing(sqlite3.connect(self.path, timeout=2)) as db:
+            rows = db.execute("SELECT player, primary_score, secondary_score, "
+                              f"RANK() OVER (ORDER BY primary_score {order}) "
+                              "FROM local_scores WHERE event_group = ? "
+                              f"ORDER BY primary_score {order}, player LIMIT ? OFFSET ?",
+                              (group, limit, start - 1)).fetchall()
+        return [(self.checked(row[:3]), row[3]) for row in rows]
+
+    def distribution(self, group: bytes) -> bytes:
+        """Count the retained best scores in this group by signed 32-bit score."""
+        with closing(sqlite3.connect(self.path, timeout=2)) as db:
+            rows = db.execute(
+                "SELECT primary_score, COUNT(*) FROM local_scores WHERE event_group = ? "
+                "AND typeof(primary_score) = 'integer' AND primary_score BETWEEN ? AND ? "
+                "GROUP BY primary_score ORDER BY primary_score", (group, -(1 << 31), (1 << 31) - 1))
+            data = [{"num": str(count), "score": str(score)} for score, count in rows]
+        return json.dumps(data, separators=(",", ":")).encode("ascii")
+
     def read(self, group: bytes, player: bytes | None = None) -> tuple[bytes, int, int | None] | None:
         """The named player's row, or the best row when the player is unknown."""
         if player is None:
@@ -653,12 +680,20 @@ class ScoreStore:
                              "WHERE event_group = ? AND player = ?", (group, player)).fetchone()
         return self.checked(row) if row is not None else None
 
-    def rank(self, group: bytes, primary: int) -> int:
-        """One plus the number of players with a strictly better score."""
+    def read_ranked(self, group: bytes, player: bytes | None = None) -> tuple[tuple[bytes, int, int | None], int] | None:
+        """Read the score and its competition rank from the same snapshot."""
+        if player is None:
+            best = self.read(group)
+            return (best, 1) if best is not None else None
         better = "<" if self.order(group) == "ASC" else ">"
         with closing(sqlite3.connect(self.path, timeout=2)) as db:
-            return 1 + db.execute("SELECT COUNT(*) FROM local_scores WHERE event_group = ? "
-                                  f"AND primary_score {better} ?", (group, primary)).fetchone()[0]
+            row = db.execute(
+                "SELECT score.player, score.primary_score, score.secondary_score, "
+                "(SELECT COUNT(*) + 1 FROM local_scores AS rival WHERE rival.event_group = score.event_group "
+                f"AND rival.primary_score {better} score.primary_score) "
+                "FROM local_scores AS score WHERE score.event_group = ? AND score.player = ?",
+                (group, player)).fetchone()
+        return (self.checked(row[:3]), row[3]) if row is not None else None
 
 
 def valid_user_status_request(body: bytes) -> bool:
@@ -849,6 +884,15 @@ def schedule_records(group: str, at: datetime | None) -> tuple[int, bytes]:
     return selector, row
 
 
+def require_lobby_loopback(bind: str) -> None:
+    try:
+        if IPv4Address(bind).is_loopback:
+            return
+    except AddressValueError:
+        pass
+    raise ValueError("--local-lobbies requires an IPv4 loopback bind address")
+
+
 class GolfServer(ThreadingHTTPServer):
     def __init__(self, port: int, discovery: bytes | None = None, *,
                  server_time: datetime | None = None, ticket_grants: bool = False,
@@ -862,6 +906,8 @@ class GolfServer(ThreadingHTTPServer):
                  national_tournament: bool = False, empty_bonus_list: bool = False,
                  empty_regulations: bool = False, bind: str = LOOPBACK,
                  handler: type[BaseHTTPRequestHandler] | None = None):
+        if local_lobbies:
+            require_lobby_loopback(bind)
         if discovery is not None and (not 0 < len(discovery) <= MAX_DISCOVERY_BYTES or
                                       len(discovery) % DISCOVERY_BLOCK):
             raise ValueError(f"Discovery fixture must contain complete 8-byte blocks, up to {MAX_DISCOVERY_BYTES} bytes")
@@ -955,7 +1001,21 @@ class GolfHandler(BaseHTTPRequestHandler):
             self.rfile.read(int(lengths[0]))
         self.reply(status, allow=allow)
 
+    def read_replay_online_id(self) -> bool:
+        self.replay_online_id = None
+        identities = self.headers.get_all("X-Golf-Online-Id", [])
+        if identities:
+            if (len(identities) != 1 or not self.client_address[0].startswith("127.")
+                    or not identities[0].isascii()
+                    or not LOCAL_SCORE_NAME.fullmatch(identities[0].encode("ascii"))):
+                self.reject_before_reading(HTTPStatus.BAD_REQUEST)
+                return False
+            self.replay_online_id = identities[0].encode("ascii")
+        return True
+
     def do_GET(self):
+        if not self.read_replay_online_id():
+            return
         labels = commerce_batch_labels(self.path) if self.server.catalog_fixture else []
         national_download = self.national_download()
         if self.path != DISCOVERY_PATH and self.path not in JSON_GET_RESPONSES and not labels and national_download is None:
@@ -1001,6 +1061,8 @@ class GolfHandler(BaseHTTPRequestHandler):
             return
         if self.server.discard_telemetry and self.path == TELEMETRY_PATH:
             self.discard_telemetry_post()
+            return
+        if not self.read_replay_online_id():
             return
         registration = self.registration_selector()
         score_query_paged = None
@@ -1167,8 +1229,11 @@ class GolfHandler(BaseHTTPRequestHandler):
             return
         if self.path.startswith(LOGIN_PREFIX) and self.server.login_reply is not None:
             name = padded_string(title_fields(body, SERVER_TIME_SUFFIX, LOGIN_FIELDS)[0])
+            if self.replay_online_id is not None and name != self.replay_online_id:
+                self.reply(HTTPStatus.BAD_REQUEST)
+                return
             if name is not None and LOCAL_SCORE_NAME.fullmatch(name):
-                self.server.players[self.client_address[0]] = name
+                self.remember_player(name)
         if (self.path == NATIONAL_BOARD_PATH and self.server.national_board
                 and unpack_from("<I", body, -len(SERVER_TIME_SUFFIX) - 4)[0] in NATIONAL_BOARD_DOWNLOAD_SELECTORS):
             response = SCORE_SUCCESS_PREFIX + score_string(0x4A60, NATIONAL_BOARD_SUFFIX.encode("ascii")) + TERMINATOR
@@ -1179,12 +1244,12 @@ class GolfHandler(BaseHTTPRequestHandler):
                 return
         if registration is not None:
             score = registered_score(body, registration)
-            if score is None:
+            if score is None or not self.matches_player(score[1]):
                 self.reply(HTTPStatus.BAD_REQUEST)
                 return
             try:
-                self.server.scores.write(score, keep_lower_primary=registration == 0)
-                self.server.players[self.client_address[0]] = score[1]
+                self.server.scores.write(score)
+                self.remember_player(score[1])
             except sqlite3.Error:
                 self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
                 return
@@ -1200,22 +1265,23 @@ class GolfHandler(BaseHTTPRequestHandler):
                 try:
                     if paged_list:
                         ranked = self.server.scores.top(group, self.score_list_rows(body))
-                        saved = ranked[0] if ranked else None
+                        if ranked:
+                            response = self.ranked_list_reply(ranked)
+                    elif distribution_query:
+                        data = self.server.scores.distribution(group)
+                        if len(data) > MAX_DISTRIBUTION_JSON:
+                            self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
+                            return
+                        if data != b"[]":
+                            response = SCORE_SUCCESS_PREFIX + score_string(0x4950, data) + TERMINATOR
                     else:
-                        saved = self.server.scores.read(group, self.player())
+                        own = self.server.scores.read_ranked(group, self.player())
+                        if own is not None:
+                            row, rank = own
+                            response = recorded_score_reply(row, paged=False, rank=rank)
                 except sqlite3.Error:
                     self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
                     return
-                if saved is not None:
-                    if distribution_query:
-                        data = distribution_data(saved[1])
-                        if data != b"[]":
-                            response = SCORE_SUCCESS_PREFIX + score_string(0x4950, data) + TERMINATOR
-                    elif paged_list:
-                        response = self.ranked_list_reply(group, ranked)
-                    else:
-                        response = recorded_score_reply(saved, paged=False,
-                                                        rank=self.server.scores.rank(group, saved[1]))
         if self.server.national_score_group is not None:
             try:
                 response = self.national_score_reply(body, response)
@@ -1231,36 +1297,53 @@ class GolfHandler(BaseHTTPRequestHandler):
         group = self.server.national_score_group
         if self.path.startswith(NATIONAL_REGISTRATION_PREFIX):
             score = registered_national_score(body, group)
-            if score is None:
+            if score is None or not self.matches_player(score[1]):
                 return None
-            self.server.scores.write(score, keep_lower_primary=True)
-            self.server.players[self.client_address[0]] = score[1]
+            self.server.scores.write(score)
+            self.remember_player(score[1])
         elif self.path in (NATIONAL_SCORE_LIST_PATH, NATIONAL_OWN_SCORE_PATH):
             paged = self.path == NATIONAL_SCORE_LIST_PATH
             if paged:
                 start, _, size = unpack_from("<3I", body, -len(SERVER_TIME_SUFFIX) - 12)
-                if start > 1 or not size:
+                if not size or (size == 1 and start > 1):
                     return fallback
-            if paged:
-                ranked = self.server.scores.top(group, min(size, MAX_SCORE_LIST_ROWS))
-                return self.ranked_list_reply(group, ranked) if ranked else fallback
-            saved = self.server.scores.read(group, self.player())
-            if saved is not None:
-                return recorded_score_reply(saved, paged=False, national=True,
-                                            rank=self.server.scores.rank(group, saved[1]))
+                start = max(1, start)
+                ranked = self.server.scores.ranked_page(group, start, min(size, MAX_SCORE_LIST_ROWS))
+                return recorded_score_list_reply(ranked, start=start)
+            own = self.server.scores.read_ranked(group, self.player())
+            if own is not None:
+                row, rank = own
+                return recorded_score_reply(row, paged=False, national=True, rank=rank)
         return fallback
 
+    def matches_player(self, name: bytes) -> bool:
+        return self.replay_online_id is None or name == self.replay_online_id
+
+    def remember_player(self, name: bytes):
+        if self.replay_online_id is None:
+            self.server.players[self.client_address[0]] = name
+
     def player(self) -> bytes | None:
-        """The online name this client last logged in or registered with, if any."""
-        return self.server.players.get(self.client_address[0])
+        """Resolve the explicit loopback identity or the legacy address mapping."""
+        return self.replay_online_id or self.server.players.get(self.client_address[0])
 
     @staticmethod
     def score_list_rows(body: bytes) -> int:
         fields = title_fields(body, SERVER_TIME_SUFFIX, SCORE_BOARD_FIELDS)
         return min(unpack_from("<i", fields[5])[0], MAX_SCORE_LIST_ROWS) if fields else DEFAULT_SCORE_LIST_ROWS
 
-    def ranked_list_reply(self, group: bytes, rows: list[tuple[bytes, int, int | None]]) -> bytes:
-        return recorded_score_list_reply([(row, self.server.scores.rank(group, row[1])) for row in rows])
+    @staticmethod
+    def ranked_list_reply(rows: list[tuple[bytes, int, int | None]]) -> bytes:
+        """Rank the sorted first page from the same snapshot as its rows."""
+        entries = []
+        previous_score = None
+        rank = 1
+        for position, row in enumerate(rows, 1):
+            if row[1] != previous_score:
+                rank = position
+                previous_score = row[1]
+            entries.append((row, rank))
+        return recorded_score_list_reply(entries)
 
     def board_reply(self, body: bytes) -> bytes | None:
         if BOARD_LIST_MIN_BYTES <= len(body) <= BOARD_LIST_MAX_BYTES and self.server.empty_boards is not None:

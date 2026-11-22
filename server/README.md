@@ -22,10 +22,11 @@ when listening and one line per request.
 python -I server/host.py --eboot work/game-1.17-prepared/eboot.elf     --libcrypto tools/msys2/msys64/clang64/bin/libcrypto-4-x64.dll     --state work/online/host --port 48765 --bind 0.0.0.0
 ```
 
-Scores are kept per online name. The server learns a client's name from
-its `gameapi_login` and score registrations and ties it to the client's IP
-address, so two players behind one address share the last name seen.
-A client with no known name gets the best row for own-score queries.
+Scores are stored per online name. Loopback clients that send
+`X-Golf-Online-Id` can use separate names on the same address. The header
+must match the name in login and score registration requests. Clients
+without the header use the last name seen for their IP address. Own-score
+queries without a known name use the best row.
 
 ## Combined replay
 
@@ -196,12 +197,14 @@ Apply the rival-list runtime route from the mailbox before testing it.
 ### Local Open Course roster
 
 After applying the Matching2 lobby bridge from the mailbox, add
-`--local-lobbies` to the combined server command and set
-`GOLF_LOCAL_LOBBIES=1` for each runtime. Give each instance a separate
+`--local-lobbies` to the combined server command or to `host.py` with its
+default loopback bind. Both commands require an IPv4 loopback address for
+this mode. Set `GOLF_LOCAL_LOBBIES=1` for each runtime. Give each instance a separate
 `--data-dir` and a distinct `GOLF_ONLINE_ID` of up to 16 ASCII letters,
 digits, underscores or hyphens. Use the same `--discovery-port` and
 select the same Open Course world. Abandoned membership expires after
-15 seconds.
+15 seconds. The host also serves the Daily OUT schedule for Eagle City,
+along with a schedule for each of its first nine holes.
 Guest presence and peer gameplay are unverified.
 
 The lobby retry patch reuses a single seat if the first join response
