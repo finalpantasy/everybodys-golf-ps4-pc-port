@@ -245,7 +245,15 @@ LOGIN_FIELDS = ((0x0020, 2, 15), (0x0084, 6, 6), (0x0070, 3, 3),
 LOGIN_MIN_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(minimum for _, minimum, _ in LOGIN_FIELDS)
 LOGIN_MAX_BYTES = SERVER_TIME_REQUEST_BYTES + 4 * sum(maximum for _, _, maximum in LOGIN_FIELDS)
 LOGIN_PROBE_CODE = b"GolfLocalProbe"
-SESSION_QUERY = rf"{LOCAL_ACCOUNT_ID}&n=(0|-?[1-9][0-9]{{0,9}})&s=1"
+# Any decimal account id: each runtime instance can have its own (GOLF_ACCOUNT_ID / GOLF_ONLINE_ID).
+SESSION_QUERY = r"(?:[1-9][0-9]{0,19})&n=(0|-?[1-9][0-9]{0,9})&s=1"
+
+
+def valid_account_field(field: bytes) -> bool:
+    """A NUL-terminated decimal account id that fits in 64 bits."""
+    digits = field[:-1] if field.endswith(b"\0") else b""
+    return (1 <= len(digits) <= 20 and digits.isdigit() and digits[:1] != b"0" and
+            int(digits) < (1 << 64))
 LOGIN_TARGET = re.compile(re.escape(LOGIN_PREFIX) + SESSION_QUERY)
 SCORE_BOARD_TARGET = re.compile(re.escape(SCORE_BOARD_PREFIX) + SESSION_QUERY)
 COURSE_ASSIGNMENT_TARGET = re.compile(re.escape(COURSE_ASSIGNMENT_PREFIX) + SESSION_QUERY)
@@ -418,7 +426,7 @@ def valid_character_count_request(body: bytes) -> bool:
     if fields is None:
         return False
     token = padded_string(fields[1])
-    return token is not None and len(token) <= 1000 and fields[2] == str(LOCAL_ACCOUNT_ID).encode("ascii") + b"\0"
+    return token is not None and len(token) <= 1000 and valid_account_field(fields[2])
 
 
 def valid_top_player_request(body: bytes) -> bool:
@@ -755,7 +763,7 @@ def valid_login_request(body: bytes) -> bool:
     if fields is None:
         return False
     name, account, metadata, reserved, code, _selector = fields
-    return (padded_string(name) is not None and account == str(LOCAL_ACCOUNT_ID).encode("ascii") + b"\0" and
+    return (padded_string(name) is not None and valid_account_field(account) and
             metadata[6:8] == b"\x02\x02" and reserved == bytes(16) and
             padded_string(code) == LOGIN_PROBE_CODE)
 

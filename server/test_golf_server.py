@@ -1296,7 +1296,7 @@ class GolfServerTests(unittest.TestCase):
             document = discovery_document(national_tournament=enabled).rstrip(b"\0")
             urls = ElementTree.fromstring(b"<fixture>" + document + b"</fixture>")
             self.assertEqual(urls.findtext("./gameurl1/gameapi_noticejoinnational"), url)
-        for target in (prefix, prefix + "5932163534510096385&n=14", prefix + "1&n=14&s=1"):
+        for target in (prefix, prefix + "5932163534510096385&n=14", prefix + "0&n=14&s=1"):
             with self.subTest(target=target):
                 client.request("POST", target, body=request, headers=SERVER_TIME_HEADERS)
                 response = client.getresponse()
@@ -1428,7 +1428,7 @@ class GolfServerTests(unittest.TestCase):
             request(client, "POST", target, 200, ack, max_size)
             request(client, "POST", target, 400, b"", registration(-9, 99).replace(
                 bytes.fromhex("4741020001000000"), bytes.fromhex("4741020002000000")))
-            request(client, "POST", target.replace("5932", "6932"), 400, b"", registration(-9, 99))
+            request(client, "POST", target.replace("5932", "0932"), 400, b"", registration(-9, 99))
             request(client, "POST", target, 400, b"", registration(-9, 99).replace(
                 bytes.fromhex("0d460200"), bytes.fromhex("0e460200")))
             request(client, "POST", target, 400, b"", registration(-(1 << 31) - 1, 99))
@@ -1641,7 +1641,7 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(empty_own_score=True)
         request = score_board_request(0, b"OneHole_20261118_0_1", 100)
         for target, body in (
-            (SCORE_BOARD_TARGET.replace("5932", "6932"), request),
+            (SCORE_BOARD_TARGET.replace("5932", "0932"), request),
             (SCORE_BOARD_TARGET.replace("n=1", "n=2147483648"), request),
             (SCORE_BOARD_TARGET + "&extra=1", request),
             (SCORE_BOARD_TARGET, score_board_request(0, b"OneHole_20261118_0_1", 0)),
@@ -1774,7 +1774,8 @@ class GolfServerTests(unittest.TestCase):
             (path, guest_sized_body, 200),
             (path.replace("n=28", "n=-2147483648"), body, 200),
             (path.replace("n=28", "n=2147483648"), body, 400),
-            (path.replace("5932163534510096385", "5932163534510096386"), body, 400),
+            (path.replace("5932163534510096385", "5932163534510096386"), body, 200),
+            (path.replace("5932163534510096385", "0932163534510096385"), body, 400),
             (path, body.replace(b"abc\0", b"abcd"), 400),
             (path, body.replace(bytes.fromhex("80004100"), bytes.fromhex("80004000")), 400),
         ):
@@ -1820,13 +1821,13 @@ class GolfServerTests(unittest.TestCase):
             response = client.getresponse()
             self.assertEqual((response.status, response.read()), (200, expected))
 
-        for invalid_target in (path.replace("6385&", "6386&"), path.replace("-2147483648", "2147483648")):
+        for invalid_target in (path.replace("5932", "0932"), path.replace("-2147483648", "2147483648")):
             client.request("POST", invalid_target, body=body(b""), headers=SERVER_TIME_HEADERS)
             response = client.getresponse()
             self.assertEqual((response.status, response.read()), (400, b""))
 
         for invalid in (
-            body(b"", b"5932163534510096386"),
+            body(b"", b"0932163534510096386"),
             body(b"x" * 1001),
             body(b"abc").replace(bytes.fromhex("04770600"), bytes.fromhex("04770500")),
         ):
@@ -1930,7 +1931,7 @@ class GolfServerTests(unittest.TestCase):
             client = self.start(score_db=Path(directory) / "scores.sqlite")
             request = registration_request(0, -1)
             for path, body in (
-                (REGISTER_TARGETS[0].replace("5932", "6932"), request),
+                (REGISTER_TARGETS[0].replace("5932", "0932"), request),
                 (REGISTER_TARGETS[1], request),
                 (REGISTER_TARGETS[0], request.replace(b"\x06\x46\x02\x00", b"\x07\x46\x02\x00")),
                 (REGISTER_TARGETS[0], request.replace(b"Golfer@", b"\nolfer@")),
@@ -2227,8 +2228,8 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(login_rejection=True)
         for target, body in (
             (LOGIN_TARGET, LOGIN_REQUEST.replace(b"GolfLocalProbe", b"GolfOtherProbe")),
-            (LOGIN_TARGET, LOGIN_REQUEST.replace(LOGIN_ACCOUNT, b"6932163534510096385")),
-            (LOGIN_TARGET.replace("5932", "6932"), LOGIN_REQUEST),
+            (LOGIN_TARGET, LOGIN_REQUEST.replace(LOGIN_ACCOUNT, b"0932163534510096385")),
+            (LOGIN_TARGET.replace("5932", "0932"), LOGIN_REQUEST),
             (LOGIN_TARGET+"&extra=1", LOGIN_REQUEST),
             (LOGIN_TARGET.replace("n=1", "n=2147483648"), LOGIN_REQUEST),
             (LOGIN_TARGET, LOGIN_REQUEST[:-1]),
