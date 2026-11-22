@@ -103,7 +103,7 @@ class LoggingHandler(GolfHandler):
 
 
 def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
-                local_lobbies: bool = False, room_key: str | None = None) -> GolfServer:
+                local_lobbies: bool = False, room_key: str | None = None, strict_key: bool = False) -> GolfServer:
     if local_lobbies and room_key is None:
         require_lobby_loopback(bind)
     score_block = (fixtures / "score-block.bin").read_bytes()
@@ -113,7 +113,8 @@ def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
         daily_score_block=score_block, empty_board_block=score_block, login_completion=True,
         empty_national_boards=True, cached_property=True, discard_telemetry=True,
         score_db=state / "scores.db", event_group=EVENT_GROUPS, national_tournament=True,
-        local_lobbies=local_lobbies, bind=bind, handler=LoggingHandler, room_key=room_key)
+        local_lobbies=local_lobbies, bind=bind, handler=LoggingHandler, room_key=room_key,
+        strict_key=strict_key)
 
 
 def stop(*_):
@@ -148,6 +149,8 @@ def main(argv=None) -> int:
     parser.add_argument("--auto", action="store_true", help="Use the installed release's game and folders")
     parser.add_argument("--name", default="Golf server", help="Name other players see in LAN discovery")
     parser.add_argument("--no-port-mapping", action="store_true", help="Do not ask the router to open the port")
+    parser.add_argument("--strict-key", action="store_true",
+                        help="Ask every other PC for the room key, home network and VPN ones too")
     parser.add_argument("--stop-file", type=Path,
                         help="Stop cleanly (and close the router port) when this file appears")
     parser.add_argument("--no-web-lookup", action="store_true",
@@ -176,7 +179,8 @@ def main(argv=None) -> int:
         fixtures = ensure_fixtures(args.eboot, args.libcrypto, args.state)
         room_key = load_room_key(args.state) if args.online else None
         server = make_server(fixtures, args.state, args.port, bind,
-                             local_lobbies=args.local_lobbies or args.online, room_key=room_key)
+                             local_lobbies=args.local_lobbies or args.online, room_key=room_key,
+                             strict_key=args.strict_key)
         if args.online:
             name = "".join(c for c in args.name if c.isascii() and c.isprintable())[:32] or "Golf server"
             host = OnlineHost(args.state, server.server_port, room_key, name,

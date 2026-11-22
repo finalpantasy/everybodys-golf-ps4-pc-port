@@ -916,7 +916,8 @@ class GolfServer(ThreadingHTTPServer):
                  event_group: str | tuple[str, ...] | None = None, local_lobbies: bool = False,
                  national_tournament: bool = False, empty_bonus_list: bool = False,
                  empty_regulations: bool = False, bind: str = LOOPBACK,
-                 handler: type[BaseHTTPRequestHandler] | None = None, room_key: str | None = None):
+                 handler: type[BaseHTTPRequestHandler] | None = None, room_key: str | None = None,
+                 strict_key: bool = False):
         # With a room key, lobbies can face other machines: callers outside private and VPN
         # address ranges must send the key (see GolfHandler.parse_request).
         if local_lobbies and room_key is None:
@@ -924,6 +925,8 @@ class GolfServer(ThreadingHTTPServer):
         if room_key is not None and not re.fullmatch(r"[0-9a-f]{7}", room_key):
             raise ValueError("The room key is 7 lowercase hex digits")
         self.room_key = room_key
+        # strict_key: every caller but this PC needs the key, home network and VPN ones too.
+        self.strict_key = strict_key and room_key is not None
         if discovery is not None and (not 0 < len(discovery) <= MAX_DISCOVERY_BYTES or
                                       len(discovery) % DISCOVERY_BLOCK):
             raise ValueError(f"Discovery fixture must contain complete 8-byte blocks, up to {MAX_DISCOVERY_BYTES} bytes")
@@ -1004,21 +1007,26 @@ class GolfHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     server: GolfServer
 
+    def room_key_ok(self) -> bool:
+        key = self.server.room_key
+        address = self.client_address[0]
+        if key is None or not (needs_room_key(address) or (self.server.strict_key and not address.startswith("127."))):
+            return True
+        sent = self.headers.get_all(ROOM_KEY_HEADER, [])
+        return len(sent) == 1 and hmac.compare_digest(sent[0].strip().lower().encode("ascii", "replace"),
+                                                      key.encode("ascii"))
+
     def parse_request(self) -> bool:
         if not super().parse_request():
             return False
-        key = self.server.room_key
-        if key is not None and needs_room_key(self.client_address[0]):
-            sent = self.headers.get_all(ROOM_KEY_HEADER, [])
-            if len(sent) != 1 or not hmac.compare_digest(sent[0].strip().lower().encode("ascii", "replace"),
-                                                         key.encode("ascii")):
-                self.close_connection = True
-                self.send_response(HTTPStatus.FORBIDDEN)
-                self.send_header("Connection", "close")
-                self.send_header("Content-Length", "0")
-                self.end_headers()
-                return False
-        return True
+        if self.room_key_ok():
+            return True
+        self.close_connection = True
+        self.send_response(HTTPStatus.FORBIDDEN)
+        self.send_header("Connection", "close")
+        self.send_header("Content-Length", "0")
+        self.end_headers()
+        return False
 
     def reply(self, status: HTTPStatus, body: bytes = b"", *,
               content_type: str | None = None, allow: str | None = None, keep_alive: bool = False):

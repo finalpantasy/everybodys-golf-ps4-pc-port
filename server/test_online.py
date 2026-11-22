@@ -11,7 +11,7 @@ import unittest
 from unittest.mock import patch
 
 import golf_server
-from golf_server import GolfServer
+from golf_server import GolfHandler, GolfServer
 from lobby_registry import LOBBY_PATH, LOBBY_REQUEST
 import invite
 import online
@@ -106,6 +106,21 @@ class RoomKeyServerTests(unittest.TestCase):
         client = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
         self.assertEqual(self.join(client)[0], 200)
         client.close()
+
+    def test_strict_key_asks_home_network_callers_too(self):
+        server = self.start(local_lobbies=True, room_key="1234abc", strict_key=True)
+        self.assertTrue(server.strict_key)
+        client = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        self.assertEqual(self.join(client)[0], 200)  # this PC never needs it
+        client.close()
+        handler = GolfHandler.__new__(GolfHandler)
+        for address, key, expected in (("192.168.1.5", None, False), ("192.168.1.5", "1234abc", True),
+                                       ("127.0.0.1", None, True)):
+            handler.server, handler.client_address = server, (address, 1)
+            handler.headers = http.client.HTTPMessage()
+            if key is not None:
+                handler.headers["X-Golf-Key"] = key
+            self.assertEqual(handler.room_key_ok(), expected, (address, key))
 
     def test_lobby_exchanges_keep_the_connection_open(self):
         server = self.start(local_lobbies=True)
