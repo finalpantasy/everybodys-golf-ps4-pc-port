@@ -43,7 +43,9 @@ ROOM_CHANNEL_RESPONSE = Struct("<QBBHQ")
 TRANSPORT_REQUEST = Struct("<BBH16sQ")
 TRANSPORT_RESPONSE = Struct("<Q16s")
 CHANNEL_MASK = 0x0f
-PACKETS_PER_EXCHANGE = 16
+# Up to 64 packets each way per exchange (the runtime's GOLF_RUDP_BATCH): with one exchange per
+# round trip, 16 capped a 50 ms internet link below the hub's ~450 packets a second.
+PACKETS_PER_EXCHANGE = 64
 MAX_PACKET_BYTES = (1 << 16) - 1
 MAX_INBOX_BYTES = 65536
 MAX_INBOX_PACKETS = 64

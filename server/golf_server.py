@@ -5,6 +5,7 @@ from contextlib import closing
 from datetime import datetime
 from functools import partial
 from hashlib import md5
+import hmac
 from http import HTTPStatus
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from ipaddress import AddressValueError, IPv4Address
@@ -307,6 +308,8 @@ JSON_GET_RESPONSES = {
 MAX_DISCOVERY_BYTES = 0xA2800
 DISCOVERY_BLOCK = 8
 LOOPBACK = "127.0.0.1"
+# The room key a runtime sends (--server-key / GOLF_SERVER_KEY, from the invite code).
+ROOM_KEY_HEADER = "X-Golf-Key"
 DEFAULT_SCORE_LIST_ROWS = 20
 MAX_SCORE_LIST_ROWS = 100
 
@@ -913,9 +916,14 @@ class GolfServer(ThreadingHTTPServer):
                  event_group: str | tuple[str, ...] | None = None, local_lobbies: bool = False,
                  national_tournament: bool = False, empty_bonus_list: bool = False,
                  empty_regulations: bool = False, bind: str = LOOPBACK,
-                 handler: type[BaseHTTPRequestHandler] | None = None):
-        if local_lobbies:
+                 handler: type[BaseHTTPRequestHandler] | None = None, room_key: str | None = None):
+        # With a room key, lobbies can face other machines: callers outside private and VPN
+        # address ranges must send the key (see GolfHandler.parse_request).
+        if local_lobbies and room_key is None:
             require_lobby_loopback(bind)
+        if room_key is not None and not re.fullmatch(r"[0-9a-f]{7}", room_key):
+            raise ValueError("The room key is 7 lowercase hex digits")
+        self.room_key = room_key
         if discovery is not None and (not 0 < len(discovery) <= MAX_DISCOVERY_BYTES or
                                       len(discovery) % DISCOVERY_BLOCK):
             raise ValueError(f"Discovery fixture must contain complete 8-byte blocks, up to {MAX_DISCOVERY_BYTES} bytes")
@@ -983,15 +991,43 @@ class GolfServer(ThreadingHTTPServer):
         return client, address
 
 
+def needs_room_key(address: str) -> bool:
+    """Callers from public addresses need the key; this PC, home networks and VPN ranges
+    (private and shared 100.64.0.0/10 addresses, as Tailscale uses) do not."""
+    try:
+        return IPv4Address(address).is_global
+    except AddressValueError:
+        return True
+
+
 class GolfHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
     server: GolfServer
 
+    def parse_request(self) -> bool:
+        if not super().parse_request():
+            return False
+        key = self.server.room_key
+        if key is not None and needs_room_key(self.client_address[0]):
+            sent = self.headers.get_all(ROOM_KEY_HEADER, [])
+            if len(sent) != 1 or not hmac.compare_digest(sent[0].strip().lower().encode("ascii", "replace"),
+                                                         key.encode("ascii")):
+                self.close_connection = True
+                self.send_response(HTTPStatus.FORBIDDEN)
+                self.send_header("Connection", "close")
+                self.send_header("Content-Length", "0")
+                self.end_headers()
+                return False
+        return True
+
     def reply(self, status: HTTPStatus, body: bytes = b"", *,
-              content_type: str | None = None, allow: str | None = None):
-        self.close_connection = True
+              content_type: str | None = None, allow: str | None = None, keep_alive: bool = False):
+        # Lobby and packet exchanges reuse one connection per runtime thread: a new TCP
+        # handshake per 20 ms tick would double the round trips over the internet.
+        keep_alive = keep_alive and status == HTTPStatus.OK and not self.close_connection
+        self.close_connection = not keep_alive
         self.send_response(status)
-        self.send_header("Connection", "close")
+        self.send_header("Connection", "keep-alive" if keep_alive else "close")
         self.send_header("Content-Length", str(len(body)))
         if allow:
             self.send_header("Allow", allow)
@@ -1398,7 +1434,7 @@ class GolfHandler(BaseHTTPRequestHandler):
             self.reply(HTTPStatus.BAD_REQUEST)
             return
         status, body = exchange(request)
-        self.reply(status, body, content_type=LOBBY_CONTENT_TYPE if body else None)
+        self.reply(status, body, content_type=LOBBY_CONTENT_TYPE if body else None, keep_alive=True)
 
     def discard_telemetry_post(self):
         if self.headers.get_all("Content-Type", []) != ["application/json"]:
