@@ -30,7 +30,7 @@ Known problems:
 - Course loads are slow. A repeat load of Eagle City took 40 to 60 seconds in one test (90 to 140 before); a course not loaded before takes longer, and some pipelines still recompile on every load.
 - Above 1800 lines of render height, the course flyover drops below 60 FPS (34 to 49 FPS measured at 2160).
 - Add-on courses, clubs, balls, carts and caddies are not checked yet.
-- Online with friends shares rankings only. Each round is still played alone: the game's matchmaking runs inside each PC, so other players never appear on your course. Joining from a second PC and the router port mapping are not tested yet.
+- Online with friends: two players on one PC, one joining with the invite code, see each other in the Eagle City hub. Joining from another home over the internet and playing a round together are not tested yet.
 
 Progress is measured by these steps: prepared image, boot, guest rendering, real menu, first playable hole, representative playthrough. The first five are reached.
 
@@ -41,7 +41,7 @@ Progress is measured by these steps: prepared image, boot, guest rendering, real
 - Restored limited-event gear, based on evidence of the original event, redemption and shop behavior.
 - Higher frame rates and resolutions on PC.
 
-The entitlement unlock is implemented and not yet verified in the game. Online play works in part: one server, on your PC or a friend's, keeps everyone's Open Course rankings; playing a round together is not implemented. Event gear is not implemented.
+The entitlement unlock is implemented and not yet verified in the game. Online play works in part: one player hosts, friends join with an invite code, and everyone shares the Open Course hub and rankings; playing a round together is not tested yet. Event gear is not implemented.
 
 ## What you need
 
