@@ -95,7 +95,7 @@ jobs:
           version=${TAG:-dev-${GITHUB_SHA::7}}
           name="everybodys-golf-pc-${version}-windows-x64.zip"
           mkdir -p "$GITHUB_WORKSPACE/out"
-          python - "out/${release}.zip" "$GITHUB_WORKSPACE/out/$name" "$release" "everybodys-golf-pc-${version}" <<'PY'
+          python - "out/${release}-windows-x64.zip" "$GITHUB_WORKSPACE/out/$name" "$release" "everybodys-golf-pc-${version}" <<'PY'
           import sys, zipfile
           src, dst, old, new = sys.argv[1:]
           with zipfile.ZipFile(src) as a, zipfile.ZipFile(dst, 'w', zipfile.ZIP_DEFLATED, compresslevel=9) as b:
