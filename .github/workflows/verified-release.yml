@@ -62,6 +62,22 @@ jobs:
           7z x -y -bd "-o$RUNNER_TEMP/streamline" "$zip" > /dev/null
           echo "RESOGUN_STREAMLINE_DIR=$(cygpath -w "$RUNNER_TEMP/streamline/bin/x64")" >> "$GITHUB_ENV"
 
+      # The release's tools/ folder: embeddable Python and Real-ESRGAN, from the sources and hashes
+      # in tools/manifest.json (package.py reads them from tools/python-embed and tools/realesrgan).
+      - name: Bundled tools
+        run: |
+          mkdir -p tools/python-embed tools/realesrgan
+          embed=tools/python-embed/python-3.13.17-embed-amd64.zip
+          curl -fsSL --retry 5 --retry-all-errors -o "$embed" \
+            https://www.python.org/ftp/python/3.13.17/python-3.13.17-embed-amd64.zip
+          echo "9e35319bffedab8b36ad44d8f377cb4f1733bcec257a0b6d04d94f01486ddb38  $embed" | sha256sum --check
+          esrgan="$RUNNER_TEMP/realesrgan.zip"
+          curl -fsSL --retry 5 --retry-all-errors -o "$esrgan" \
+            https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-windows.zip
+          echo "abc02804e17982a3be33675e4d471e91ea374e65b70167abc09e31acb412802d  $esrgan" | sha256sum --check
+          7z x -y -bd -otools/realesrgan "$esrgan" > /dev/null
+          echo "07e49f7cbb4ede01ae4dd4c399d3a7e5846e3d2085c3128eff881e55cb7b1a0c  tools/realesrgan/realesrgan-ncnn-vulkan.exe" | sha256sum --check
+
       - name: Build
         timeout-minutes: 90
         working-directory: external/resogun-recomp
