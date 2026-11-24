@@ -81,6 +81,10 @@ jobs:
       - name: Build
         timeout-minutes: 90
         working-directory: external/resogun-recomp
+        # A release build carries its tag, which the launcher compares with the newest release to offer
+        # updates; a test run keeps git describe.
+        env:
+          GOLF_VERSION: ${{ github.event.release.tag_name }}
         run: bash build.sh
 
       # package.py names the zip and its folder after git describe; the release uses the tag instead.
@@ -90,7 +94,7 @@ jobs:
         env:
           TAG: ${{ github.event.release.tag_name }}
         run: |
-          python tools/package.py --zip
+          python tools/package.py --zip ${TAG:+--version "$TAG"}
           release=$(cat dist/release.txt)
           version=${TAG:-dev-${GITHUB_SHA::7}}
           name="everybodys-golf-pc-${version}-windows-x64.zip"
