@@ -864,14 +864,18 @@ top-player reply carries `0x4970/2/0`. The distribution reply carries
 `0x4950/2` with the bytes `5b 5d 00 00` (a padded `[]`). The runtime
 owner's 19:22 run reached both POSTs and received HTTP 200.
 
-With `--score-db`, the distribution route also reads the exact requested
-daily group. A stored score produces one `num`/`score` pair in `0x4950`.
-The guest compares the keys at `0x120b29f` and `0x120b2ad` and scans the
-values with the `%d` format at `0x1223d86` (`0xb6c55c–0xb6c617`). The
-loopback reply is 60–68 bytes for one signed 32-bit score. Empty groups
-and old scores outside that range keep the 36-byte empty reply. Loopback
-tests cover the maximum reply and group isolation. Guest display of a
-populated distribution is NOT_RUN.
+The guest compares the `num` and `score` keys at `0x120b29f` and
+`0x120b2ad`. It scans the values with `%d` at `0x1223d86`
+(`0xb6c55c–0xb6c617`) and appends each pair to a vector before looping
+back for another (`0xb6c62d–0xb6c6c9`).
+
+With `--score-db`, the local implementation counts each player's retained
+best score in the requested Daily group. It sends the counts in ascending
+score order as `num`/`score` pairs in `0x4950`. Scores outside the signed
+32-bit range are excluded. Empty groups keep the original 36-byte reply.
+Loopback replay verifies ties, improved submissions, group isolation and
+the same reply for a player and a spectator. Guest display of a populated
+distribution is NOT_RUN.
 
 ### Recorded local scores
 
@@ -880,10 +884,11 @@ URLs with a blank `?account=` suffix for the guest formatter.
 `--score-db` enables the 180-byte login reply, user status, personal
 scores, and session score lists on the listener. After checking the
 synthetic account, counter, selector and record layout, it commits the
-player name and score words to SQLite. A One Hole submission replaces
-its event-group row when the primary score is lower or equal. The
-listener acknowledges worse submissions while retaining the stored row.
-SQLite stores no title context, token or indexed detail payloads.
+player name and score words to SQLite. The local fixture keeps the lower
+primary value for stroke events and the higher value for Long Drive. An
+equal primary value updates the associated fields. The listener acknowledges
+worse submissions while retaining the stored row. SQLite stores no title
+context, token or indexed detail payloads.
 
 Registration uses the success decoder's record order above. It replies
 with a synthetic token, `0x4270/2/1` for One Hole and Daily, and a
@@ -1313,7 +1318,14 @@ score-list parser (`0xb65f39–0xb65fa7`, `0xb6e9c4–0xb6ead8`,
 reply uses the inline form with `0x4200/2/0` and `0x4210/2/1`.
 Zero rows branch to `0xb85c8a` (`0xb853bb–0xb853fa`,
 `0xb8544d–0xb8549f`). Both request forms passed loopback replay.
-Guest acceptance is NOT_RUN. The SQLite-backed reply is described below.
+The local SQLite fixture uses the two words sent at
+`0xb56cf3–0xb56cfc` as the ordinary list's one-based start and page size.
+The reply echoes the start in `0x4210`, read by the guest at
+`0xb853e3–0xb853fa`. The fixtures normalize start 0 to 1, retain
+ranks over the full score group, and cap each reply at 100 rows. This
+paging policy applies to ordinary list requests. The single-row
+request with `0x42f3` keeps its existing local reply behavior.
+Guest acceptance is NOT_RUN.
 
 #### National score registration
 

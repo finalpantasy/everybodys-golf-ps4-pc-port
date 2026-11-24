@@ -384,16 +384,19 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(local_lobbies=True)
         _, tx, _ = self.lobby_exchange(client, 1, 7, name=b"Sender")
         peer, rx, _ = self.lobby_exchange(client, 1, 7, name=b"Peer")
-        batch = [(peer, 25000, 25001, bytes(4096))] * 16
-        self.lobby_packets(client, 7, tx, sequence=1, packets=batch)
-        self.lobby_packets(client, 7, tx, sequence=2, packets=[batch[0]], expected=429)
+        batch = [(peer, 25000, 25001, bytes(4096))] * 16  # one exchange's worth: 64 KB
+        for sequence in range(1, 5):  # the inbox holds four exchanges
+            self.lobby_packets(client, 7, tx, sequence=sequence, packets=batch)
+        self.lobby_packets(client, 7, tx, sequence=5, packets=[batch[0]], expected=429)
         _, received = self.lobby_packets(client, 7, rx)
-        self.assertEqual(len(received), 16)
-        self.assertEqual(received[-1][0], 16)
-        self.assertEqual(self.lobby_packets(client, 7, rx, ack=16), (0, []))
-        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=2, packets=[batch[0]]), (2, []))
-        _, received = self.lobby_packets(client, 7, rx, ack=16)
-        self.assertEqual([row[0] for row in received], [17])
+        self.assertEqual([row[0] for row in received], list(range(1, 17)))
+        for ack in (16, 32, 48):
+            _, received = self.lobby_packets(client, 7, rx, ack=ack)
+            self.assertEqual([row[0] for row in received], list(range(ack + 1, ack + 17)))
+        self.assertEqual(self.lobby_packets(client, 7, rx, ack=64), (0, []))
+        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=5, packets=[batch[0]]), (5, []))
+        _, received = self.lobby_packets(client, 7, rx, ack=64)
+        self.assertEqual([row[0] for row in received], [65])
 
     def test_local_peer_packets_use_the_full_wire_payload_width(self):
         client = self.start(local_lobbies=True)
@@ -406,11 +409,16 @@ class GolfServerTests(unittest.TestCase):
         packets = [(peer, 25000, 25001, data), (peer, 25002, 25003, b"X")]
         self.assertEqual(self.lobby_packets(client, 7, tx, sequence=1, packets=packets), (1, []))
         self.assertEqual(self.lobby_packets(client, 7, tx, sequence=1, packets=packets), (1, []))
-        self.lobby_packets(client, 7, tx, sequence=2, packets=[packets[1]], expected=429)
+        for sequence in range(2, 5):  # the inbox holds four full exchanges
+            self.assertEqual(self.lobby_packets(client, 7, tx, sequence=sequence, packets=packets), (sequence, []))
+        self.lobby_packets(client, 7, tx, sequence=5, packets=[packets[1]], expected=429)
         self.assertEqual(self.lobby_packets(client, 7, rx),
                          (0, [(1, sender, 25000, 25001, data), (2, sender, 25002, 25003, b"X")]))
-        self.assertEqual(self.lobby_packets(client, 7, rx, ack=2), (0, []))
-        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=2, packets=[packets[1]]), (2, []))
+        for ack in (2, 4, 6):  # each answer stops at one exchange's payload
+            self.assertEqual(self.lobby_packets(client, 7, rx, ack=ack),
+                             (0, [(ack + 1, sender, 25000, 25001, data), (ack + 2, sender, 25002, 25003, b"X")]))
+        self.assertEqual(self.lobby_packets(client, 7, rx, ack=8), (0, []))
+        self.assertEqual(self.lobby_packets(client, 7, tx, sequence=5, packets=[packets[1]]), (5, []))
 
     def lobby_channels(self, client, world, token, peer, revision, mask, expected=200, scoped=False):
         request = pack("<BBH16sQ", world, mask, peer, token, revision)
@@ -1296,7 +1304,7 @@ class GolfServerTests(unittest.TestCase):
             document = discovery_document(national_tournament=enabled).rstrip(b"\0")
             urls = ElementTree.fromstring(b"<fixture>" + document + b"</fixture>")
             self.assertEqual(urls.findtext("./gameurl1/gameapi_noticejoinnational"), url)
-        for target in (prefix, prefix + "5932163534510096385&n=14", prefix + "1&n=14&s=1"):
+        for target in (prefix, prefix + "5932163534510096385&n=14", prefix + "0&n=14&s=1"):
             with self.subTest(target=target):
                 client.request("POST", target, body=request, headers=SERVER_TIME_HEADERS)
                 response = client.getresponse()
@@ -1428,7 +1436,7 @@ class GolfServerTests(unittest.TestCase):
             request(client, "POST", target, 200, ack, max_size)
             request(client, "POST", target, 400, b"", registration(-9, 99).replace(
                 bytes.fromhex("4741020001000000"), bytes.fromhex("4741020002000000")))
-            request(client, "POST", target.replace("5932", "6932"), 400, b"", registration(-9, 99))
+            request(client, "POST", target.replace("5932", "0932"), 400, b"", registration(-9, 99))
             request(client, "POST", target, 400, b"", registration(-9, 99).replace(
                 bytes.fromhex("0d460200"), bytes.fromhex("0e460200")))
             request(client, "POST", target, 400, b"", registration(-(1 << 31) - 1, 99))
@@ -1436,9 +1444,20 @@ class GolfServerTests(unittest.TestCase):
             request(restarted, "POST", NATIONAL_OWN_SCORE_PATH, 200, expected_own, own_request)
             request(restarted, "POST", score_list, 200, expected_list, list_request)
             request(restarted, "GET", download, 200, b'[{"num":"1","score":"-3"}]')
-            request(restarted, "POST", score_list, 200,
-                    prefix + bytes.fromhex("0042020000000000 1042020001000000") + term,
-                    list_request.replace(page, bytes.fromhex("0040020002000000 1040020064000000")))
+            request(restarted, "POST", target, 200, ack, registration(-3, 52, player=b"Zed"))
+            tied_score = pack("<2Hq2Hq", 0x4500, 3, -3, 0x4501, 3, 52)
+            request(restarted, "POST", NATIONAL_OWN_SCORE_PATH, 200, expected_own.replace(best, tied_score),
+                    own_request)
+            for start, size, rows in (
+                (2, 2, (list_row(1, b"Zed", -3, 52), list_row(3, b"G", -2, 42))),
+                (4, 2, (list_row(4, b"ABCDEFGHIJKLMNOP", 8, 123),)),
+                (5, 2, ()),
+            ):
+                with self.subTest(start=start, size=size):
+                    params = pack("<2HI2HI", 0x4000, 2, start, 0x4010, 2, size)
+                    window = pack("<2HI2HI", 0x4200, 2, len(rows), 0x4210, 2, start)
+                    request(restarted, "POST", score_list, 200, prefix + window + b"".join(rows) + term,
+                            list_request.replace(page, params))
             next_day = self.start(score_db=db, national_tournament=True, server_time=datetime(2026, 11, 19, 12))
             request(next_day, "POST", NATIONAL_OWN_SCORE_PATH, 200, empty, own_request)
             request(next_day, "GET", download, 200, b"[]")
@@ -1573,6 +1592,31 @@ class GolfServerTests(unittest.TestCase):
                 response = reader.getresponse()
                 self.assertEqual((response.status, response.read()), (200, expected))
 
+    def test_daily_distribution_counts_each_players_best_score_in_the_group(self):
+        group = b"Daily_20180914_1_OUT"
+        with TemporaryDirectory() as directory:
+            client = self.start(score_db=Path(directory) / "scores.sqlite")
+            for name, score, target_group in (
+                (b"Golfer", 4, group), (b"Golfer", 3, group), (b"Golfer", 6, group),
+                (b"Putter", 3, group), (b"Driver", 7, group), (b"Other", 1, b"Daily_20180914_1_IN"),
+                (b"TooLarge", 1 << 31, group),
+            ):
+                stamp = name + b"@2026-11-18T10:00:00+09:00"
+                body = registration_request(1, score, group=target_group, name_stamp=stamp)
+                client.request("POST", REGISTER_TARGETS[1], body=body, headers=SERVER_TIME_HEADERS)
+                response = client.getresponse()
+                self.assertEqual(response.status, 200)
+                response.read()
+            expected = (bytes.fromhex("00800100 0000020001000000 830003006c6f63616c000000")
+                        + string_record(0x4950, b'[{"num":"2","score":"3"},{"num":"1","score":"7"}]')
+                        + bytes.fromhex("10800100"))
+            for reader in ("Golfer", "Spectator"):
+                with self.subTest(reader=reader):
+                    headers = {**SERVER_TIME_HEADERS, "X-Golf-Online-Id": reader}
+                    client.request("POST", SCORE_DISTRIBUTION_PATH, body=own_score_request(1, group), headers=headers)
+                    response = client.getresponse()
+                    self.assertEqual((response.status, response.read()), (200, expected))
+
     def test_score_board_uses_the_session_account_query_prefix(self):
         for enabled, path in ((False, SCORE_PATH), (True, SCORE_BOARD_PREFIX)):
             with self.subTest(enabled=enabled):
@@ -1605,7 +1649,7 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(empty_own_score=True)
         request = score_board_request(0, b"OneHole_20261118_0_1", 100)
         for target, body in (
-            (SCORE_BOARD_TARGET.replace("5932", "6932"), request),
+            (SCORE_BOARD_TARGET.replace("5932", "0932"), request),
             (SCORE_BOARD_TARGET.replace("n=1", "n=2147483648"), request),
             (SCORE_BOARD_TARGET + "&extra=1", request),
             (SCORE_BOARD_TARGET, score_board_request(0, b"OneHole_20261118_0_1", 0)),
@@ -1738,7 +1782,8 @@ class GolfServerTests(unittest.TestCase):
             (path, guest_sized_body, 200),
             (path.replace("n=28", "n=-2147483648"), body, 200),
             (path.replace("n=28", "n=2147483648"), body, 400),
-            (path.replace("5932163534510096385", "5932163534510096386"), body, 400),
+            (path.replace("5932163534510096385", "5932163534510096386"), body, 200),
+            (path.replace("5932163534510096385", "0932163534510096385"), body, 400),
             (path, body.replace(b"abc\0", b"abcd"), 400),
             (path, body.replace(bytes.fromhex("80004100"), bytes.fromhex("80004000")), 400),
         ):
@@ -1784,13 +1829,13 @@ class GolfServerTests(unittest.TestCase):
             response = client.getresponse()
             self.assertEqual((response.status, response.read()), (200, expected))
 
-        for invalid_target in (path.replace("6385&", "6386&"), path.replace("-2147483648", "2147483648")):
+        for invalid_target in (path.replace("5932", "0932"), path.replace("-2147483648", "2147483648")):
             client.request("POST", invalid_target, body=body(b""), headers=SERVER_TIME_HEADERS)
             response = client.getresponse()
             self.assertEqual((response.status, response.read()), (400, b""))
 
         for invalid in (
-            body(b"", b"5932163534510096386"),
+            body(b"", b"0932163534510096386"),
             body(b"x" * 1001),
             body(b"abc").replace(bytes.fromhex("04770600"), bytes.fromhex("04770500")),
         ):
@@ -1865,31 +1910,36 @@ class GolfServerTests(unittest.TestCase):
                     response = second.getresponse()
                     self.assertEqual((response.status, response.read()), (200, expected))
 
-    def test_one_hole_registration_keeps_the_lower_primary_score(self):
+    def test_registration_retains_the_best_primary_score_for_each_event(self):
         with TemporaryDirectory() as directory:
             client = self.start(score_db=Path(directory) / "scores.sqlite")
-            for score in (3, -2, 4):
-                client.request("POST", REGISTER_TARGETS[0], body=registration_request(0, score),
-                               headers=SERVER_TIME_HEADERS)
-                response = client.getresponse()
-                self.assertEqual(response.status, 200)
-                response.read()
+            for selector, scores, best in (
+                (0, (3, -2, 4), -2),
+                (1, (6, -5, 2), -5),
+                (2, (32530, 37000, 32700), 37000),
+            ):
+                with self.subTest(selector=selector):
+                    for score in scores:
+                        client.request("POST", REGISTER_TARGETS[selector], body=registration_request(selector, score),
+                                       headers=SERVER_TIME_HEADERS)
+                        response = client.getresponse()
+                        self.assertEqual(response.status, 200)
+                        response.read()
 
-            group = REGISTER_GROUPS[0]
-            for target, body in ((OWN_SCORE_PATH, own_score_request(0, group)),
-                                 (SCORE_BOARD_TARGET, score_board_request(0, group, 5))):
-                with self.subTest(target=target):
-                    client.request("POST", target, body=body, headers=SERVER_TIME_HEADERS)
-                    response = client.getresponse()
-                    self.assertEqual(response.status, 200)
-                    self.assertIn(pack("<2Hq", 0x4500, 3, -2), response.read())
+                    group = REGISTER_GROUPS[selector]
+                    for target, body in ((OWN_SCORE_PATH, own_score_request(selector, group)),
+                                         (SCORE_BOARD_TARGET, score_board_request(selector, group, 5))):
+                        client.request("POST", target, body=body, headers=SERVER_TIME_HEADERS)
+                        response = client.getresponse()
+                        self.assertEqual(response.status, 200)
+                        self.assertIn(pack("<2Hq", 0x4500, 3, best), response.read())
 
     def test_score_registration_rejects_shape_and_account_mismatches(self):
         with TemporaryDirectory() as directory:
             client = self.start(score_db=Path(directory) / "scores.sqlite")
             request = registration_request(0, -1)
             for path, body in (
-                (REGISTER_TARGETS[0].replace("5932", "6932"), request),
+                (REGISTER_TARGETS[0].replace("5932", "0932"), request),
                 (REGISTER_TARGETS[1], request),
                 (REGISTER_TARGETS[0], request.replace(b"\x06\x46\x02\x00", b"\x07\x46\x02\x00")),
                 (REGISTER_TARGETS[0], request.replace(b"Golfer@", b"\nolfer@")),
@@ -2186,8 +2236,8 @@ class GolfServerTests(unittest.TestCase):
         client = self.start(login_rejection=True)
         for target, body in (
             (LOGIN_TARGET, LOGIN_REQUEST.replace(b"GolfLocalProbe", b"GolfOtherProbe")),
-            (LOGIN_TARGET, LOGIN_REQUEST.replace(LOGIN_ACCOUNT, b"6932163534510096385")),
-            (LOGIN_TARGET.replace("5932", "6932"), LOGIN_REQUEST),
+            (LOGIN_TARGET, LOGIN_REQUEST.replace(LOGIN_ACCOUNT, b"0932163534510096385")),
+            (LOGIN_TARGET.replace("5932", "0932"), LOGIN_REQUEST),
             (LOGIN_TARGET+"&extra=1", LOGIN_REQUEST),
             (LOGIN_TARGET.replace("n=1", "n=2147483648"), LOGIN_REQUEST),
             (LOGIN_TARGET, LOGIN_REQUEST[:-1]),
