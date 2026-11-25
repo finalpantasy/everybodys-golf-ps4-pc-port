@@ -337,53 +337,73 @@ passed loopback replay. Guest tournament entry is NOT_RUN.
 
 #### Collab cups
 
-`--collab-cup ff30` (with `--national-tournament`, `--server-time` and
-`--score-db`) runs the FINAL FANTASY 30th Anniversary Cup as a qualifier
-and a final. `host.py` takes the same `--collab-cup` and `--cup-cut`.
-The catalog is `collab_cups.py`: tournament number 4, group
-`FF30CollabCup`, qualifier event 41 (Vortex Valley, 18 holes, big cup,
-course_condition row 1013) and final event 42 (row 1034: champion tees,
-strong wind). The settings archive carries the prizes: finishing the
-qualifier gives the Cactuar outer 8953 and the twelve Cactuar caps
-(set 8962), finishing the final gives the Moogle 8958.
+`--collab-cups classic` or `--collab-cups hardcore` (with
+`--national-tournament`, `--server-time` and `--score-db`) runs the 2018
+tie-in cups as the International Tournament, one after the other: the
+FINAL FANTASY 30th Anniversary Cup, LEVEL-5 20th Anniversary Cups 1 and 2,
+and the Famitsu Collab Cup. `--collab-cup KEY` runs one cup only.
+`host.py` takes the same options; the launcher passes `--collab-cups`
+when settings.ini has `collab_items=classic` or `hardcore`. The catalog
+is `collab_cups.py`:
+
+| Cup | Number, group | Qualifier | Final |
+|---|---|---|---|
+| ff30 | 4, `FF30CollabCup` | 41: Vortex Valley, row 1013; Cactuar outer 8953 and caps (set 8962) | 42: row 1034 (champion tees, strong wind); Moogle 8958 |
+| level5-1 | 5, `Level5Collab1` | 51: Alpina Forest, row 1014; set 9000 | 52: set 9001 |
+| level5-2 | 6, `Level5Collab2` | 61: Kanaloa Beach, row 1014; set 9002 | 62: Jibanyan 8984, Komasan 8985 |
+| famitsu | 7, `FamitsuCollab` | 71: Eagle City, row 1014; set 9128 | 72: Akigase Keikoku (course 10); 3,000 coins (item 5716 by `score_reward`) |
+
+Only the FF30 course and rules are from 2018 records; the others are
+picks, and the numbers, groups and event ids are this server's own. The
+Famitsu final's ranger suits have no textures, so it pays coins.
 
 | Option | Meaning |
 |---|---|
-| `--cup-cut N` | Qualifier pass line in strokes against par. Default +3 (Classic); Hardcore uses -3. |
+| `--cup-cut N` | Qualifier pass line in strokes against par. Default +3 (classic), -3 (hardcore). |
 | `--cup-holes N` | Test rounds of N holes (3 or more). |
 | `--cup-course N` | Another course (1 Eagle City ... 5 Imperial Garden). |
 
-How the server runs a cup:
+Hardcore also puts every final on row 1034 and allows 3 rounds per
+stage per day: `resetThreshold` is 3, and `gameapi_noticejoinnational`
+answers with the rounds this player started today in that stage (real
+date), this one included. The entry screen compares the two (0xc4b8f3).
+
+How the server runs the cups:
 
 - Board selector 1 fills the game's single current entry. The game
   copies every selector-1 row of the same group over that entry, so the
   last row wins, whatever the windows say. The server sends only the
-  current stage for selector 1 (the qualifier until the cut is made,
-  then the final) and both stages for selectors 0 and 3. The board
-  download follows the selector of the last board POST.
-- The qualifier window is D-2..D and the final window is D+1..D+3,
-  where D is the `--server-time` day. The login clock follows the
-  player's progress: D 12:00 in the qualifier, D+1 01:00 on the first
-  login after the cut (results day), D+2 12:00 on later logins (the
-  final) and D+4 12:00 after the final. Logins after the cut are
-  counted in `gameapi_login` (group `Cup4_logins_after_cut`); the game
-  also asks for the time after a round, so the time request cannot count
-  them.
-- Scores are kept per stage (groups `Cup4_41` and `Cup4_42`). Own score
-  sends `0x42d1` = 1 when the qualifier score is at or under the cut.
-  The game reads that flag to open the final's entry screen.
-- Prizes come from the game's own result records. After a round the
-  game saves a record with the event id and the stage's last day. On a
-  later day Notices lists it as "EG Cup No. 4 - Qualifier" or "- Finals".
-  Opening it sends `gameapi_getmyscorenational`, then the game grants
-  the `reg_reward_*` items of the current entry and marks the record
-  received. So on the results day and after the final, the stage that
-  just closed stays the selector-1 entry, with its window held open to
-  the clock's day: the game builds no current entry from a closed row.
-  Tested in game: the qualifier gave the Cactuar outer and caps, the
-  final gave the Moogle set, and both could be worn.
-- The notice list (selector 0) also holds one `<nid>4</nid>` item per
-  finished stage. The game shows it as a tournament introduction; it
+  current stage for selector 1 and both stages for selectors 0 and 3.
+  The board download follows the selector of the last board POST.
+- The schedule follows the player, not the calendar. The clock the
+  server sends (at login and after each round) is the `--server-time`
+  day plus a cup day counter, at 12:00. Every registered cup round adds
+  a day. The current stage's window is the three days ending on the
+  clock's day. After a round the game saves a result record with the
+  window's last day, and Notices lists it once the clock is past that
+  day, which is the clock the game gets right after the round.
+- Opening a result notice grants the `reg_reward_*` items (and
+  `score_reward`) of the current entry whose event id matches the
+  record. So a stage stays current until its notice is opened: the
+  qualifier until it is opened with the cut made, then the final until
+  its notice is opened, then the next cup (back to the first after the
+  last). The Notices box sends `gameapi_getbonuslist` when it opens, then
+  `gameapi_getmyscorenational` when a result notice is opened; the
+  tournament and entry screens send that request after a board request.
+  The server counts an own-score request after the bonus list, with the
+  stage's notice due, as opened, and applies it at the next board or
+  time request. Everything happens in one sitting.
+- Scores are kept per stage and per pass through the list (groups
+  `Cup5_51`, then `Cup5_51_r1`, ...). The counters (cup day, finished
+  cups, opened qualifier notice, each stage's last round day) are rows
+  of the score database with player `-`. A cup on a shared server
+  follows one player's progress.
+- Own score sends `0x42d1` = 1 when the qualifier score is at or under
+  the cut. The game reads that flag to open the final's entry screen.
+- The notice list (selector 0) holds one `<nid>N</nid>` item per played
+  stage of the current cup, dated 00:0N of the day after its last round
+  (the game hides notices dated after its clock and remembers opened
+  ones by date). The game shows it as a tournament introduction; it
   carries no prize.
 - Opening Notices first requests `gameapi_getbonuslist`. Host fixtures
   v2 answer it with an empty list (`empty_bonus_list`).

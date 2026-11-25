@@ -27,8 +27,7 @@ from lobby_registry import (
 from room_registry import (
     ROOM_HEADER, ROOM_MESSAGE_PATH, ROOM_MESSAGE_REQUEST, ROOM_MESSAGE_REQUEST_MAX, ROOM_PATH, ROOM_REQUEST_MAX,
 )
-from collab_cups import (AFTER_FINAL, CUPS, QUALIFIER, RESULTS_DAY, Cup, configured_cup, cup_clock, cup_phase,
-                         notice_time, phase_stage, stage_window)
+from collab_cups import CUPS, MODES, Cup, configured_cup, cup_clock, mode_cups, notice_time, stage_windows
 from tournament_archive import tournament_archive
 
 LOCAL_LOBBY_PATHS = (LOBBY_PATH, PEER_PACKET_PATH, PEER_CHANNEL_PATH, ROOM_PATH, TRANSPORT_PATH, ROOM_MESSAGE_PATH)
@@ -589,13 +588,13 @@ def national_board_row(window: tuple[datetime, datetime], *, number: int, stage:
 
 
 def national_tournament_board(at: datetime, cup: Cup | None = None, current: int | None = None,
-                              through: datetime | None = None) -> bytes:
+                              windows: Sequence[tuple[datetime, datetime]] | None = None) -> bytes:
     """The national board. Board selector 1 fills the game's single current entry: entry builder
     0xa5d3a0 copies every selector-1 row of the same group over it, so the last row wins whatever
     the windows say (with both cup rows the game showed the final). A cup therefore sends only the
     current stage (`current`) for selector 1 and both stages for the history selectors 0 and 3,
-    where the Notices box pairs a result notice with the stage-1 and stage-2 entries. `through`
-    keeps the current stage's window open to that day (results logins, see stage_window)."""
+    where the Notices box pairs a result notice with the stage-1 and stage-2 entries. `windows`
+    are the two stages' windows (collab_cups.stage_windows)."""
     if cup is None:
         day = (at.replace(hour=0, minute=0, second=0, microsecond=0),
                at.replace(hour=23, minute=59, second=59, microsecond=0))
@@ -603,8 +602,8 @@ def national_tournament_board(at: datetime, cup: Cup | None = None, current: int
                                    group=LOCAL_TOURNAMENT_GROUP, event_id=LOCAL_TOURNAMENT_ID,
                                    name=b"Local Tournament")]
     else:
-        rows = [national_board_row(stage_window(at, stage, through if current == stage else None),
-                                   number=cup.number, stage=stage, group=cup.group,
+        windows = windows or stage_windows(at, 0, current or 1)
+        rows = [national_board_row(windows[stage - 1], number=cup.number, stage=stage, group=cup.group,
                                    event_id=event.event_id, name=cup.name.encode("ascii"))
                 for stage, event in enumerate(cup.stages, 1) if current in (None, stage)]
     return pack("<2HI", 0x4100, 2, len(rows)) + b"".join(rows) + TERMINATOR
@@ -995,7 +994,8 @@ class GolfServer(ThreadingHTTPServer):
                  national_tournament: bool = False, empty_bonus_list: bool = False,
                  empty_regulations: bool = False, bind: str = LOOPBACK,
                  handler: type[BaseHTTPRequestHandler] | None = None, room_key: str | None = None,
-                 strict_key: bool = False, collab_cup: Cup | None = None):
+                 strict_key: bool = False, collab_cup: Cup | None = None,
+                 collab_cups: Sequence[Cup] = ()):
         # With a room key, lobbies can face other machines: callers outside private and VPN
         # address ranges must send the key (see GolfHandler.parse_request).
         if local_lobbies and room_key is None:
@@ -1014,7 +1014,10 @@ class GolfServer(ThreadingHTTPServer):
             raise ValueError("Select one login reply")
         if national_tournament and server_time is None:
             raise ValueError("National tournament replay requires --server-time")
-        if collab_cup is not None and not national_tournament:
+        cups = tuple(collab_cups) or ((collab_cup,) if collab_cup is not None else ())
+        if len({cup.number for cup in cups}) != len(cups):
+            raise ValueError("Each collab cup needs its own tournament number")
+        if cups and not national_tournament:
             raise ValueError("A collab cup is a national tournament: it needs --national-tournament")
         if empty_regulations and daily_score_block is None:
             raise ValueError("Empty regulation replay requires --daily-score-block")
@@ -1036,14 +1039,18 @@ class GolfServer(ThreadingHTTPServer):
         ) if empty_regulations else None
         self.empty_own_score = empty_own_score
         self.empty_national_boards = empty_national_boards
-        self.cup = collab_cup
+        self.cups = cups
+        self.cup = cups[0] if cups else None   # the cup being played (see cup_state)
+        self.cup_archives = {cup.number: tournament_archive(cup.number, cup.settings(), cup.name) for cup in cups}
+        self.pending_claim: tuple[int, int] | None = None   # (cup number, stage) of an opened notice
+        self.notices_open = False   # gameapi_getbonuslist (the Notices box) since the last board request
+        self.cup_lock = Lock()
         self.board_selector = None   # the selector of the last board POST; its download follows it
-        self.cup_session_phase = QUALIFIER   # set at each login (server time request)
         self.server_clock = server_time
-        self.national_board = national_tournament_board(server_time, collab_cup) if national_tournament else None
-        if collab_cup is not None:
-            self.national_events = {stage.event_id: collab_cup.group for stage in collab_cup.stages}
-            self.national_archive = tournament_archive(collab_cup.number, collab_cup.settings(), collab_cup.name)
+        self.national_board = national_tournament_board(server_time, self.cup) if national_tournament else None
+        if cups:
+            self.national_events = {stage.event_id: cup.group for cup in cups for stage in cup.stages}
+            self.national_archive = self.cup_archives[self.cup.number]
         else:
             self.national_events = LOCAL_NATIONAL_EVENTS
             self.national_archive = tournament_archive(LOCAL_TOURNAMENT_ID) if national_tournament else None
@@ -1074,45 +1081,122 @@ class GolfServer(ThreadingHTTPServer):
 
     def national_group(self, event_id: int) -> bytes:
         """The score-database group of one national event. A cup's stages keep their scores across
-        days (the qualifier result decides the final); the local tournament is per day."""
-        if self.cup is not None:
-            return f"Cup{self.cup.number}_{event_id}".encode("ascii")
+        days (the qualifier result decides the final), once per pass through the cup list; the
+        local tournament is per day."""
+        cup = self.event_cup(event_id)
+        if cup is not None:
+            cycle = self.cup_counter(b"Cups_finished") // len(self.cups)
+            return f"Cup{cup.number}_{event_id}".encode("ascii") + (f"_r{cycle}".encode("ascii") if cycle else b"")
         return f"National_{self.server_clock:%Y%m%d}_{event_id}".encode("ascii")
 
-    def cup_progress(self, player: bytes | None) -> tuple[bool, bool]:
-        """(made the qualifier cut, finished the final) for this player, or for anyone when the
-        player is not known yet (a single-player server before the first registration)."""
-        qualifier = self.scores.read(self.national_group(self.cup.qualifier.event_id), player)
-        final = self.scores.read(self.national_group(self.cup.final.event_id), player)
-        return qualifier is not None and qualifier[1] <= self.cup.cut, final is not None
+    def event_cup(self, event_id: int) -> Cup | None:
+        return next((cup for cup in self.cups if cup.stage_of(event_id) is not None), None)
 
-    def current_cup_board(self, player: bytes | None) -> bytes:
-        """The selector-1 board: the qualifier until the cut is made, then the final."""
-        phase = self.cup_session_phase
-        through = cup_clock(self.server_clock, phase) if phase in (RESULTS_DAY, AFTER_FINAL) else None
-        return national_tournament_board(self.server_clock, self.cup, current=phase_stage(phase), through=through)
+    # Cup progress lives in counter rows of the score database (player "-"): the cup day (the game
+    # clock), finished cups (the final notice opened), and per cup and pass the opened qualifier
+    # notice and each stage's last round day (its notice date). A cup is single-player: on a shared
+    # server the counters follow whoever plays it.
+    def cup_counter(self, name: bytes, step: int = 0) -> int:
+        scores = getattr(self, "scores", None)   # national_group runs before the database opens
+        return scores.count(name, b"-", step) if scores is not None else 0
+
+    def cup_key(self, cup: Cup, name: str) -> bytes:
+        cycle = self.cup_counter(b"Cups_finished") // len(self.cups)
+        return f"Cup{cup.number}_r{cycle}_{name}".encode("ascii")
+
+    def cup_state(self, player: bytes | None) -> tuple[Cup, int, bool, bool, bool]:
+        """(cup, day, made the cut, qualifier notice opened, finished the final). The cup is the
+        first one whose final notice has not been opened, in catalog order, round and round."""
+        cup = self.cups[self.cup_counter(b"Cups_finished") % len(self.cups)]
+        if cup is not self.cup:
+            self.cup = cup
+            self.national_archive = self.cup_archives[cup.number]
+        qualifier = self.scores.read(self.national_group(cup.qualifier.event_id), player)
+        final = self.scores.read(self.national_group(cup.final.event_id), player)
+        return (cup, self.cup_counter(b"Cups_day"), qualifier is not None and qualifier[1] <= cup.cut,
+                self.cup_counter(self.cup_key(cup, "qualifier_opened")) > 0, final is not None)
+
+    def cup_stage(self, player: bytes | None) -> tuple[Cup, int, int]:
+        """(cup, day, current stage): the final once the cut is made and the qualifier notice opened."""
+        cup, day, passed, opened, _ = self.cup_state(player)
+        return cup, day, 2 if passed and opened else 1
+
+    def current_cup_board(self, player: bytes | None, selector: int | None) -> bytes:
+        """Selector 1: the current stage only; the history selectors: both stages."""
+        with self.cup_lock:
+            self.commit_claim(player)
+            cup, day, stage = self.cup_stage(player)
+        return national_tournament_board(self.server_clock, cup, current=stage if selector == 1 else None,
+                                         windows=stage_windows(self.server_clock, day, stage))
 
     def current_time_records(self, player: bytes | None) -> bytes:
-        if self.cup is None or self.scores is None:
+        if not self.cups or self.scores is None:
             return self.server_time
-        passed, final_done = self.cup_progress(player)
-        # The game asks for the time at boot (just before it logs in) and again after a round; only
-        # logins count. This boot's login is not counted yet, hence + 1.
-        logins = self.cup_logins_after_cut(0) + 1 if passed and not final_done else 0
-        self.cup_session_phase = cup_phase(passed=passed, final_done=final_done, logins_after_cut=logins)
-        return server_time_records(cup_clock(self.server_clock, self.cup_session_phase))
+        with self.cup_lock:
+            self.commit_claim(player)
+            _, day, _ = self.cup_stage(player)
+        return server_time_records(cup_clock(self.server_clock, day))
 
-    def cup_logins_after_cut(self, step: int) -> int:
-        # One counter per cup: the time request comes before the game logs in, when the player is
-        # not known yet (a cup is single-player, like cup_progress).
-        return self.scores.count(f"Cup{self.cup.number}_logins_after_cut".encode("ascii"), b"-", step)
+    def cup_round(self, event_id: int) -> None:
+        """A cup round was registered: the cup day moves on, and the stage's notice gets that date."""
+        with self.cup_lock:
+            cup = self.event_cup(event_id)
+            day = self.cup_counter(b"Cups_day", 1)
+            key = self.cup_key(cup, f"{event_id}_day")
+            self.cup_counter(key, day - self.cup_counter(key))
+
+    def note_own_score(self, event_id: int, player: bytes | None) -> None:
+        """gameapi_getmyscorenational: the Notices box sends it when a result notice is opened (after
+        gameapi_getbonuslist, which opening the box sends), and so do the tournament and entry
+        screens (after a board request). Only the first counts as an opened notice; it takes effect
+        at the next board or time request."""
+        with self.cup_lock:
+            if not self.notices_open:
+                return
+            cup, _, passed, opened, final_done = self.cup_state(player)
+            stage = cup.stage_of(event_id)
+            if (stage == 1 and passed and not opened) or (stage == 2 and final_done):
+                self.pending_claim = (cup.number, stage)
+
+    def drop_claim(self) -> None:
+        with self.cup_lock:
+            self.pending_claim = None
+
+    def notices_box(self, opened: bool) -> None:
+        with self.cup_lock:
+            self.notices_open = opened
+
+    def commit_claim(self, player: bytes | None) -> None:
+        """An opened notice: the qualifier's opens the final, the final's moves on to the next cup.
+        Called with cup_lock held, from the requests that follow an opened notice (board, time)."""
+        claim, self.pending_claim = self.pending_claim, None
+        if claim is None or self.scores is None:
+            return
+        cup, _, passed, opened, final_done = self.cup_state(player)
+        if claim[0] != cup.number:
+            return
+        if claim[1] == 1 and passed and not opened:
+            self.cup_counter(self.cup_key(cup, "qualifier_opened"), 1)
+            print(f"Collab cup {cup.key}: qualifier notice opened, the final is open", flush=True)
+        elif claim[1] == 2 and final_done:
+            self.cup_counter(b"Cups_finished", 1)
+            following = self.cup_state(player)[0]
+            print(f"Collab cup {cup.key}: final notice opened, next cup {following.key}", flush=True)
+
+    def cup_joins(self, event_id: int, player: bytes | None) -> int:
+        """Hardcore: the rounds this player started today (real date) in this stage, this one included."""
+        today = datetime.now().strftime("%Y%m%d")
+        return self.scores.count(f"CupJoin_{event_id}_{today}".encode("ascii"), player or b"-", 1)
 
     def cup_notices(self, player: bytes | None) -> list[bytes]:
-        """One result notice per finished stage, newest first (the game keeps 10)."""
-        items = []
-        for number, stage in enumerate(self.cup.stages, 1):
-            if self.scores.read(self.national_group(stage.event_id), player) is not None:
-                items.append(cup_notice_item(self.cup, number, notice_time(self.server_clock, number)))
+        """One result notice per played stage of the current cup, newest first (the game keeps 10)."""
+        with self.cup_lock:
+            cup = self.cup_state(player)[0]
+            items = []
+            for number, stage in enumerate(cup.stages, 1):
+                if self.scores.read(self.national_group(stage.event_id), player) is not None:
+                    day = self.cup_counter(self.cup_key(cup, f"{stage.event_id}_day"))
+                    items.append(cup_notice_item(cup, number, notice_time(self.server_clock, day, cup)))
         return items[::-1]
 
     def server_bind(self):
@@ -1430,10 +1514,8 @@ class GolfHandler(BaseHTTPRequestHandler):
                 return
             if name is not None and LOCAL_SCORE_NAME.fullmatch(name):
                 self.remember_player(name)
-            if self.server.cup is not None and self.server.scores is not None:
-                passed, final_done = self.server.cup_progress(self.player())
-                if passed and not final_done:
-                    self.server.cup_logins_after_cut(1)
+        if self.server.cups and self.path in (BONUS_LIST_PATH, NATIONAL_BOARD_PATH):
+            self.server.notices_box(self.path == BONUS_LIST_PATH)
         if (self.path == NATIONAL_BOARD_PATH and self.server.national_board
                 and unpack_from("<I", body, -len(SERVER_TIME_SUFFIX) - 4)[0] in NATIONAL_BOARD_DOWNLOAD_SELECTORS):
             response = SCORE_SUCCESS_PREFIX + score_string(0x4A60, NATIONAL_BOARD_SUFFIX.encode("ascii")) + TERMINATOR
@@ -1510,10 +1592,24 @@ class GolfHandler(BaseHTTPRequestHandler):
             event_id = national_request_event(body, national_score_list_layout(body), 2, events)
         elif self.path == NATIONAL_OWN_SCORE_PATH:
             event_id = national_request_event(body, NATIONAL_OWN_SCORE_FIELDS, 5, events)
+        elif self.path.startswith(NATIONAL_JOIN_PREFIX) and self.server.cups:
+            event_id = national_request_event(body, NATIONAL_JOIN_FIELDS, 2, events)
+            if event_id is None:
+                return None
+            self.server.drop_claim()
+            cup = self.server.event_cup(event_id)
+            if not cup.attempts:
+                return fallback
+            joins = self.server.cup_joins(event_id, self.player())
+            print(f"Collab cup {cup.key}: stage {cup.stage_of(event_id)} round {joins} of {cup.attempts} today",
+                  flush=True)
+            return SCORE_SUCCESS_PREFIX + pack("<2HI", 0x4962, 2, joins) + TERMINATOR
         else:
             return fallback
         if event_id is None:
             return None
+        if self.server.cups and self.path == NATIONAL_OWN_SCORE_PATH:
+            self.server.note_own_score(event_id, self.player())
         group = self.server.national_group(event_id)
         if self.path.startswith(NATIONAL_REGISTRATION_PREFIX):
             score = registered_national_score(body, group, events)
@@ -1523,9 +1619,12 @@ class GolfHandler(BaseHTTPRequestHandler):
             self.remember_player(score[1])
             cup = self.server.cup
             if cup is not None:
+                cup = self.server.event_cup(event_id)
                 stage = cup.stage_of(event_id)
-                verdict = "" if stage != 1 else (" (made the cut)" if score[2] <= cup.cut else " (missed the cut)")
+                verdict = "" if stage != 1 else (f" (made the cut, {cup.cut:+d})" if score[2] <= cup.cut
+                                                  else f" (missed the cut, {cup.cut:+d})")
                 print(f"Collab cup {cup.key}: stage {stage} score {score[2]:+d}{verdict}", flush=True)
+                self.server.cup_round(event_id)
         elif self.path in (NATIONAL_SCORE_LIST_PATH, NATIONAL_OWN_SCORE_PATH):
             paged = self.path == NATIONAL_SCORE_LIST_PATH
             if paged:
@@ -1540,7 +1639,7 @@ class GolfHandler(BaseHTTPRequestHandler):
             own = self.server.scores.read_ranked(group, self.player())
             if own is not None:
                 row, rank = own
-                cup = self.server.cup
+                cup = self.server.event_cup(event_id)
                 passed = cup is not None and cup.stage_of(event_id) == 1 and row[1] <= cup.cut
                 return recorded_score_reply(row, paged=False, national=True, rank=rank, passed=passed)
         return fallback
@@ -1682,8 +1781,8 @@ class GolfHandler(BaseHTTPRequestHandler):
 
     def national_download(self):
         if self.path == NATIONAL_BOARD_DOWNLOAD_PATH:
-            if self.server.cup is not None and self.server.board_selector == 1:
-                return self.server.current_cup_board(self.player())
+            if self.server.cup is not None and self.server.scores is not None:
+                return self.server.current_cup_board(self.player(), self.server.board_selector)
             return self.server.national_board
         if self.path == NATIONAL_GAME_DOWNLOAD_PATH:
             return self.server.national_archive
@@ -1769,6 +1868,9 @@ def main():
                         help="Replay one local national tournament on the --server-time date")
     parser.add_argument("--collab-cup", choices=sorted(CUPS),
                         help="Run a collab cup (qualifier and final, prizes by result notice) as the national tournament")
+    parser.add_argument("--collab-cups", choices=MODES,
+                        help="Run every collab cup in turn: classic, or hardcore (cut -3, finals on champion tees "
+                             "in strong wind, 3 rounds per stage per day)")
     parser.add_argument("--cup-cut", type=int, metavar="STROKES",
                         help="Qualifier pass line against par (default +3, the 2018 FF30 line; Hardcore: -3)")
     parser.add_argument("--cup-holes", type=int, metavar="N",
@@ -1802,11 +1904,14 @@ def main():
         if args.empty_board_block:
             with args.empty_board_block.open("rb") as stream:
                 empty_board_block = stream.read(9)
-        cup = None
+        cups = ()
+        if args.cup_holes is not None and args.cup_holes < 3:
+            raise ValueError("--cup-holes takes 3 or more (the game reads 0, 1 and 2 as 18, OUT 9 and IN 9)")
+        options = dict(cut=args.cup_cut, holes=args.cup_holes, course=args.cup_course)
         if args.collab_cup:
-            if args.cup_holes is not None and args.cup_holes < 3:
-                raise ValueError("--cup-holes takes 3 or more (the game reads 0, 1 and 2 as 18, OUT 9 and IN 9)")
-            cup = configured_cup(args.collab_cup, cut=args.cup_cut, holes=args.cup_holes, course=args.cup_course)
+            cups = (configured_cup(args.collab_cup, hardcore=args.collab_cups == "hardcore", **options),)
+        elif args.collab_cups:
+            cups = mode_cups(args.collab_cups, **options)
         with GolfServer(args.port, discovery, server_time=server_time,
                         ticket_grants=args.ticket_grants, eula_text=eula_text,
                         empty_notices=args.empty_notices, daily_score_block=daily_score_block,
@@ -1818,7 +1923,7 @@ def main():
                         event_group=tuple(args.event_group or ()),
                         local_lobbies=args.local_lobbies, national_tournament=args.national_tournament,
                         empty_bonus_list=args.empty_bonus_list, empty_regulations=args.empty_regulations,
-                        bind=args.bind, collab_cup=cup) as server:
+                        bind=args.bind, collab_cups=cups) as server:
             print(f"Listening on http://{args.bind}:{server.server_port}", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

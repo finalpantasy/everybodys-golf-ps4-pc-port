@@ -29,7 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from datetime import datetime  # noqa: E402
 
-from collab_cups import CUPS, Cup, configured_cup  # noqa: E402
+from collab_cups import CUPS, MODES, Cup, configured_cup, mode_cups  # noqa: E402
 from golf_server import GolfHandler, GolfServer, LOOPBACK, MAX_EULA_TEXT_BYTES, require_lobby_loopback  # noqa: E402
 from make_daily_score_block import build_score_block  # noqa: E402
 from make_discovery_fixture import build_fixture  # noqa: E402
@@ -105,7 +105,7 @@ class LoggingHandler(GolfHandler):
 
 def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
                 local_lobbies: bool = False, room_key: str | None = None, strict_key: bool = False,
-                collab_cup: Cup | None = None) -> GolfServer:
+                collab_cups: tuple[Cup, ...] = ()) -> GolfServer:
     if local_lobbies and room_key is None:
         require_lobby_loopback(bind)
     score_block = (fixtures / "score-block.bin").read_bytes()
@@ -116,7 +116,7 @@ def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
         empty_national_boards=True, cached_property=True, discard_telemetry=True, empty_bonus_list=True,
         score_db=state / "scores.db", event_group=EVENT_GROUPS, national_tournament=True,
         local_lobbies=local_lobbies, bind=bind, handler=LoggingHandler, room_key=room_key,
-        strict_key=strict_key, collab_cup=collab_cup)
+        strict_key=strict_key, collab_cups=collab_cups)
 
 
 def stop(*_):
@@ -159,8 +159,12 @@ def main(argv=None) -> int:
                         help="Do not ask a web service for the public address when the router does not say")
     parser.add_argument("--collab-cup", choices=sorted(CUPS),
                         help="Run this collab cup as the International Tournament (qualifier, final, prizes)")
+    parser.add_argument("--collab-cups", choices=MODES,
+                        help="Run every collab cup in turn (settings.ini collab_items=classic or hardcore)")
     parser.add_argument("--cup-cut", type=int, metavar="STROKES",
                         help="Qualifier pass line against par (default +3; Hardcore: -3)")
+    parser.add_argument("--cup-holes", type=int, metavar="N", help="Test cup rounds of N holes (3 or more)")
+    parser.add_argument("--cup-course", type=int, metavar="N", help="Play the cups on course N (1 Eagle City ...)")
     args = parser.parse_args(argv)
     try:
         if args.auto:
@@ -184,10 +188,14 @@ def main(argv=None) -> int:
         args.state.mkdir(parents=True, exist_ok=True)
         fixtures = ensure_fixtures(args.eboot, args.libcrypto, args.state)
         room_key = load_room_key(args.state) if args.online else None
+        hardcore = args.collab_cups == "hardcore"
+        options = {"cut": args.cup_cut, "holes": args.cup_holes, "course": args.cup_course}
+        cups = ((configured_cup(args.collab_cup, hardcore=hardcore, **options),) if args.collab_cup
+                else mode_cups(args.collab_cups, **options) if args.collab_cups else ())
         server = make_server(fixtures, args.state, args.port, bind,
                              local_lobbies=args.local_lobbies or args.online, room_key=room_key,
                              strict_key=args.strict_key,
-                             collab_cup=configured_cup(args.collab_cup, cut=args.cup_cut) if args.collab_cup else None)
+                             collab_cups=cups)
         if args.online:
             name = "".join(c for c in args.name if c.isascii() and c.isprintable())[:32] or "Golf server"
             host = OnlineHost(args.state, server.server_port, room_key, name,

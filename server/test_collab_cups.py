@@ -8,8 +8,8 @@ import unittest
 from unittest.mock import patch
 import zlib
 
-from collab_cups import (AFTER_FINAL, FF30, FINAL, QUALIFIER, RESULTS_DAY, configured_cup, cup_clock, cup_phase,
-                         notice_time, phase_stage, stage_window)
+from collab_cups import (CUPS, FAMITSU, FF30, LEVEL5_1, LEVEL5_2, configured_cup, cup_clock, mode_cups,
+                         notice_time, stage_windows)
 from golf_server import (LOOPBACK, GolfServer, cup_notice_item, national_tournament_board, notice_reply,
                          recorded_score_reply)
 from test_golf_server import (LOGIN_REQUEST, LOGIN_TARGET, DOWNLOAD_BASE, NATIONAL_BOARD_PATH, NATIONAL_BOARD_REQUEST, NATIONAL_OWN_SCORE_PATH,
@@ -19,6 +19,11 @@ from test_golf_server import (LOGIN_REQUEST, LOGIN_TARGET, DOWNLOAD_BASE, NATION
 DAY = datetime(2018, 9, 14, 12)
 TERM = bytes.fromhex("10800100")
 REGISTRATION = "/nmg-us/replay-probe/gameapi_registscorenational?account=5932163534510096385&n=4&s=1"
+JOIN = "/nmg-us/replay-probe/gameapi_noticejoinnational?account=5932163534510096385&n=14&s=1"
+NATIONAL_SCORE_LIST_PATH = "/nmg-us/replay-probe/gameapi_getscorelistnational"
+BONUS_LIST_PATH = "/nmg-us/replay-probe/gameapi_getbonuslist"
+BONUS_LIST_REQUEST = SERVER_TIME_REQUEST.replace(TERM, NOTICE_FIELDS[:260] + string_record(0x0083, b"")
+                                                 + bytes.fromhex("0040020000000000 1040020032000000") + TERM)
 
 
 def event_fields(event_id: int, group: bytes = FF30.group) -> bytes:
@@ -26,17 +31,26 @@ def event_fields(event_id: int, group: bytes = FF30.group) -> bytes:
             + bytes.fromhex("4241020000030303 4341020000000000 4441020000000000"))
 
 
-def registration(event_id: int, score: int, player: bytes = b"Golfer") -> bytes:
+def registration(event_id: int, score: int, player: bytes = b"Golfer", group: bytes = FF30.group) -> bytes:
     session = NOTICE_FIELDS[:260] + string_record(0x0083, b"abc")
     stats = pack("<2Hq2Hq", 0x4500, 3, score, 0x4501, 3, 90)
     details = b"".join(string_record(0x4600 + index, b"0") for index in range(14))
     stamp = string_record(0x42B0, player + b"@2018-09-14T12:00:00+09:00")
-    return SERVER_TIME_REQUEST.replace(TERM, session + event_fields(event_id) + stamp + stats + details + TERM)
+    return SERVER_TIME_REQUEST.replace(TERM, session + event_fields(event_id, group) + stamp + stats + details + TERM)
 
 
-def own_score_request(event_id: int) -> bytes:
+def own_score_request(event_id: int, group: bytes = FF30.group) -> bytes:
     login = bytes.fromhex("86002100") + bytes(128) + bytes.fromhex("8700020000000000 8800020000000000")
-    return SERVER_TIME_REQUEST.replace(TERM, NOTICE_FIELDS[:268] + login + event_fields(event_id) + TERM)
+    return SERVER_TIME_REQUEST.replace(TERM, NOTICE_FIELDS[:268] + login + event_fields(event_id, group) + TERM)
+
+
+def score_list_request(event_id: int, group: bytes = FF30.group) -> bytes:
+    page = bytes.fromhex("0040020001000000 1040020064000000")
+    return SERVER_TIME_REQUEST.replace(TERM, NOTICE_FIELDS[:268] + event_fields(event_id, group) + page + TERM)
+
+
+def join_request(event_id: int, group: bytes = FF30.group) -> bytes:
+    return SERVER_TIME_REQUEST.replace(TERM, NOTICE_FIELDS[:268] + event_fields(event_id, group) + TERM)
 
 
 def board_rows(board: bytes) -> list[tuple[int, int, int]]:
@@ -64,38 +78,62 @@ class CupCatalogTests(unittest.TestCase):
 
     def test_configured_cup_overrides_cut_holes_and_course(self):
         self.assertEqual(configured_cup("ff30"), FF30)
-        hardcore = configured_cup("ff30", cut=-3, holes=3, course=1)
-        self.assertEqual(hardcore.cut, -3)
-        self.assertEqual([(stage.hole, stage.course) for stage in hardcore.stages], [(3, 1), (3, 1)])
-        self.assertEqual([stage.entry_prizes for stage in hardcore.stages], [(8953, 8962), (8958,)])
+        short = configured_cup("ff30", cut=-3, holes=3, course=1)
+        self.assertEqual(short.cut, -3)
+        self.assertEqual([(stage.hole, stage.course) for stage in short.stages], [(3, 1), (3, 1)])
+        self.assertEqual([stage.entry_prizes for stage in short.stages], [(8953, 8962), (8958,)])
 
-    def test_schedule_keeps_each_clock_inside_its_stage_and_after_its_notice(self):
-        self.assertEqual(stage_window(DAY, 1), (datetime(2018, 9, 12), datetime(2018, 9, 14, 23, 59, 59)))
-        self.assertEqual(stage_window(DAY, 2), (datetime(2018, 9, 15), datetime(2018, 9, 17, 23, 59, 59)))
-        phases = [cup_phase(passed=False, final_done=False, logins_after_cut=0),
-                  cup_phase(passed=True, final_done=False, logins_after_cut=1),
-                  cup_phase(passed=True, final_done=False, logins_after_cut=2),
-                  cup_phase(passed=True, final_done=True, logins_after_cut=2)]
-        self.assertEqual(phases, [QUALIFIER, RESULTS_DAY, FINAL, AFTER_FINAL])
-        self.assertEqual([phase_stage(phase) for phase in phases], [1, 1, 2, 2])
-        for phase in (QUALIFIER, FINAL):
-            window = stage_window(DAY, phase_stage(phase))
-            self.assertTrue(window[0] <= cup_clock(DAY, phase) <= window[1], phase)
-        # Results logins come the day after the stage window (the game lists a result notice only
-        # after the date its round recorded), with that stage kept open as the current entry.
-        for phase in (RESULTS_DAY, AFTER_FINAL):
-            stage = phase_stage(phase)
-            self.assertLess(stage_window(DAY, stage)[1].date(), cup_clock(DAY, phase).date(), phase)
-            window = stage_window(DAY, stage, through=cup_clock(DAY, phase))
-            self.assertTrue(window[0] <= cup_clock(DAY, phase) <= window[1], phase)
-        self.assertLess(cup_clock(DAY, RESULTS_DAY), cup_clock(DAY, FINAL))
-        # The results day comes after a round played at the qualifier clock; the final's notice is
-        # shown after the final round.
-        self.assertGreater(cup_clock(DAY, RESULTS_DAY), cup_clock(DAY, QUALIFIER))
-        self.assertTrue(notice_time(DAY, 1) <= cup_clock(DAY, QUALIFIER))
-        self.assertTrue(notice_time(DAY, 2) <= cup_clock(DAY, AFTER_FINAL))
-        # A missed cut keeps the qualifier (the player can try again).
-        self.assertEqual(cup_phase(passed=False, final_done=True, logins_after_cut=0), QUALIFIER)
+    def test_catalog_cups_have_their_own_numbers_events_and_prizes(self):
+        self.assertEqual(list(CUPS), ["ff30", "level5-1", "level5-2", "famitsu"])
+        self.assertEqual(len({cup.number for cup in CUPS.values()}), 4)
+        events = [stage.event_id for cup in CUPS.values() for stage in cup.stages]
+        self.assertEqual(len(set(events)), 8)
+        # Request validation takes a 12 to 15 character group (a 5-word record, as LocalTournament).
+        self.assertTrue(all(12 <= len(cup.group) <= 15 and cup.name.isascii() for cup in CUPS.values()))
+        prizes = {key: [stage.entry_prizes for stage in cup.stages] for key, cup in CUPS.items()}
+        self.assertEqual(prizes["level5-1"], [(9000,), (9001,)])
+        self.assertEqual(prizes["level5-2"], [(9002,), (8984, 8985)])
+        self.assertEqual(prizes["famitsu"], [(9128,), ()])
+        # The Famitsu final's ranger suits have no textures: it pays 3,000 coins for finishing.
+        settings = FAMITSU.settings()
+        self.assertEqual((settings["p2_course"], settings["p2_reg_reward_normal_1"]), (10, 0))
+        self.assertEqual((settings["p2_score_reward_flag"], settings["p2_score_reward_score"],
+                          settings["p2_score_reward_itemId"], settings["p2_score_reward_itemCount"]),
+                         (1, 99, 5716, 3000))
+        self.assertNotIn("p1_score_reward_flag", settings)
+        self.assertEqual(LEVEL5_2.settings()["p2_reg_reward_normal_2"], 8985)
+        self.assertEqual(LEVEL5_1.settings()["p1_course"], 2)
+
+    def test_modes_set_cut_final_conditions_and_attempts(self):
+        classic, hardcore = mode_cups("classic"), mode_cups("hardcore")
+        self.assertEqual(classic, tuple(CUPS.values()))
+        self.assertTrue(all(cup.cut == -3 and cup.final.regulation == 1034 and cup.attempts == 3
+                            and cup.settings()["resetThreshold"] == 3 for cup in hardcore))
+        # Qualifier conditions and prizes do not change.
+        self.assertEqual([cup.qualifier for cup in hardcore], [cup.qualifier for cup in classic])
+        self.assertEqual([cup.final.entry_prizes for cup in hardcore], [cup.final.entry_prizes for cup in classic])
+        self.assertTrue(all(cup.settings()["resetThreshold"] == 99 for cup in classic))
+        self.assertEqual(mode_cups("hardcore", holes=3)[1].qualifier.hole, 3)
+        with self.assertRaises(ValueError):
+            mode_cups("earn")
+
+    def test_schedule_keeps_the_clock_inside_the_current_stage(self):
+        self.assertEqual(cup_clock(DAY, 0), datetime(2018, 9, 14, 12))
+        self.assertEqual(cup_clock(DAY, 3), datetime(2018, 9, 17, 12))
+        self.assertEqual(stage_windows(DAY, 0, 1), ((datetime(2018, 9, 12), datetime(2018, 9, 14, 23, 59, 59)),
+                                                    (datetime(2018, 9, 15), datetime(2018, 9, 17, 23, 59, 59))))
+        self.assertEqual(stage_windows(DAY, 5, 2), ((datetime(2018, 9, 14), datetime(2018, 9, 16, 23, 59, 59)),
+                                                    (datetime(2018, 9, 17), datetime(2018, 9, 19, 23, 59, 59))))
+        for day in range(6):
+            for stage in (1, 2):
+                window = stage_windows(DAY, day, stage)[stage - 1]
+                self.assertTrue(window[0] <= cup_clock(DAY, day) <= window[1])
+                # A round's record carries its window's last day; the clock after the round (one
+                # day on) is past it, so the game lists the result notice.
+                self.assertLess(window[1], cup_clock(DAY, day + 1))
+                self.assertLessEqual(notice_time(DAY, day + 1, FF30), cup_clock(DAY, day + 1))
+                self.assertGreater(notice_time(DAY, day + 1, FF30), window[1])
+        self.assertNotEqual(notice_time(DAY, 1, FF30), notice_time(DAY, 1, LEVEL5_1))
 
 
 class CupRecordTests(unittest.TestCase):
@@ -160,6 +198,30 @@ class CupServerTests(unittest.TestCase):
         self.assertEqual(self.call(client, LOGIN_TARGET, LOGIN_REQUEST)[0], 200)
         return clock
 
+    def open_notice(self, client, event_id, group=FF30.group):
+        """The Notices box (bonus list), then a result notice: own score and score list of both stages."""
+        self.assertEqual(self.call(client, NATIONAL_BOARD_PATH, NATIONAL_BOARD_REQUEST)[0], 200)
+        self.assertEqual(self.call(client, BONUS_LIST_PATH, BONUS_LIST_REQUEST)[0], 200)
+        for event in (event_id - (event_id % 10 == 2), event_id + (event_id % 10 == 1)):
+            self.own(client, event, group)
+            self.assertEqual(self.call(client, NATIONAL_SCORE_LIST_PATH, score_list_request(event, group))[0], 200)
+
+    def own(self, client, event_id, group=FF30.group):
+        status, reply = self.call(client, NATIONAL_OWN_SCORE_PATH, own_score_request(event_id, group))
+        self.assertEqual(status, 200)
+        return reply
+
+    @staticmethod
+    def archive_settings(archive):
+        files, stream = [], 56
+        for index in range(2):
+            compressed, expanded = unpack_from("<2I", archive, 16 + index * 20 + 12)
+            files.append(zlib.decompress(archive[stream:stream + compressed]))
+            stream += (compressed + 3) & ~3
+        settings = next(data for data in files if b"resetThreshold" in data)
+        header, values = settings.decode("utf-8-sig").split("\r\n")[:2]
+        return dict(zip(header.split("\t"), map(int, values.split("\t"))))
+
     def notices(self, client):
         status, reply = self.call(client, NOTICE_PATH, NOTICE_REQUEST.replace(
             bytes.fromhex("5030020001000000"), bytes.fromhex("5030020000000000")))
@@ -170,53 +232,108 @@ class CupServerTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             GolfServer(0, None, server_time=DAY, collab_cup=FF30)
 
-    def test_qualifier_then_final_then_notices(self):
+    def test_qualifier_then_final_then_next_cup_in_one_sitting(self):
         with TemporaryDirectory() as directory:
-            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cup=configured_cup("ff30", cut=3),
-                                login_completion=True)
+            cups = (configured_cup("ff30", cut=3), LEVEL5_1)
+            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cups=cups, login_completion=True,
+                                empty_bonus_list=True)
+            self.assertEqual(self.boot(client), bytes.fromhex("20180914120000"))
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
             self.assertEqual(self.board(client, 0), [(4, 1, 41), (4, 2, 42)])
             self.assertEqual(self.board(client, 3), [(4, 1, 41), (4, 2, 42)])
-            self.assertEqual(self.clock(client), bytes.fromhex("20180914120000"))
             self.assertNotIn(b"<nid>", self.notices(client))
 
-            # A missed cut: the prize notice comes, the final stays closed.
+            # A missed cut: the day moves on, the qualifier notice comes, the final stays closed.
             self.assertEqual(self.call(client, REGISTRATION, registration(41, 5))[0], 200)
-            status, own = self.call(client, NATIONAL_OWN_SCORE_PATH, own_score_request(41))
-            self.assertEqual(status, 200)
-            self.assertIn(pack("<2HI", 0x42D1, 2, 2), own)
+            self.assertEqual(self.clock(client), bytes.fromhex("20180915120000"))
+            self.assertIn(pack("<2HI", 0x42D1, 2, 2), self.own(client, 41))
+            notices = self.notices(client)
+            self.assertIn(b"<nid>4</nid>FINAL FANTASY 30th Anniversary Cup: Qualifier results", notices)
+            self.assertIn(pack("<2H", 0x3064, 3) + bytes.fromhex("2018091500040000"), notices)
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
-            self.assertIn(b"<nid>4</nid>FINAL FANTASY 30th Anniversary Cup: Qualifier results", self.notices(client))
 
-            # Making the cut: the session goes on with the qualifier current. The next login is the
-            # results day (the qualifier stays current, so its prizes can be read); the one after
-            # that opens the final.
+            # Making the cut: the next round's notice is dated that day.
             self.assertEqual(self.call(client, REGISTRATION, registration(41, 3))[0], 200)
-            self.assertIn(pack("<2HI", 0x42D1, 2, 1), self.call(client, NATIONAL_OWN_SCORE_PATH,
-                                                               own_score_request(41))[1])
-            # The time request after the round already gives the results-day clock.
-            self.assertEqual(self.clock(client), bytes.fromhex("20180915010000"))
+            self.assertEqual(self.clock(client), bytes.fromhex("20180916120000"))
+            self.assertIn(bytes.fromhex("2018091600040000"), self.notices(client))
+            # The tournament screen (a board request, own score, score list) is not an opened notice.
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
-            # Next boot (time, then login): still the results day; the boot after that opens the final.
-            self.assertEqual(self.boot(client), bytes.fromhex("20180915010000"))
+            self.assertIn(pack("<2HI", 0x42D1, 2, 1), self.own(client, 41))
+            self.assertEqual(self.call(client, NATIONAL_SCORE_LIST_PATH, score_list_request(41))[0], 200)
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
+            # Neither is the entry screen (own score, then the join).
+            self.own(client, 41)
+            self.assertEqual(self.call(client, JOIN, join_request(41))[0], 200)
+            self.assertEqual(self.board(client, 1), [(4, 1, 41)])
+            # Opening the notice in the Notices box opens the final at the next board request.
+            self.open_notice(client, 41)
+            self.assertEqual(self.board(client, 1), [(4, 2, 42)])
+            self.assertEqual(self.clock(client), bytes.fromhex("20180916120000"))
             self.assertEqual(self.boot(client), bytes.fromhex("20180916120000"))
             self.assertEqual(self.board(client, 1), [(4, 2, 42)])
-            self.assertEqual(self.boot(client), bytes.fromhex("20180916120000"))
-            # The final's own score never carries the passed flag.
+
+            # The final: its notice, and the final's own score never carries the passed flag.
             self.assertEqual(self.call(client, REGISTRATION, registration(42, 1))[0], 200)
-            self.assertIn(pack("<2HI", 0x42D1, 2, 2), self.call(client, NATIONAL_OWN_SCORE_PATH,
-                                                               own_score_request(42))[1])
-            self.assertEqual(self.clock(client), bytes.fromhex("20180918120000"))
+            self.assertIn(pack("<2HI", 0x42D1, 2, 2), self.own(client, 42))
+            self.assertEqual(self.call(client, NATIONAL_SCORE_LIST_PATH, score_list_request(42))[0], 200)
+            self.assertEqual(self.clock(client), bytes.fromhex("20180917120000"))
             self.assertEqual(self.board(client, 1), [(4, 2, 42)])
             notices = self.notices(client)
             self.assertIn(pack("<2HI", 0x3000, 2, 2), notices)
             self.assertLess(notices.index(b"Final results"), notices.index(b"Qualifier results"))
 
-            # Another cup's group or event id is refused.
+            # Opening the final's notice moves on to the next cup, on the same clock.
+            self.open_notice(client, 42)
+            self.assertEqual(self.board(client, 1), [(5, 1, 51)])
+            self.assertEqual(self.clock(client), bytes.fromhex("20180917120000"))
+            self.assertNotIn(b"<nid>", self.notices(client))
+            status, archive = self.call(client, DOWNLOAD_BASE + "/local-tournament.xb")
+            self.assertEqual(status, 200)
+            self.assertEqual(self.archive_settings(archive)["tournamentId"], 5)
+            group = LEVEL5_1.group
+            self.assertEqual(self.call(client, REGISTRATION, registration(51, 0, group=group))[0], 200)
+            self.open_notice(client, 51, group)
+            self.assertEqual(self.board(client, 1), [(5, 2, 52)])
+            self.assertEqual(self.call(client, REGISTRATION, registration(52, 0, group=group))[0], 200)
+            self.open_notice(client, 52, group)
+            # Round and round: FF30 again, with fresh scores.
+            self.assertEqual(self.board(client, 1), [(4, 1, 41)])
+            self.assertNotIn(b"<nid>", self.notices(client))
+            self.assertEqual(self.call(client, NATIONAL_OWN_SCORE_PATH, own_score_request(41))[0], 200)
+
+            # Another cup's group or an unknown event id is refused.
             self.assertEqual(self.call(client, REGISTRATION, registration(43, 0))[0], 400)
+            self.assertEqual(self.call(client, REGISTRATION, registration(51, 0))[0], 400)
             self.assertEqual(self.call(client, REGISTRATION, registration(1, 0).replace(
                 FF30.group, b"LocalTournament"))[0], 400)
+
+    def test_hardcore_join_counts_rounds_per_stage_per_day(self):
+        with TemporaryDirectory() as directory:
+            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cups=mode_cups("hardcore"),
+                                login_completion=True)
+            counts = []
+            for event_id in (41, 41, 41, 41, 42):
+                status, reply = self.call(client, JOIN, join_request(event_id))
+                self.assertEqual(status, 200)
+                counts.append(unpack_from("<I", reply, reply.index(pack("<2H", 0x4962, 2)) + 4)[0])
+            self.assertEqual(counts, [1, 2, 3, 4, 1])
+            # -3 makes the cut, -2 does not.
+            self.assertEqual(self.call(client, REGISTRATION, registration(41, -2))[0], 200)
+            self.assertIn(pack("<2HI", 0x42D1, 2, 2), self.own(client, 41))
+            self.assertEqual(self.call(client, REGISTRATION, registration(41, -3))[0], 200)
+            self.assertIn(pack("<2HI", 0x42D1, 2, 1), self.own(client, 41))
+
+    def test_classic_join_count_stays_zero(self):
+        with TemporaryDirectory() as directory:
+            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cups=mode_cups("classic"),
+                                login_completion=True)
+            for _ in range(5):
+                reply = self.call(client, JOIN, join_request(41))[1]
+                self.assertIn(pack("<2HI", 0x4962, 2, 0), reply)
+
+    def test_cups_need_their_own_numbers(self):
+        with self.assertRaises(ValueError):
+            GolfServer(0, None, national_tournament=True, server_time=DAY, collab_cups=(FF30, FF30))
 
     def test_cup_archive_names_the_cup(self):
         client = self.start(collab_cup=FF30)
