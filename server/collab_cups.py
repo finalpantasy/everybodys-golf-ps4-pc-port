@@ -96,35 +96,54 @@ def configured_cup(key: str, *, cut: int | None = None, holes: int | None = None
 
 # The qualifier and then the final, as the 2018 cups ran them. The game keeps one current national
 # entry, filled from board selector 1 (the server sends only the current stage there, see
-# national_tournament_board); the menu greys that entry out before its window opens and says "No
-# International Tournament is being held" after it closes. The game clock starts from the server time
-# sent at login, so the server moves its clock with the player's progress: the cup day D while in the
-# qualifier, D+2 once the cut is made, D+5 after the final. Each result notice is dated before the
-# clock that should show it (the game hides notices dated after its clock). Only the qualifier phase
-# keeps the day the rest of the server uses (Open Course event groups are dated D).
+# national_tournament_board). Only the current entry has its settings archive loaded, and the prize
+# code reads the prize ids from the entry whose event id matches the result record the game saved
+# at the end of the round. So the qualifier stays current for one more login after the cut is made
+# (the results day, when the player opens the qualifier notice), and the final is current after
+# that. The game lists a stage's result notice only once that stage's window has closed, so the
+# results-day clock is just after the qualifier window (the qualifier entry stays current). The game
+# clock starts from the server time sent at login.
 STAGE_DAYS = ((-2, 0), (1, 3))   # first and last day of each stage's window, relative to D
-PHASE_DAYS = (0, 2, 5)           # the login clock's day: in the qualifier, in the final, after both
-NOTICE_DAYS = (-1, 4)            # each stage's result notice date (noon), before the clock that shows it
+QUALIFIER, RESULTS_DAY, FINAL, AFTER_FINAL = range(4)
+PHASE_CLOCK = ((0, 12), (1, 1), (2, 12), (4, 12))    # (day after D, hour) of the login clock
+NOTICE_CLOCK = ((-1, 12), (1, 12))                    # each stage's <nid> notice date
 
 
-def _noon(day: datetime, offset: int) -> datetime:
-    return day.replace(hour=12, minute=0, second=0, microsecond=0) + timedelta(days=offset)
+def _at(day: datetime, offset: int, hour: int) -> datetime:
+    return day.replace(hour=hour, minute=0, second=0, microsecond=0) + timedelta(days=offset)
 
 
-def stage_window(day: datetime, stage: int) -> tuple[datetime, datetime]:
+def stage_window(day: datetime, stage: int, through: datetime | None = None) -> tuple[datetime, datetime]:
+    """A stage's window. `through` keeps it open to the end of that day: on a results login the
+    stage that just closed stays the current entry, because the game builds no current entry from
+    a closed selector-1 row, and the prize code reads the prize keys from that entry."""
     first, last = STAGE_DAYS[stage - 1]
     midnight = day.replace(hour=0, minute=0, second=0, microsecond=0)
-    return (midnight + timedelta(days=first),
-            midnight + timedelta(days=last + 1) - timedelta(seconds=1))
+    end = midnight + timedelta(days=last + 1) - timedelta(seconds=1)
+    if through is not None:
+        end = max(end, through.replace(hour=23, minute=59, second=59, microsecond=0))
+    return midnight + timedelta(days=first), end
 
 
-def cup_clock(day: datetime, *, passed: bool, final_done: bool) -> datetime:
-    phase = 2 if passed and final_done else 1 if passed else 0
-    return _noon(day, PHASE_DAYS[phase])
+def cup_phase(*, passed: bool, final_done: bool, logins_after_cut: int) -> int:
+    """The phase of a login. logins_after_cut counts this login (1 = the first after the cut)."""
+    if not passed:
+        return QUALIFIER
+    if final_done:
+        return AFTER_FINAL
+    return RESULTS_DAY if logins_after_cut <= 1 else FINAL
+
+
+def phase_stage(phase: int) -> int:
+    """The stage that is current (board selector 1) in a phase."""
+    return 1 if phase in (QUALIFIER, RESULTS_DAY) else 2
+
+
+def cup_clock(day: datetime, phase: int) -> datetime:
+    return _at(day, *PHASE_CLOCK[phase])
 
 
 def notice_time(day: datetime, stage: int) -> datetime:
-    """A stage's result notice date. The qualifier's is before the qualifier-phase clock (its prize
-    is for finishing, cut or not); the final's before the after-final clock. The game hides notices
-    dated after its clock and remembers opened ones by date, so the stages get different dates."""
-    return _noon(day, NOTICE_DAYS[stage - 1])
+    """A stage's <nid> result notice date, before the clock of the phase that shows it (the game
+    hides notices dated after its clock and remembers opened ones by date)."""
+    return _at(day, *NOTICE_CLOCK[stage - 1])

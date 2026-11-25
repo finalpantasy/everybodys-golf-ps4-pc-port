@@ -362,16 +362,31 @@ How the server runs a cup:
   then the final) and both stages for selectors 0 and 3. The board
   download follows the selector of the last board POST.
 - The qualifier window is D-2..D and the final window is D+1..D+3,
-  where D is the `--server-time` day. The login clock is D at noon in
-  the qualifier, D+2 once the cut is made and D+5 after the final.
+  where D is the `--server-time` day. The login clock follows the
+  player's progress: D 12:00 in the qualifier, D+1 01:00 on the first
+  login after the cut (results day), D+2 12:00 on later logins (the
+  final) and D+4 12:00 after the final. Logins after the cut are
+  counted in `gameapi_login` (group `Cup4_logins_after_cut`); the game
+  also asks for the time after a round, so the time request cannot count
+  them.
 - Scores are kept per stage (groups `Cup4_41` and `Cup4_42`). Own score
   sends `0x42d1` = 1 when the qualifier score is at or under the cut.
   The game reads that flag to open the final's entry screen.
-- The notice list (selector 0) holds one item per finished stage,
-  titled `<nid>4</nid>...`. The game pairs it with the stage-1 and
-  stage-2 entries of tournament 4 and grants the stage's prizes when
-  the player opens it in Notices. Each notice is dated before the clock
-  that shows it: qualifier D-1, final D+4.
+- Prizes come from the game's own result records. After a round the
+  game saves a record with the event id and the stage's last day. On a
+  later day Notices lists it as "EG Cup No. 4 - Qualifier" or "- Finals".
+  Opening it sends `gameapi_getmyscorenational`, then the game grants
+  the `reg_reward_*` items of the current entry and marks the record
+  received. So on the results day and after the final, the stage that
+  just closed stays the selector-1 entry, with its window held open to
+  the clock's day: the game builds no current entry from a closed row.
+  Tested in game: the qualifier gave the Cactuar outer and caps, the
+  final gave the Moogle set, and both could be worn.
+- The notice list (selector 0) also holds one `<nid>4</nid>` item per
+  finished stage. The game shows it as a tournament introduction; it
+  carries no prize.
+- Opening Notices first requests `gameapi_getbonuslist`. Host fixtures
+  v2 answer it with an empty list (`empty_bonus_list`).
 
 The runtime must accept a notice reply and board download larger than
 the fixed probes (tourney branch, `src/runtime_net.c`).

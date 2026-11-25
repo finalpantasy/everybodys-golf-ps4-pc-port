@@ -27,7 +27,8 @@ from lobby_registry import (
 from room_registry import (
     ROOM_HEADER, ROOM_MESSAGE_PATH, ROOM_MESSAGE_REQUEST, ROOM_MESSAGE_REQUEST_MAX, ROOM_PATH, ROOM_REQUEST_MAX,
 )
-from collab_cups import CUPS, Cup, configured_cup, cup_clock, notice_time, stage_window
+from collab_cups import (AFTER_FINAL, CUPS, QUALIFIER, RESULTS_DAY, Cup, configured_cup, cup_clock, cup_phase,
+                         notice_time, phase_stage, stage_window)
 from tournament_archive import tournament_archive
 
 LOCAL_LOBBY_PATHS = (LOBBY_PATH, PEER_PACKET_PATH, PEER_CHANNEL_PATH, ROOM_PATH, TRANSPORT_PATH, ROOM_MESSAGE_PATH)
@@ -587,12 +588,14 @@ def national_board_row(window: tuple[datetime, datetime], *, number: int, stage:
             + pack("<2H", 0x4130, 1))
 
 
-def national_tournament_board(at: datetime, cup: Cup | None = None, current: int | None = None) -> bytes:
+def national_tournament_board(at: datetime, cup: Cup | None = None, current: int | None = None,
+                              through: datetime | None = None) -> bytes:
     """The national board. Board selector 1 fills the game's single current entry: entry builder
     0xa5d3a0 copies every selector-1 row of the same group over it, so the last row wins whatever
     the windows say (with both cup rows the game showed the final). A cup therefore sends only the
     current stage (`current`) for selector 1 and both stages for the history selectors 0 and 3,
-    where the Notices box pairs a result notice with the stage-1 and stage-2 entries."""
+    where the Notices box pairs a result notice with the stage-1 and stage-2 entries. `through`
+    keeps the current stage's window open to that day (results logins, see stage_window)."""
     if cup is None:
         day = (at.replace(hour=0, minute=0, second=0, microsecond=0),
                at.replace(hour=23, minute=59, second=59, microsecond=0))
@@ -600,7 +603,8 @@ def national_tournament_board(at: datetime, cup: Cup | None = None, current: int
                                    group=LOCAL_TOURNAMENT_GROUP, event_id=LOCAL_TOURNAMENT_ID,
                                    name=b"Local Tournament")]
     else:
-        rows = [national_board_row(stage_window(at, stage), number=cup.number, stage=stage, group=cup.group,
+        rows = [national_board_row(stage_window(at, stage, through if current == stage else None),
+                                   number=cup.number, stage=stage, group=cup.group,
                                    event_id=event.event_id, name=cup.name.encode("ascii"))
                 for stage, event in enumerate(cup.stages, 1) if current in (None, stage)]
     return pack("<2HI", 0x4100, 2, len(rows)) + b"".join(rows) + TERMINATOR
@@ -732,6 +736,14 @@ class ScoreStore:
                 "GROUP BY primary_score ORDER BY primary_score", (group, -(1 << 31), (1 << 31) - 1))
             data = [{"num": str(count), "score": str(score)} for score, count in rows]
         return json.dumps(data, separators=(",", ":")).encode("ascii")
+
+    def count(self, group: bytes, player: bytes, step: int = 1) -> int:
+        """Add `step` to a per-player counter kept as a row of `group`; return the new value."""
+        with closing(sqlite3.connect(self.path, timeout=2)) as db, db:
+            db.execute("INSERT INTO local_scores VALUES (?, ?, ?, NULL) ON CONFLICT (event_group, player) "
+                       "DO UPDATE SET primary_score = primary_score + ?", (group, player, step, step))
+            return db.execute("SELECT primary_score FROM local_scores WHERE event_group = ? AND player = ?",
+                              (group, player)).fetchone()[0]
 
     def read(self, group: bytes, player: bytes | None = None) -> tuple[bytes, int, int | None] | None:
         """The named player's row, or the best row when the player is unknown."""
@@ -1026,6 +1038,7 @@ class GolfServer(ThreadingHTTPServer):
         self.empty_national_boards = empty_national_boards
         self.cup = collab_cup
         self.board_selector = None   # the selector of the last board POST; its download follows it
+        self.cup_session_phase = QUALIFIER   # set at each login (server time request)
         self.server_clock = server_time
         self.national_board = national_tournament_board(server_time, collab_cup) if national_tournament else None
         if collab_cup is not None:
@@ -1075,14 +1088,24 @@ class GolfServer(ThreadingHTTPServer):
 
     def current_cup_board(self, player: bytes | None) -> bytes:
         """The selector-1 board: the qualifier until the cut is made, then the final."""
-        passed = self.scores is not None and self.cup_progress(player)[0]
-        return national_tournament_board(self.server_clock, self.cup, current=2 if passed else 1)
+        phase = self.cup_session_phase
+        through = cup_clock(self.server_clock, phase) if phase in (RESULTS_DAY, AFTER_FINAL) else None
+        return national_tournament_board(self.server_clock, self.cup, current=phase_stage(phase), through=through)
 
     def current_time_records(self, player: bytes | None) -> bytes:
         if self.cup is None or self.scores is None:
             return self.server_time
         passed, final_done = self.cup_progress(player)
-        return server_time_records(cup_clock(self.server_clock, passed=passed, final_done=final_done))
+        # The game asks for the time at boot (just before it logs in) and again after a round; only
+        # logins count. This boot's login is not counted yet, hence + 1.
+        logins = self.cup_logins_after_cut(0) + 1 if passed and not final_done else 0
+        self.cup_session_phase = cup_phase(passed=passed, final_done=final_done, logins_after_cut=logins)
+        return server_time_records(cup_clock(self.server_clock, self.cup_session_phase))
+
+    def cup_logins_after_cut(self, step: int) -> int:
+        # One counter per cup: the time request comes before the game logs in, when the player is
+        # not known yet (a cup is single-player, like cup_progress).
+        return self.scores.count(f"Cup{self.cup.number}_logins_after_cut".encode("ascii"), b"-", step)
 
     def cup_notices(self, player: bytes | None) -> list[bytes]:
         """One result notice per finished stage, newest first (the game keeps 10)."""
@@ -1407,6 +1430,10 @@ class GolfHandler(BaseHTTPRequestHandler):
                 return
             if name is not None and LOCAL_SCORE_NAME.fullmatch(name):
                 self.remember_player(name)
+            if self.server.cup is not None and self.server.scores is not None:
+                passed, final_done = self.server.cup_progress(self.player())
+                if passed and not final_done:
+                    self.server.cup_logins_after_cut(1)
         if (self.path == NATIONAL_BOARD_PATH and self.server.national_board
                 and unpack_from("<I", body, -len(SERVER_TIME_SUFFIX) - 4)[0] in NATIONAL_BOARD_DOWNLOAD_SELECTORS):
             response = SCORE_SUCCESS_PREFIX + score_string(0x4A60, NATIONAL_BOARD_SUFFIX.encode("ascii")) + TERMINATOR

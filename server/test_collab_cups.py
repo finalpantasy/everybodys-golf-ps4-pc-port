@@ -8,10 +8,11 @@ import unittest
 from unittest.mock import patch
 import zlib
 
-from collab_cups import FF30, configured_cup, cup_clock, notice_time, stage_window
+from collab_cups import (AFTER_FINAL, FF30, FINAL, QUALIFIER, RESULTS_DAY, configured_cup, cup_clock, cup_phase,
+                         notice_time, phase_stage, stage_window)
 from golf_server import (LOOPBACK, GolfServer, cup_notice_item, national_tournament_board, notice_reply,
                          recorded_score_reply)
-from test_golf_server import (DOWNLOAD_BASE, NATIONAL_BOARD_PATH, NATIONAL_BOARD_REQUEST, NATIONAL_OWN_SCORE_PATH,
+from test_golf_server import (LOGIN_REQUEST, LOGIN_TARGET, DOWNLOAD_BASE, NATIONAL_BOARD_PATH, NATIONAL_BOARD_REQUEST, NATIONAL_OWN_SCORE_PATH,
                               NOTICE_FIELDS, NOTICE_PATH, NOTICE_REQUEST, SERVER_TIME_HEADERS, SERVER_TIME_PATH,
                               SERVER_TIME_REQUEST, string_record)
 
@@ -71,15 +72,30 @@ class CupCatalogTests(unittest.TestCase):
     def test_schedule_keeps_each_clock_inside_its_stage_and_after_its_notice(self):
         self.assertEqual(stage_window(DAY, 1), (datetime(2018, 9, 12), datetime(2018, 9, 14, 23, 59, 59)))
         self.assertEqual(stage_window(DAY, 2), (datetime(2018, 9, 15), datetime(2018, 9, 17, 23, 59, 59)))
-        qualifier = cup_clock(DAY, passed=False, final_done=False)
-        final = cup_clock(DAY, passed=True, final_done=False)
-        after = cup_clock(DAY, passed=True, final_done=True)
-        self.assertTrue(stage_window(DAY, 1)[0] <= qualifier <= stage_window(DAY, 1)[1])
-        self.assertTrue(stage_window(DAY, 2)[0] <= final <= stage_window(DAY, 2)[1])
-        self.assertTrue(notice_time(DAY, 1) <= qualifier and notice_time(DAY, 2) <= after)
-        self.assertGreater(notice_time(DAY, 2), final)
-        # A missed cut keeps the qualifier clock (the player can try again).
-        self.assertEqual(cup_clock(DAY, passed=False, final_done=True), qualifier)
+        phases = [cup_phase(passed=False, final_done=False, logins_after_cut=0),
+                  cup_phase(passed=True, final_done=False, logins_after_cut=1),
+                  cup_phase(passed=True, final_done=False, logins_after_cut=2),
+                  cup_phase(passed=True, final_done=True, logins_after_cut=2)]
+        self.assertEqual(phases, [QUALIFIER, RESULTS_DAY, FINAL, AFTER_FINAL])
+        self.assertEqual([phase_stage(phase) for phase in phases], [1, 1, 2, 2])
+        for phase in (QUALIFIER, FINAL):
+            window = stage_window(DAY, phase_stage(phase))
+            self.assertTrue(window[0] <= cup_clock(DAY, phase) <= window[1], phase)
+        # Results logins come the day after the stage window (the game lists a result notice only
+        # after the date its round recorded), with that stage kept open as the current entry.
+        for phase in (RESULTS_DAY, AFTER_FINAL):
+            stage = phase_stage(phase)
+            self.assertLess(stage_window(DAY, stage)[1].date(), cup_clock(DAY, phase).date(), phase)
+            window = stage_window(DAY, stage, through=cup_clock(DAY, phase))
+            self.assertTrue(window[0] <= cup_clock(DAY, phase) <= window[1], phase)
+        self.assertLess(cup_clock(DAY, RESULTS_DAY), cup_clock(DAY, FINAL))
+        # The results day comes after a round played at the qualifier clock; the final's notice is
+        # shown after the final round.
+        self.assertGreater(cup_clock(DAY, RESULTS_DAY), cup_clock(DAY, QUALIFIER))
+        self.assertTrue(notice_time(DAY, 1) <= cup_clock(DAY, QUALIFIER))
+        self.assertTrue(notice_time(DAY, 2) <= cup_clock(DAY, AFTER_FINAL))
+        # A missed cut keeps the qualifier (the player can try again).
+        self.assertEqual(cup_phase(passed=False, final_done=True, logins_after_cut=0), QUALIFIER)
 
 
 class CupRecordTests(unittest.TestCase):
@@ -139,6 +155,11 @@ class CupServerTests(unittest.TestCase):
         self.assertEqual(status, 200)
         return reply[reply.index(pack("<2H", 0x5000, 3)) + 4:][:7]
 
+    def boot(self, client):
+        clock = self.clock(client)
+        self.assertEqual(self.call(client, LOGIN_TARGET, LOGIN_REQUEST)[0], 200)
+        return clock
+
     def notices(self, client):
         status, reply = self.call(client, NOTICE_PATH, NOTICE_REQUEST.replace(
             bytes.fromhex("5030020001000000"), bytes.fromhex("5030020000000000")))
@@ -151,7 +172,8 @@ class CupServerTests(unittest.TestCase):
 
     def test_qualifier_then_final_then_notices(self):
         with TemporaryDirectory() as directory:
-            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cup=configured_cup("ff30", cut=3))
+            client = self.start(score_db=Path(directory) / "scores.sqlite", collab_cup=configured_cup("ff30", cut=3),
+                                login_completion=True)
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
             self.assertEqual(self.board(client, 0), [(4, 1, 41), (4, 2, 42)])
             self.assertEqual(self.board(client, 3), [(4, 1, 41), (4, 2, 42)])
@@ -166,17 +188,27 @@ class CupServerTests(unittest.TestCase):
             self.assertEqual(self.board(client, 1), [(4, 1, 41)])
             self.assertIn(b"<nid>4</nid>FINAL FANTASY 30th Anniversary Cup: Qualifier results", self.notices(client))
 
-            # Making the cut opens the final and moves the clock into its window.
+            # Making the cut: the session goes on with the qualifier current. The next login is the
+            # results day (the qualifier stays current, so its prizes can be read); the one after
+            # that opens the final.
             self.assertEqual(self.call(client, REGISTRATION, registration(41, 3))[0], 200)
             self.assertIn(pack("<2HI", 0x42D1, 2, 1), self.call(client, NATIONAL_OWN_SCORE_PATH,
                                                                own_score_request(41))[1])
+            # The time request after the round already gives the results-day clock.
+            self.assertEqual(self.clock(client), bytes.fromhex("20180915010000"))
+            self.assertEqual(self.board(client, 1), [(4, 1, 41)])
+            # Next boot (time, then login): still the results day; the boot after that opens the final.
+            self.assertEqual(self.boot(client), bytes.fromhex("20180915010000"))
+            self.assertEqual(self.board(client, 1), [(4, 1, 41)])
+            self.assertEqual(self.boot(client), bytes.fromhex("20180916120000"))
             self.assertEqual(self.board(client, 1), [(4, 2, 42)])
-            self.assertEqual(self.clock(client), bytes.fromhex("20180916120000"))
+            self.assertEqual(self.boot(client), bytes.fromhex("20180916120000"))
             # The final's own score never carries the passed flag.
             self.assertEqual(self.call(client, REGISTRATION, registration(42, 1))[0], 200)
             self.assertIn(pack("<2HI", 0x42D1, 2, 2), self.call(client, NATIONAL_OWN_SCORE_PATH,
                                                                own_score_request(42))[1])
-            self.assertEqual(self.clock(client), bytes.fromhex("20180919120000"))
+            self.assertEqual(self.clock(client), bytes.fromhex("20180918120000"))
+            self.assertEqual(self.board(client, 1), [(4, 2, 42)])
             notices = self.notices(client)
             self.assertIn(pack("<2HI", 0x3000, 2, 2), notices)
             self.assertLess(notices.index(b"Final results"), notices.index(b"Qualifier results"))
