@@ -62,14 +62,15 @@ class Cup:
     def settings(self) -> dict[str, int]:
         # resetThreshold: the entry screen refuses a new round once the join count the server sends
         # (gameapi_noticejoinnational, 0x4962) is above it (0xc4b8f3). 99 is never reached (Classic).
-        values = {"resetThreshold": self.attempts or 99, "tournamentId": self.number, "sponsored_US": 0}
+        # tournamentId: the Notices box names the cup "EG Cup No. <tournamentId + 1>", so it shows `number`.
+        values = {"resetThreshold": self.attempts or 99, "tournamentId": self.number - 1, "sponsored_US": 0}
         for number, stage in enumerate(self.stages, 1):
             values.update(stage.settings(number))
         return values
 
 
 # Rows of course_condition.xb (Cup_Use, Tee_Use, Wind_Use, Mirror_Use).
-STANDARD = 1014        # (0, 0, 0, 0): regular tee; the entry screen shows Mega Cup and no mirror
+STANDARD = 1014        # (0, 0, 0, 0): the entry screen shows Regular Tee, Normal Cup, Mirror off
 BIG_CUP = 1013         # the FF30 qualifier (big cup, low growth per the 2018 player blog)
 CHAMPION_WIND = 1034   # (0, 2, 1, 0): champion tees and strong wind (the FF30 final; Hardcore finals)
 COIN_ITEM = 5716       # material_coin_00: coins, given with a count by score_reward

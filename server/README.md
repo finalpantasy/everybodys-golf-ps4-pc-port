@@ -355,7 +355,9 @@ is `collab_cups.py`:
 
 Only the FF30 course and rules are from 2018 records; the others are
 picks, and the numbers, groups and event ids are this server's own. The
-Famitsu final's ranger suits have no textures, so it pays coins.
+Famitsu final's ranger suits have no textures, so it pays coins. Row 1014 shows as Regular Tee, Normal Cup,
+Mirror off. The Notices box names each cup "EG Cup No." and its number
+(the server sends `tournamentId` = number - 1; the game adds 1).
 
 | Option | Meaning |
 |---|---|
@@ -367,6 +369,9 @@ Hardcore also puts every final on row 1034 and allows 3 rounds per
 stage per day: `resetThreshold` is 3, and `gameapi_noticejoinnational`
 answers with the rounds this player started today in that stage (real
 date), this one included. The entry screen compares the two (0xc4b8f3).
+In both modes the game itself charges an S Ticket for a second round of
+a stage (seen in game; `limitation_reentry` 1 makes it "Limited to 1
+entry" instead), so Hardcore's limit only applies to S Ticket retries.
 
 How the server runs the cups:
 

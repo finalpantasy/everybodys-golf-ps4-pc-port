@@ -10,8 +10,8 @@ In the launcher, open the Saves tab and set Collab outfits and cups:
 
 | Setting | Cups | Outfits in the shop's coin tab |
 |---|---|---|
-| Classic cups | Qualifier cut +3, unlimited rounds | 500 coins a part |
-| Hardcore cups | Qualifier cut -3, finals on champion tees in strong wind, 3 rounds per stage a day | 1,500 to 2,500 coins a part |
+| Classic cups | Qualifier cut +3 | 500 coins a part |
+| Hardcore cups | Qualifier cut -3, finals on champion tees in strong wind, at most 3 rounds per stage a day | 1,500 to 2,500 coins a part |
 
 In both modes the outfits are not handed out at the start. Win them in the cups or buy them in
 the shop. The other settings (All unlocked, Earn in game, Original) run no cups.
@@ -27,7 +27,8 @@ the shop. The other settings (All unlocked, Earn in game, Original) run no cups.
 5. The next cup then opens. After the last one, the list starts over.
 
 All of this works in one sitting. The game's calendar moves on with your rounds, so there are no
-dates to wait for. Missed the cut? Play the qualifier again.
+dates to wait for. The first round of each stage is free. As in the original game, another
+try costs an S Ticket.
 
 | Cup | Qualifier prize | Final prize |
 |---|---|---|

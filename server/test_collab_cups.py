@@ -68,7 +68,7 @@ def board_rows(board: bytes) -> list[tuple[int, int, int]]:
 class CupCatalogTests(unittest.TestCase):
     def test_ff30_settings_carry_both_stages_and_prizes(self):
         settings = FF30.settings()
-        self.assertEqual((settings["tournamentId"], settings["resetThreshold"]), (4, 99))
+        self.assertEqual((settings["tournamentId"], settings["resetThreshold"]), (3, 99))
         self.assertEqual((settings["p1_course"], settings["p1_hole"], settings["p1_regulation"]), (4, 0, 1013))
         self.assertEqual((settings["p2_course"], settings["p2_hole"], settings["p2_regulation"]), (4, 0, 1034))
         self.assertEqual((settings["p1_reg_reward_normal_1"], settings["p1_reg_reward_normal_2"]), (8953, 8962))
@@ -289,7 +289,7 @@ class CupServerTests(unittest.TestCase):
             self.assertNotIn(b"<nid>", self.notices(client))
             status, archive = self.call(client, DOWNLOAD_BASE + "/local-tournament.xb")
             self.assertEqual(status, 200)
-            self.assertEqual(self.archive_settings(archive)["tournamentId"], 5)
+            self.assertEqual(self.archive_settings(archive)["tournamentId"], 4)
             group = LEVEL5_1.group
             self.assertEqual(self.call(client, REGISTRATION, registration(51, 0, group=group))[0], 200)
             self.open_notice(client, 51, group)
