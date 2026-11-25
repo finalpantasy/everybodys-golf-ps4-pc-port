@@ -335,6 +335,47 @@ score list, and distribution replay that saved score. The listener
 passed loopback replay. Guest tournament entry is NOT_RUN.
 [Wire format](../analysis/online/protocol.md#local-national-tournament)
 
+#### Collab cups
+
+`--collab-cup ff30` (with `--national-tournament`, `--server-time` and
+`--score-db`) runs the FINAL FANTASY 30th Anniversary Cup as a qualifier
+and a final. `host.py` takes the same `--collab-cup` and `--cup-cut`.
+The catalog is `collab_cups.py`: tournament number 4, group
+`FF30CollabCup`, qualifier event 41 (Vortex Valley, 18 holes, big cup,
+course_condition row 1013) and final event 42 (row 1034: champion tees,
+strong wind). The settings archive carries the prizes: finishing the
+qualifier gives the Cactuar outer 8953 and the twelve Cactuar caps
+(set 8962), finishing the final gives the Moogle 8958.
+
+| Option | Meaning |
+|---|---|
+| `--cup-cut N` | Qualifier pass line in strokes against par. Default +3 (Classic); Hardcore uses -3. |
+| `--cup-holes N` | Test rounds of N holes (3 or more). |
+| `--cup-course N` | Another course (1 Eagle City ... 5 Imperial Garden). |
+
+How the server runs a cup:
+
+- Board selector 1 fills the game's single current entry. The game
+  copies every selector-1 row of the same group over that entry, so the
+  last row wins, whatever the windows say. The server sends only the
+  current stage for selector 1 (the qualifier until the cut is made,
+  then the final) and both stages for selectors 0 and 3. The board
+  download follows the selector of the last board POST.
+- The qualifier window is D-2..D and the final window is D+1..D+3,
+  where D is the `--server-time` day. The login clock is D at noon in
+  the qualifier, D+2 once the cut is made and D+5 after the final.
+- Scores are kept per stage (groups `Cup4_41` and `Cup4_42`). Own score
+  sends `0x42d1` = 1 when the qualifier score is at or under the cut.
+  The game reads that flag to open the final's entry screen.
+- The notice list (selector 0) holds one item per finished stage,
+  titled `<nid>4</nid>...`. The game pairs it with the stage-1 and
+  stage-2 entries of tournament 4 and grants the stage's prizes when
+  the player opens it in Notices. Each notice is dated before the clock
+  that shows it: qualifier D-1, final D+4.
+
+The runtime must accept a notice reply and board download larger than
+the fixed probes (tourney branch, `src/runtime_net.c`).
+
 For the empty board-list probe, generate discovery with `--empty-boards`
 and give the server `--empty-board-block PATH`. Use the same encrypted
 block as the daily score probe. The reply has zero rows.

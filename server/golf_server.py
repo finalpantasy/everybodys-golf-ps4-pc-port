@@ -27,6 +27,7 @@ from lobby_registry import (
 from room_registry import (
     ROOM_HEADER, ROOM_MESSAGE_PATH, ROOM_MESSAGE_REQUEST, ROOM_MESSAGE_REQUEST_MAX, ROOM_PATH, ROOM_REQUEST_MAX,
 )
+from collab_cups import CUPS, Cup, configured_cup, cup_clock, notice_time, stage_window
 from tournament_archive import tournament_archive
 
 LOCAL_LOBBY_PATHS = (LOBBY_PATH, PEER_PACKET_PATH, PEER_CHANNEL_PATH, ROOM_PATH, TRANSPORT_PATH, ROOM_MESSAGE_PATH)
@@ -463,14 +464,22 @@ def valid_national_board_request(body: bytes) -> bool:
     return padded_string(token) is not None and selector in NATIONAL_BOARD_DOWNLOAD_SELECTORS
 
 
-def valid_national_id_request(body: bytes, *, layout: tuple) -> bool:
+LOCAL_NATIONAL_EVENTS = {LOCAL_TOURNAMENT_ID: LOCAL_TOURNAMENT_GROUP}
+
+
+def national_event_id(group: bytes, event_id: bytes, events: dict[int, bytes]) -> int | None:
+    """The board event id these two request fields name, or None when no served event matches."""
+    number = unpack_from("<I", event_id)[0]
+    return number if events.get(number) is not None and padded_string(group) == events[number] else None
+
+
+def valid_national_id_request(body: bytes, *, layout: tuple, events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> bool:
     fields = title_fields(body, SERVER_TIME_SUFFIX, layout)
     if fields is None:
         return False
     _context, token, group, event_id = fields[:4]
     token = padded_string(token)
-    return (token is not None and len(token) <= 1000 and padded_string(group) == LOCAL_TOURNAMENT_GROUP
-            and event_id == pack("<I", LOCAL_TOURNAMENT_ID))
+    return token is not None and len(token) <= 1000 and national_event_id(group, event_id, events) is not None
 
 
 def score_group(fields: list[bytes]) -> bytes | None:
@@ -515,9 +524,10 @@ def score_player(field: bytes) -> bytes | None:
     return player if LOCAL_SCORE_NAME.fullmatch(player) and SCORE_TIMESTAMP.fullmatch(timestamp) else None
 
 
-def registered_national_score(body: bytes, group: bytes) -> tuple[bytes, bytes, int, int] | None:
+def registered_national_score(body: bytes, group: bytes,
+                              events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> tuple[bytes, bytes, int, int] | None:
     fields = title_fields(body, SERVER_TIME_SUFFIX, NATIONAL_REGISTRATION_FIELDS)
-    if fields is None or not valid_national_event_fields(fields[2:7]):
+    if fields is None or not valid_national_event_fields(fields[2:7], events):
         return None
     token = padded_string(fields[1])
     player = score_player(fields[7])
@@ -562,17 +572,56 @@ def distribution_data(score: int) -> bytes:
     return f'[{{"num":"1","score":"{score}"}}]'.encode("ascii")
 
 
-def national_tournament_board(at: datetime) -> bytes:
-    start = bcd_timestamp(at.replace(hour=0, minute=0, second=0, microsecond=0))
-    end = bcd_timestamp(at.replace(hour=23, minute=59, second=59, microsecond=0))
-    return (pack("<2HI2H2HI2HI", 0x4100, 2, 1, 0x4120, 1,
-                 0x4145, 2, LOCAL_TOURNAMENT_VERSION, 0x4146, 2, LOCAL_TOURNAMENT_STAGE)
-            + score_string(0x4140, LOCAL_TOURNAMENT_GROUP)
-            + pack("<2HI", 0x4147, 2, LOCAL_TOURNAMENT_ID)
+def national_board_row(window: tuple[datetime, datetime], *, number: int, stage: int, group: bytes,
+                       event_id: int, name: bytes) -> bytes:
+    """One 0x4120..0x4130 board row open from window[0] to window[1]. 0x4145 becomes entry +0x278
+    (the number notices pair by), 0x4146 entry +0x271 (stage), 0x4147 entry +0x26c (event id); row
+    parser 0xb848a0, entry builder 0xa5d3a0."""
+    start, end = (bcd_timestamp(at) for at in window)
+    return (pack("<2H2HI2HI", 0x4120, 1, 0x4145, 2, number, 0x4146, 2, stage)
+            + score_string(0x4140, group)
+            + pack("<2HI", 0x4147, 2, event_id)
             + score_string(0x4142, b"") + pack("<2HI2HI", 0x4143, 2, 0, 0x4144, 2, 0)
-            + score_string(0x4150, b"Local Tournament")
+            + score_string(0x4150, name)
             + pack("<2H", 0x4177, 3) + start + pack("<2H", 0x4178, 3) + end
-            + pack("<2H", 0x4130, 1) + TERMINATOR)
+            + pack("<2H", 0x4130, 1))
+
+
+def national_tournament_board(at: datetime, cup: Cup | None = None, current: int | None = None) -> bytes:
+    """The national board. Board selector 1 fills the game's single current entry: entry builder
+    0xa5d3a0 copies every selector-1 row of the same group over it, so the last row wins whatever
+    the windows say (with both cup rows the game showed the final). A cup therefore sends only the
+    current stage (`current`) for selector 1 and both stages for the history selectors 0 and 3,
+    where the Notices box pairs a result notice with the stage-1 and stage-2 entries."""
+    if cup is None:
+        day = (at.replace(hour=0, minute=0, second=0, microsecond=0),
+               at.replace(hour=23, minute=59, second=59, microsecond=0))
+        rows = [national_board_row(day, number=LOCAL_TOURNAMENT_VERSION, stage=LOCAL_TOURNAMENT_STAGE,
+                                   group=LOCAL_TOURNAMENT_GROUP, event_id=LOCAL_TOURNAMENT_ID,
+                                   name=b"Local Tournament")]
+    else:
+        rows = [national_board_row(stage_window(at, stage), number=cup.number, stage=stage, group=cup.group,
+                                   event_id=event.event_id, name=cup.name.encode("ascii"))
+                for stage, event in enumerate(cup.stages, 1) if current in (None, stage)]
+    return pack("<2HI", 0x4100, 2, len(rows)) + b"".join(rows) + TERMINATOR
+
+
+def cup_notice_item(cup: Cup, stage: int, at: datetime) -> bytes:
+    """A selector-0 notice item for one finished stage. The <nid> tag (parser 0xb68d42) stores the
+    tournament number at item +0x343c; the Notices box (0x6c11f5) turns the item into a national
+    result notice when a stage-1 and a stage-2 board entry carry that number. The game shows the
+    notice only when its date (0x3064) is not after its clock."""
+    kind = "Qualifier" if stage == 1 else "Final"
+    title = f"<nid>{cup.number}</nid>{cup.name}: {kind} results".encode("ascii")
+    text = f"Your {kind.lower()} results and prizes are here.".encode("ascii")
+    return (pack("<2H", 0x3010, 1) + score_string(0x3030, title) + score_string(0x3040, text)
+            + pack("<2H", 0x3064, 3) + bcd_timestamp(at) + pack("<2HI", 0x3063, 2, 0)
+            + pack("<2H", 0x3020, 1))
+
+
+def notice_reply(items: Sequence[bytes] = ()) -> bytes:
+    return (pack("<4HI", 0x8000, 1, 0x0000, 2, 1) + pack("<2H", 0x0083, 3) + b"local\0\0\0"
+            + pack("<2HI", 0x3000, 2, len(items)) + b"".join(items) + TERMINATOR)
 
 
 def national_game_data_reply() -> bytes:
@@ -601,10 +650,12 @@ def recorded_score_list_reply(rows: Sequence[tuple[tuple[bytes, int, int | None]
 
 
 def recorded_score_reply(row: tuple[bytes, int, int | None], *, paged: bool, national: bool = False,
-                         rank: int = 1) -> bytes:
+                         rank: int = 1, passed: bool = False) -> bytes:
     if paged:
         return recorded_score_list_reply([(row, rank)])
-    entry = pack("<2HI", 0x42D1, 2, 2) if national else b""
+    # 0x42d1: 1 sets result flag 0x40 (the qualifier was passed: the final's entry screen picks
+    # tour_clear0, not tour_fail0, 0xc4bfd0), 2 clears it (parser 0xb7323e-0xb7758a).
+    entry = pack("<2HI", 0x42D1, 2, 1 if passed else 2) if national else b""
     records = (pack("<2H", 0x4230, 1) + entry + pack("<2HI", 0x4270, 2, rank) + score_stats(row)
                + pack("<2H", 0x4240, 1))
     return SCORE_SUCCESS_PREFIX + pack("<2HI", 0x4200, 2, 1) + records + TERMINATOR
@@ -717,21 +768,35 @@ def valid_user_status_request(body: bytes) -> bool:
             all(actual == expected for actual, (_, expected) in zip(fields[2:-1], USER_STATUS_SESSION)))
 
 
-def valid_national_event_fields(fields: list[bytes]) -> bool:
+def valid_national_event_fields(fields: list[bytes], events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> bool:
     group, tournament_id, description, first, second = fields
-    return (padded_string(group) == LOCAL_TOURNAMENT_GROUP and tournament_id == pack("<I", LOCAL_TOURNAMENT_ID)
+    return (national_event_id(group, tournament_id, events) is not None
             and padded_string(description) == b"" and first == second == bytes(4))
 
 
-def valid_national_join_request(body: bytes) -> bool:
+def national_request_event(body: bytes, layout: tuple, offset: int, events: dict[int, bytes]) -> int | None:
+    """The event id of a request whose event fields start at field `offset`, or None."""
+    fields = title_fields(body, SERVER_TIME_SUFFIX, layout)
+    if fields is None or not valid_national_event_fields(fields[offset:offset + 5], events):
+        return None
+    return unpack_from("<I", fields[offset + 1])[0]
+
+
+def valid_national_join_request(body: bytes, events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> bool:
     fields = title_fields(body, SERVER_TIME_SUFFIX, NATIONAL_JOIN_FIELDS)
     if fields is None:
         return False
     token = padded_string(fields[1])
-    return token is not None and len(token) <= 1000 and valid_national_event_fields(fields[2:])
+    return token is not None and len(token) <= 1000 and valid_national_event_fields(fields[2:], events)
 
 
-def valid_national_score_list_request(body: bytes) -> bool:
+def national_score_list_layout(body: bytes) -> tuple:
+    tail_start = -len(SERVER_TIME_SUFFIX)
+    single = body[tail_start - 4:tail_start] == pack("<I", 1)
+    return NATIONAL_SCORE_LIST_SINGLE_FIELDS if single else NATIONAL_SCORE_LIST_FIELDS
+
+
+def valid_national_score_list_request(body: bytes, events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> bool:
     tail_start = -len(SERVER_TIME_SUFFIX)
     single = body[tail_start - 4:tail_start] == pack("<I", 1)
     layout = NATIONAL_SCORE_LIST_SINGLE_FIELDS if single else NATIONAL_SCORE_LIST_FIELDS
@@ -739,7 +804,7 @@ def valid_national_score_list_request(body: bytes) -> bool:
     if fields is None:
         return False
     token = padded_string(fields[1])
-    if token is None or len(token) > 1000 or not valid_national_event_fields(fields[2:7]):
+    if token is None or len(token) > 1000 or not valid_national_event_fields(fields[2:7], events):
         return False
     if single:
         account, terminator, _padding = fields[7].partition(b"\0")
@@ -747,14 +812,14 @@ def valid_national_score_list_request(body: bytes) -> bool:
     return True
 
 
-def valid_national_own_score_request(body: bytes) -> bool:
+def valid_national_own_score_request(body: bytes, events: dict[int, bytes] = LOCAL_NATIONAL_EVENTS) -> bool:
     fields = title_fields(body, SERVER_TIME_SUFFIX, NATIONAL_OWN_SCORE_FIELDS)
     if fields is None:
         return False
     token = padded_string(fields[1])
     return (token is not None and len(token) <= 1000
             and fields[2:5] == [payload for _, payload in USER_STATUS_SESSION]
-            and valid_national_event_fields(fields[5:]))
+            and valid_national_event_fields(fields[5:], events))
 
 
 def valid_session_target(target: str, pattern: re.Pattern) -> bool:
@@ -918,7 +983,7 @@ class GolfServer(ThreadingHTTPServer):
                  national_tournament: bool = False, empty_bonus_list: bool = False,
                  empty_regulations: bool = False, bind: str = LOOPBACK,
                  handler: type[BaseHTTPRequestHandler] | None = None, room_key: str | None = None,
-                 strict_key: bool = False):
+                 strict_key: bool = False, collab_cup: Cup | None = None):
         # With a room key, lobbies can face other machines: callers outside private and VPN
         # address ranges must send the key (see GolfHandler.parse_request).
         if local_lobbies and room_key is None:
@@ -937,6 +1002,8 @@ class GolfServer(ThreadingHTTPServer):
             raise ValueError("Select one login reply")
         if national_tournament and server_time is None:
             raise ValueError("National tournament replay requires --server-time")
+        if collab_cup is not None and not national_tournament:
+            raise ValueError("A collab cup is a national tournament: it needs --national-tournament")
         if empty_regulations and daily_score_block is None:
             raise ValueError("Empty regulation replay requires --daily-score-block")
         self.discovery = discovery
@@ -957,9 +1024,17 @@ class GolfServer(ThreadingHTTPServer):
         ) if empty_regulations else None
         self.empty_own_score = empty_own_score
         self.empty_national_boards = empty_national_boards
-        self.national_board = national_tournament_board(server_time) if national_tournament else None
-        self.national_archive = tournament_archive(LOCAL_TOURNAMENT_ID) if national_tournament else None
-        self.national_score_group = (f"National_{server_time:%Y%m%d}_{LOCAL_TOURNAMENT_ID}".encode("ascii")
+        self.cup = collab_cup
+        self.board_selector = None   # the selector of the last board POST; its download follows it
+        self.server_clock = server_time
+        self.national_board = national_tournament_board(server_time, collab_cup) if national_tournament else None
+        if collab_cup is not None:
+            self.national_events = {stage.event_id: collab_cup.group for stage in collab_cup.stages}
+            self.national_archive = tournament_archive(collab_cup.number, collab_cup.settings(), collab_cup.name)
+        else:
+            self.national_events = LOCAL_NATIONAL_EVENTS
+            self.national_archive = tournament_archive(LOCAL_TOURNAMENT_ID) if national_tournament else None
+        self.national_score_group = (self.national_group(next(iter(self.national_events)))
                                      if national_tournament and score_db is not None else None)
         self.empty_boards = empty_board_records(empty_board_block) if empty_board_block is not None else None
         self.finish_boards = empty_finish_board_records(empty_board_block) if empty_board_block is not None else None
@@ -983,6 +1058,39 @@ class GolfServer(ThreadingHTTPServer):
         self.local_lobbies = LobbyRegistry() if local_lobbies else None
         self.players: dict[str, bytes] = {}
         super().__init__((bind, port), handler or GolfHandler)
+
+    def national_group(self, event_id: int) -> bytes:
+        """The score-database group of one national event. A cup's stages keep their scores across
+        days (the qualifier result decides the final); the local tournament is per day."""
+        if self.cup is not None:
+            return f"Cup{self.cup.number}_{event_id}".encode("ascii")
+        return f"National_{self.server_clock:%Y%m%d}_{event_id}".encode("ascii")
+
+    def cup_progress(self, player: bytes | None) -> tuple[bool, bool]:
+        """(made the qualifier cut, finished the final) for this player, or for anyone when the
+        player is not known yet (a single-player server before the first registration)."""
+        qualifier = self.scores.read(self.national_group(self.cup.qualifier.event_id), player)
+        final = self.scores.read(self.national_group(self.cup.final.event_id), player)
+        return qualifier is not None and qualifier[1] <= self.cup.cut, final is not None
+
+    def current_cup_board(self, player: bytes | None) -> bytes:
+        """The selector-1 board: the qualifier until the cut is made, then the final."""
+        passed = self.scores is not None and self.cup_progress(player)[0]
+        return national_tournament_board(self.server_clock, self.cup, current=2 if passed else 1)
+
+    def current_time_records(self, player: bytes | None) -> bytes:
+        if self.cup is None or self.scores is None:
+            return self.server_time
+        passed, final_done = self.cup_progress(player)
+        return server_time_records(cup_clock(self.server_clock, passed=passed, final_done=final_done))
+
+    def cup_notices(self, player: bytes | None) -> list[bytes]:
+        """One result notice per finished stage, newest first (the game keeps 10)."""
+        items = []
+        for number, stage in enumerate(self.cup.stages, 1):
+            if self.scores.read(self.national_group(stage.event_id), player) is not None:
+                items.append(cup_notice_item(self.cup, number, notice_time(self.server_clock, number)))
+        return items[::-1]
 
     def server_bind(self):
         TCPServer.server_bind(self)
@@ -1130,14 +1238,18 @@ class GolfHandler(BaseHTTPRequestHandler):
             minimum = maximum = PROPERTY_REQUEST_BYTES
             validate = valid_property_request
         elif self.path == SERVER_TIME_PATH and self.server.server_time is not None:
-            response = self.server.server_time
+            try:
+                response = self.server.current_time_records(self.player())
+            except sqlite3.Error:
+                self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
+                return
             minimum = maximum = SERVER_TIME_REQUEST_BYTES
             validate = valid_server_time_request
         elif self.path == EULA_PATH and self.server.eula is not None:
             response = self.server.eula
             minimum = maximum = EULA_REQUEST_BYTES
             validate = valid_eula_request
-        elif self.path == NOTICE_PATH and self.server.empty_notices:
+        elif self.path == NOTICE_PATH and (self.server.empty_notices or self.server.cup is not None):
             response = NOTICE_REPLY
             minimum = NOTICE_FIXED_REQUEST_BYTES + 8
             maximum = NOTICE_FIXED_REQUEST_BYTES + 1008
@@ -1232,27 +1344,29 @@ class GolfHandler(BaseHTTPRequestHandler):
         elif self.path == NATIONAL_GAME_DATA_PATH and self.server.national_archive is not None:
             response = national_game_data_reply()
             minimum, maximum = NATIONAL_GAME_DATA_MIN_BYTES, NATIONAL_GAME_DATA_MAX_BYTES
-            validate = partial(valid_national_id_request, layout=NATIONAL_GAME_DATA_FIELDS)
+            validate = partial(valid_national_id_request, layout=NATIONAL_GAME_DATA_FIELDS,
+                               events=self.server.national_events)
         elif self.path == NATIONAL_DISTRIBUTION_PATH and self.server.national_archive is not None:
             response = (SCORE_SUCCESS_PREFIX + score_string(0x4292, NATIONAL_DISTRIBUTION_SUFFIX.encode("ascii"))
                         + TERMINATOR)
             minimum, maximum = NATIONAL_DISTRIBUTION_MIN_BYTES, NATIONAL_DISTRIBUTION_MAX_BYTES
-            validate = partial(valid_national_id_request, layout=NATIONAL_DISTRIBUTION_FIELDS)
+            validate = partial(valid_national_id_request, layout=NATIONAL_DISTRIBUTION_FIELDS,
+                               events=self.server.national_events)
         elif self.path == NATIONAL_OWN_SCORE_PATH and self.server.national_archive is not None:
             response = NATIONAL_OWN_SCORE_EMPTY_REPLY
             minimum, maximum = NATIONAL_OWN_SCORE_MIN_BYTES, NATIONAL_OWN_SCORE_MAX_BYTES
-            validate = valid_national_own_score_request
+            validate = partial(valid_national_own_score_request, events=self.server.national_events)
         elif self.path.startswith(NATIONAL_JOIN_PREFIX) and self.server.national_archive is not None:
             if not valid_session_target(self.path, NATIONAL_JOIN_TARGET):
                 self.reject_before_reading(HTTPStatus.BAD_REQUEST)
                 return
             response = NATIONAL_JOIN_REPLY
             minimum, maximum = NATIONAL_JOIN_MIN_BYTES, NATIONAL_JOIN_MAX_BYTES
-            validate = valid_national_join_request
+            validate = partial(valid_national_join_request, events=self.server.national_events)
         elif self.path == NATIONAL_SCORE_LIST_PATH and self.server.national_archive is not None:
             response = NATIONAL_SCORE_LIST_REPLY
             minimum, maximum = NATIONAL_SCORE_LIST_MIN_BYTES, NATIONAL_SCORE_LIST_MAX_BYTES
-            validate = valid_national_score_list_request
+            validate = partial(valid_national_score_list_request, events=self.server.national_events)
         elif self.path.startswith(NATIONAL_REGISTRATION_PREFIX) and self.server.national_score_group is not None:
             if not valid_session_target(self.path, NATIONAL_REGISTRATION_TARGET):
                 self.reject_before_reading(HTTPStatus.BAD_REQUEST)
@@ -1296,6 +1410,7 @@ class GolfHandler(BaseHTTPRequestHandler):
         if (self.path == NATIONAL_BOARD_PATH and self.server.national_board
                 and unpack_from("<I", body, -len(SERVER_TIME_SUFFIX) - 4)[0] in NATIONAL_BOARD_DOWNLOAD_SELECTORS):
             response = SCORE_SUCCESS_PREFIX + score_string(0x4A60, NATIONAL_BOARD_SUFFIX.encode("ascii")) + TERMINATOR
+            self.server.board_selector = unpack_from("<I", body, -len(SERVER_TIME_SUFFIX) - 4)[0]
         if response is None:
             response = self.board_reply(body)
             if response is None:
@@ -1341,6 +1456,14 @@ class GolfHandler(BaseHTTPRequestHandler):
                 except sqlite3.Error:
                     self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
                     return
+        if self.path == NOTICE_PATH and self.server.cup is not None and self.server.scores is not None:
+            selector = unpack_from("<I", body, len(body) - len(NOTICE_TAIL) - 4)[0]
+            if selector == 0:
+                try:
+                    response = notice_reply(self.server.cup_notices(self.player()))
+                except sqlite3.Error:
+                    self.reply(HTTPStatus.SERVICE_UNAVAILABLE)
+                    return
         if self.server.national_score_group is not None:
             try:
                 response = self.national_score_reply(body, response)
@@ -1353,18 +1476,36 @@ class GolfHandler(BaseHTTPRequestHandler):
         self.reply(HTTPStatus.OK, response, content_type="application/octet-stream")
 
     def national_score_reply(self, body: bytes, fallback: bytes) -> bytes | None:
-        group = self.server.national_score_group
+        events = self.server.national_events
         if self.path.startswith(NATIONAL_REGISTRATION_PREFIX):
-            score = registered_national_score(body, group)
+            event_id = national_request_event(body, NATIONAL_REGISTRATION_FIELDS, 2, events)
+        elif self.path == NATIONAL_SCORE_LIST_PATH:
+            event_id = national_request_event(body, national_score_list_layout(body), 2, events)
+        elif self.path == NATIONAL_OWN_SCORE_PATH:
+            event_id = national_request_event(body, NATIONAL_OWN_SCORE_FIELDS, 5, events)
+        else:
+            return fallback
+        if event_id is None:
+            return None
+        group = self.server.national_group(event_id)
+        if self.path.startswith(NATIONAL_REGISTRATION_PREFIX):
+            score = registered_national_score(body, group, events)
             if score is None or not self.matches_player(score[1]):
                 return None
             self.server.scores.write(score)
             self.remember_player(score[1])
+            cup = self.server.cup
+            if cup is not None:
+                stage = cup.stage_of(event_id)
+                verdict = "" if stage != 1 else (" (made the cut)" if score[2] <= cup.cut else " (missed the cut)")
+                print(f"Collab cup {cup.key}: stage {stage} score {score[2]:+d}{verdict}", flush=True)
         elif self.path in (NATIONAL_SCORE_LIST_PATH, NATIONAL_OWN_SCORE_PATH):
             paged = self.path == NATIONAL_SCORE_LIST_PATH
             if paged:
                 start, _, size = unpack_from("<3I", body, -len(SERVER_TIME_SUFFIX) - 12)
-                if not size or (size == 1 and start > 1):
+                # A cup sends the empty page: the final's tournament screen showed "Connection failed"
+                # after a one-row page (2026-11-24); a single-player cup has no table to show.
+                if not size or (size == 1 and start > 1) or self.server.cup is not None:
                     return fallback
                 start = max(1, start)
                 ranked = self.server.scores.ranked_page(group, start, min(size, MAX_SCORE_LIST_ROWS))
@@ -1372,7 +1513,9 @@ class GolfHandler(BaseHTTPRequestHandler):
             own = self.server.scores.read_ranked(group, self.player())
             if own is not None:
                 row, rank = own
-                return recorded_score_reply(row, paged=False, national=True, rank=rank)
+                cup = self.server.cup
+                passed = cup is not None and cup.stage_of(event_id) == 1 and row[1] <= cup.cut
+                return recorded_score_reply(row, paged=False, national=True, rank=rank, passed=passed)
         return fallback
 
     def matches_player(self, name: bytes) -> bool:
@@ -1512,6 +1655,8 @@ class GolfHandler(BaseHTTPRequestHandler):
 
     def national_download(self):
         if self.path == NATIONAL_BOARD_DOWNLOAD_PATH:
+            if self.server.cup is not None and self.server.board_selector == 1:
+                return self.server.current_cup_board(self.player())
             return self.server.national_board
         if self.path == NATIONAL_GAME_DOWNLOAD_PATH:
             return self.server.national_archive
@@ -1527,7 +1672,7 @@ class GolfHandler(BaseHTTPRequestHandler):
         elif ((self.path in LOCAL_LOBBY_PATHS and self.server.local_lobbies is not None)
               or (self.path == SERVER_TIME_PATH and self.server.server_time is not None)
               or (self.path == EULA_PATH and self.server.eula is not None)
-              or (self.path == NOTICE_PATH and self.server.empty_notices)
+              or (self.path == NOTICE_PATH and (self.server.empty_notices or self.server.cup is not None))
               or (self.path == BONUS_LIST_PATH and self.server.empty_bonus_list)
               or (self.path == REGULATION_PATH and self.server.regulations is not None)
               or self.is_daily_score()
@@ -1595,6 +1740,13 @@ def main():
                         help="Return an empty national board for the login and entry selectors")
     parser.add_argument("--national-tournament", action="store_true",
                         help="Replay one local national tournament on the --server-time date")
+    parser.add_argument("--collab-cup", choices=sorted(CUPS),
+                        help="Run a collab cup (qualifier and final, prizes by result notice) as the national tournament")
+    parser.add_argument("--cup-cut", type=int, metavar="STROKES",
+                        help="Qualifier pass line against par (default +3, the 2018 FF30 line; Hardcore: -3)")
+    parser.add_argument("--cup-holes", type=int, metavar="N",
+                        help="Test only: play N holes (3 or more) per stage instead of the cup's round")
+    parser.add_argument("--cup-course", type=int, metavar="N", help="Test only: play course N instead")
     login = parser.add_mutually_exclusive_group()
     login.add_argument("--login-rejection", action="store_true",
                        help="Replay the local title login rejection")
@@ -1623,6 +1775,11 @@ def main():
         if args.empty_board_block:
             with args.empty_board_block.open("rb") as stream:
                 empty_board_block = stream.read(9)
+        cup = None
+        if args.collab_cup:
+            if args.cup_holes is not None and args.cup_holes < 3:
+                raise ValueError("--cup-holes takes 3 or more (the game reads 0, 1 and 2 as 18, OUT 9 and IN 9)")
+            cup = configured_cup(args.collab_cup, cut=args.cup_cut, holes=args.cup_holes, course=args.cup_course)
         with GolfServer(args.port, discovery, server_time=server_time,
                         ticket_grants=args.ticket_grants, eula_text=eula_text,
                         empty_notices=args.empty_notices, daily_score_block=daily_score_block,
@@ -1634,7 +1791,7 @@ def main():
                         event_group=tuple(args.event_group or ()),
                         local_lobbies=args.local_lobbies, national_tournament=args.national_tournament,
                         empty_bonus_list=args.empty_bonus_list, empty_regulations=args.empty_regulations,
-                        bind=args.bind) as server:
+                        bind=args.bind, collab_cup=cup) as server:
             print(f"Listening on http://{args.bind}:{server.server_port}", flush=True)
             server.serve_forever()
     except KeyboardInterrupt:

@@ -27,16 +27,22 @@ def tabular_row(columns: dict[str, int | str]) -> bytes:
     return f"{header}\r\n{row}\r\n".encode("utf-8-sig")
 
 
-def tournament_archive(tournament_id: int) -> bytes:
-    settings = {"resetThreshold": 0, "tournamentId": tournament_id, "sponsored_US": 0}
-    for stage in (1, 2):
-        # The entry screen requires a nonzero course byte for the selected stage (0xc4e0ad).
-        settings.update({f"p{stage}_course": 1, f"p{stage}_hole": 1,
-                         f"p{stage}_regulation": REGULATION_PATTERN})
+def tournament_archive(tournament_id: int, settings: dict[str, int] | None = None,
+                       name: str = "Local Tournament") -> bytes:
+    """The settings and messages files the manager worker 0xa4de30 opens. `settings` replaces the
+    default one-stage Eagle City rows (collab_cups.Cup.settings gives both stages and prizes)."""
+    if settings is None:
+        settings = {"resetThreshold": 0, "tournamentId": tournament_id, "sponsored_US": 0}
+        for stage in (1, 2):
+            # The entry screen requires a nonzero course byte for the selected stage (0xc4e0ad).
+            settings.update({f"p{stage}_course": 1, f"p{stage}_hole": 1,
+                             f"p{stage}_regulation": REGULATION_PATTERN})
+    if '"' in name:
+        raise ValueError("Tournament names cannot contain quotes")
     sources = {
         SETTINGS_PATH: tabular_row(settings),
         # The loader drops the first and last character of the name (0xa4f88f-0xa4f8b8), so it is quoted.
-        MESSAGES_PATH: tabular_row({"tournamentName_US_01_ENG": '"Local Tournament"'}),
+        MESSAGES_PATH: tabular_row({"tournamentName_US_01_ENG": f'"{name}"'}),
     }
     records = []
     streams = []

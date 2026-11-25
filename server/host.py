@@ -29,19 +29,20 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from datetime import datetime  # noqa: E402
 
+from collab_cups import CUPS, Cup, configured_cup  # noqa: E402
 from golf_server import GolfHandler, GolfServer, LOOPBACK, MAX_EULA_TEXT_BYTES, require_lobby_loopback  # noqa: E402
 from make_daily_score_block import build_score_block  # noqa: E402
 from make_discovery_fixture import build_fixture  # noqa: E402
 from online import OnlineHost, load_room_key  # noqa: E402
 
 # Bump when the fixture set below changes, so older caches are rebuilt.
-FIXTURE_VERSION = 1
+FIXTURE_VERSION = 2
 SERVER_TIME = datetime(2018, 9, 14, 12, 0, 0)
 # The discovery options of the verified full online run (fixture ss-info-local-national-v7).
 DISCOVERY_OPTIONS = dict(
     eula=True, empty_notices=True, daily_scores=True, empty_boards=True, login_rejection=True,
     empty_national_boards=True, cached_property=True, discard_telemetry=True, empty_own_score=True,
-    score_registration=True, event_schedule=True, national_tournament=True,
+    score_registration=True, event_schedule=True, national_tournament=True, empty_bonus_list=True,
 )
 EULA_TEXT = b"Local replay test.\n"
 # Eagle City Golf Club is course 1; its Open Course round is holes 1 to 9.
@@ -103,7 +104,8 @@ class LoggingHandler(GolfHandler):
 
 
 def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
-                local_lobbies: bool = False, room_key: str | None = None, strict_key: bool = False) -> GolfServer:
+                local_lobbies: bool = False, room_key: str | None = None, strict_key: bool = False,
+                collab_cup: Cup | None = None) -> GolfServer:
     if local_lobbies and room_key is None:
         require_lobby_loopback(bind)
     score_block = (fixtures / "score-block.bin").read_bytes()
@@ -111,10 +113,10 @@ def make_server(fixtures: Path, state: Path, port: int, bind: str = LOOPBACK, *,
         port, (fixtures / "ss-info.bin").read_bytes(), server_time=SERVER_TIME,
         eula_text=(fixtures / "eula.txt").read_bytes()[:MAX_EULA_TEXT_BYTES + 1], empty_notices=True,
         daily_score_block=score_block, empty_board_block=score_block, login_completion=True,
-        empty_national_boards=True, cached_property=True, discard_telemetry=True,
+        empty_national_boards=True, cached_property=True, discard_telemetry=True, empty_bonus_list=True,
         score_db=state / "scores.db", event_group=EVENT_GROUPS, national_tournament=True,
         local_lobbies=local_lobbies, bind=bind, handler=LoggingHandler, room_key=room_key,
-        strict_key=strict_key)
+        strict_key=strict_key, collab_cup=collab_cup)
 
 
 def stop(*_):
@@ -155,6 +157,10 @@ def main(argv=None) -> int:
                         help="Stop cleanly (and close the router port) when this file appears")
     parser.add_argument("--no-web-lookup", action="store_true",
                         help="Do not ask a web service for the public address when the router does not say")
+    parser.add_argument("--collab-cup", choices=sorted(CUPS),
+                        help="Run this collab cup as the International Tournament (qualifier, final, prizes)")
+    parser.add_argument("--cup-cut", type=int, metavar="STROKES",
+                        help="Qualifier pass line against par (default +3; Hardcore: -3)")
     args = parser.parse_args(argv)
     try:
         if args.auto:
@@ -180,7 +186,8 @@ def main(argv=None) -> int:
         room_key = load_room_key(args.state) if args.online else None
         server = make_server(fixtures, args.state, args.port, bind,
                              local_lobbies=args.local_lobbies or args.online, room_key=room_key,
-                             strict_key=args.strict_key)
+                             strict_key=args.strict_key,
+                             collab_cup=configured_cup(args.collab_cup, cut=args.cup_cut) if args.collab_cup else None)
         if args.online:
             name = "".join(c for c in args.name if c.isascii() and c.isprintable())[:32] or "Golf server"
             host = OnlineHost(args.state, server.server_port, room_key, name,
